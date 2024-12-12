@@ -1770,34 +1770,48 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         'c.RefTypeCompte',
                         DB::raw('MIN(c.NomCompte) AS NomCompte'), // Sélectionner un seul NomCompte, ici le premier trouvé
                         DB::raw('MIN(c.NumCompte) AS NumCompte'), // Sélectionner un seul NumCompte, ici le premier trouvé
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS soldeDebut"),
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS soldeFin"),
+                        DB::raw("
+                        SUM(CASE 
+                            WHEN t.DateTransaction <= '$date1' THEN 
+                                CASE 
+                                    WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                                    WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                                    ELSE t.Creditusd - t.Debitusd
+                                END
+                            ELSE 0 
+                        END) AS soldeDebut
+                    "),
+                        DB::raw("
+                        SUM(CASE 
+                            WHEN t.DateTransaction <= '$date2' THEN 
+                                CASE 
+                                    WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                                    WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                                    ELSE t.Creditusd - t.Debitusd
+                                END
+                            ELSE 0 
+                        END) AS soldeFin
+                    "),
                         'c.RefSousGroupe'
                     )
                     ->where('c.CodeMonnaie', 1)
-                    // ->where('c.accountState', "is_actif")
+                    ->where('t.extourner', "!=", 1)
                     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
                     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
                     ->where(function ($query) {
                         $query->where('c.isResultAccount', 1);
                     })
-                    // ->whereNotIn('c.RefCadre', [38, 59]) // Utiliser whereNotIn pour exclure plusieurs valeurs
                     ->groupBy('c.RefCadre', 'c.RefSousGroupe', 'c.RefTypeCompte')
-                    ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
-                    // ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice') DESC")
+                    ->orderByRaw("CASE 
+                                WHEN c.RefTypeCompte = 7 THEN 1 
+                                WHEN c.RefTypeCompte = 6 THEN 2 
+                                ELSE 3 
+                              END")
                     ->orderBy('c.NomCompte')
                     ->get();
 
-                // $getResultat = DB::table('comptes as c')
-                //     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                //     ->select(
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS totalSoldeDebutProduits"),
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS totalSoldeFinProduits")
-                //     )
-                //     ->where('c.CodeMonnaie', 1)
-                //     ->where('c.NumCompte', 870)
-                //     ->first();
-                // dd($getResultat);
+
+
                 return response()->json(["status" => 1, "data" => $result]);
             } else if ($request->devise == "CDF") {
                 $result = DB::table('comptes as c')
@@ -1808,40 +1822,51 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         'c.RefTypeCompte',
                         DB::raw('MIN(c.NomCompte) AS NomCompte'), // Sélectionner un seul NomCompte, ici le premier trouvé
                         DB::raw('MIN(c.NumCompte) AS NumCompte'), // Sélectionner un seul NumCompte, ici le premier trouvé
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS soldeDebut"),
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS soldeFin"),
+                        DB::raw("
+                        SUM(CASE 
+                            WHEN t.DateTransaction <= '$date1' THEN 
+                                CASE 
+                                    WHEN c.RefCadre = 7 THEN t.Creditfc - t.Debitfc
+                                    WHEN c.RefCadre = 6 THEN t.Debitfc - t.Creditfc
+                                    ELSE t.Creditfc - t.Debitfc
+                                END
+                            ELSE 0 
+                        END) AS soldeDebut
+                    "),
+                        DB::raw("
+                        SUM(CASE 
+                            WHEN t.DateTransaction <= '$date2' THEN 
+                                CASE 
+                                    WHEN c.RefCadre = 7 THEN t.Creditfc - t.Debitfc
+                                    WHEN c.RefCadre = 6 THEN t.Debitfc - t.Creditfc
+                                    ELSE t.Creditfc - t.Debitfc
+                                END
+                            ELSE 0 
+                        END) AS soldeFin
+                    "),
                         'c.RefSousGroupe'
                     )
                     ->where('c.CodeMonnaie', 2)
-                    // ->where('c.accountState', "is_actif")
+                    ->where('t.extourner', "!=", 1)
                     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
                     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
                     ->where(function ($query) {
                         $query->where('c.isResultAccount', 1);
                     })
-                    // ->whereNotIn('c.RefCadre', [38, 59]) // Utiliser whereNotIn pour exclure plusieurs valeurs
                     ->groupBy('c.RefCadre', 'c.RefSousGroupe', 'c.RefTypeCompte')
-                    ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
+                    ->orderByRaw("CASE 
+                                WHEN c.RefTypeCompte = 7 THEN 1 
+                                WHEN c.RefTypeCompte = 6 THEN 2 
+                                ELSE 3 
+                              END")
                     ->orderBy('c.NomCompte')
                     ->get();
-
-
-                // $getResultat = DB::table('comptes as c')
-                //     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                //     ->select(
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS totalSoldeDebutProduits"),
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS totalSoldeFinProduits")
-                //     )
-                //     ->where('c.CodeMonnaie', 2)
-                //     ->where('c.NumCompte', 871)
-                //     ->first();
-                // dd($getResultat);
 
                 return response()->json(["status" => 1, "data" => $result]);
             }
         }
 
-        if (isset($request->radioValue) and isset($request->radioValue2) and $request->radioValue2 == "porte_detaillee") {
+        if (isset($request->radioValue) and isset($request->radioValue2)) {
             if ($request->devise == "USD") {
                 $result = DB::table('comptes as c')
                     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
@@ -1856,6 +1881,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         'c.RefSousGroupe'
                     )
                     ->where('c.CodeMonnaie', 1)
+                    ->where('t.extourner', "!=", 1)
                     // ->where('c.accountState', "is_actif")
                     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
                     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
@@ -1884,6 +1910,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         'c.RefSousGroupe'
                     )
                     ->where('c.CodeMonnaie', 2)
+                    ->where('t.extourner', "!=", 1)
                     // ->where('c.accountState', "is_actif")
                     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
                     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
@@ -1902,96 +1929,9 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
             }
         }
 
-        if (isset($request->radioValue) and isset($request->radioValue2) and $request->radioValue2 == "porte_groupee") {
 
-            if ($request->devise == "USD") {
-                $result = DB::table('comptes as c')
-                    ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                    ->select(
-                        'c.RefCadre',
-                        'c.RefSousGroupe',
-                        'c.RefTypeCompte',
-                        DB::raw('MIN(c.NomCompte) AS NomCompte'), // Sélectionner un seul NomCompte, ici le premier trouvé
-                        DB::raw('MIN(c.NumCompte) AS NumCompte'), // Sélectionner un seul NumCompte, ici le premier trouvé
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS soldeDebut"),
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS soldeFin"),
-                        'c.RefSousGroupe'
-                    )
-                    ->where('c.CodeMonnaie', 1)
-                    // ->where('c.accountState', "is_actif")
-                    ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
-                    ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
-                    ->where(function ($query) {
-                        $query->where('c.isResultAccount', 1);
-                    })
-                    // ->whereNotIn('c.RefCadre', [38, 59]) // Utiliser whereNotIn pour exclure plusieurs valeurs
-                    ->groupBy('c.RefCadre', 'c.RefSousGroupe', 'c.RefTypeCompte')
-                    ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
-                    ->orderBy('c.NomCompte')
-                    ->get();
+        if (isset($request->radioValue) and $request->radioValue == "balance_convertie_cdf") {
 
-
-                return response()->json(["status" => 1, "data" => $result]);
-            } else if ($request->devise == "CDF") {
-                $result = DB::table('comptes as c')
-                    ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                    ->select(
-                        'c.RefCadre',
-                        'c.RefSousGroupe',
-                        'c.RefTypeCompte',
-                        DB::raw('MIN(c.NomCompte) AS NomCompte'), // Sélectionner un seul NomCompte, ici le premier trouvé
-                        DB::raw('MIN(c.NumCompte) AS NumCompte'), // Sélectionner un seul NumCompte, ici le premier trouvé
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS soldeDebut"),
-                        DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS soldeFin"),
-                        'c.RefSousGroupe'
-                    )
-                    ->where('c.CodeMonnaie', 2)
-                    ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
-                    ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
-                    ->where(function ($query) {
-                        $query->where('c.isResultAccount', 1);
-                    })
-                    // ->whereNotIn('c.RefCadre', [38, 59]) // Utiliser whereNotIn pour exclure plusieurs valeurs
-                    ->groupBy('c.RefCadre', 'c.RefSousGroupe', 'c.RefTypeCompte')
-                    ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
-                    ->orderBy('c.NomCompte')
-                    ->get();
-
-
-                return response()->json(["status" => 1, "data" => $result]);
-            }
-        }
-
-        if (isset($request->radioValue) and $request->radioValue == "balance_convertie_cdf"  and isset($request->radioValue2) and $request->radioValue2 == "porte_detaillee") {
-
-            $result = DB::table('comptes as c')
-                ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                ->select(
-                    DB::raw('MIN(c.NomCompte) AS NomCompte'),
-                    'c.RefCadre',
-                    'c.NumAdherant',
-                    'c.RefTypeCompte',
-
-                    DB::raw('MIN(c.NumCompte) AS Ncompte'),
-                    DB::raw('MIN(c.RefSousGroupe) AS RefSousGroupe'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeDebutUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeFinUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeDebutCDF'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeFinCDF')
-                )
-                // ->where('c.accountState', 'is_actif')
-                // ->whereNotIn('c.RefCadre', [38, 59])
-                ->where('c.isResultAccount', 1)
-                ->whereNotNull('c.NomCompte')
-                ->groupBy('c.RefCadre', 'c.NumAdherant', 'c.RefTypeCompte')
-                ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
-                ->get();
-
-
-
-            return response()->json(["status" => 1, "data" => $result]);
-        }
-        if (isset($request->radioValue) and $request->radioValue == "balance_convertie_cdf"  and isset($request->radioValue2) and $request->radioValue2 == "porte_groupee") {
             $result = DB::table('comptes as c')
                 ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
                 ->select(
@@ -2001,24 +1941,62 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     'c.RefTypeCompte',
                     DB::raw('MIN(c.NumCompte) AS Ncompte'),
                     DB::raw('MIN(c.RefSousGroupe) AS RefSousGroupe'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeDebutUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeFinUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeDebutCDF'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeFinCDF')
+                    DB::raw("
+            SUM(CASE 
+                WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= '$date1' THEN 
+                    CASE 
+                        WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                        WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                        ELSE t.Creditusd - t.Debitusd
+                    END
+                ELSE 0 
+            END) AS soldeDebutUSD
+        "),
+                    DB::raw("
+            SUM(CASE 
+                WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= '$date2' THEN 
+                    CASE 
+                        WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                        WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                        ELSE t.Creditusd - t.Debitusd
+                    END
+                ELSE 0 
+            END) AS soldeFinUSD
+        "),
+                    DB::raw("
+            SUM(CASE 
+                WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= '$date1' THEN 
+                    CASE 
+                        WHEN c.RefCadre = 7 THEN t.Creditfc - t.Debitfc
+                        WHEN c.RefCadre = 6 THEN t.Debitfc - t.Creditfc
+                        ELSE t.Creditfc - t.Debitfc
+                    END
+                ELSE 0 
+            END) AS soldeDebutCDF
+        "),
+                    DB::raw("
+            SUM(CASE 
+                WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= '$date2' THEN 
+                    CASE 
+                        WHEN c.RefCadre = 7 THEN t.Creditfc - t.Debitfc
+                        WHEN c.RefCadre = 6 THEN t.Debitfc - t.Creditfc
+                        ELSE t.Creditfc - t.Debitfc
+                    END
+                ELSE 0 
+            END) AS soldeFinCDF
+        ")
                 )
-                // ->where('c.accountState', 'is_actif')
-                // ->whereNotIn('c.RefCadre', [38, 59])
                 ->where('c.isResultAccount', 1)
+                ->where('t.extourner', "!=", 1)
                 ->whereNotNull('c.NomCompte')
                 ->groupBy('c.RefCadre', 'c.NumAdherant', 'c.RefTypeCompte')
                 ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
                 ->get();
-
 
             return response()->json(["status" => 1, "data" => $result]);
         }
 
-        if (isset($request->radioValue) and $request->radioValue == "balance_convertie_usd"  and isset($request->radioValue2) and $request->radioValue2 == "porte_groupee") {
+        if (isset($request->radioValue) and $request->radioValue == "balance_convertie_usd") {
 
             $result = DB::table('comptes as c')
                 ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
@@ -2029,46 +2007,58 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     'c.RefTypeCompte',
                     DB::raw('MIN(c.NumCompte) AS Ncompte'),
                     DB::raw('MIN(c.RefSousGroupe) AS RefSousGroupe'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeDebutUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeFinUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeDebutCDF'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeFinCDF')
+                    DB::raw("
+                    SUM(CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= '$date1' THEN 
+                            CASE 
+                                WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                                WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                                ELSE t.Creditusd - t.Debitusd
+                            END
+                        ELSE 0 
+                    END) AS soldeDebutUSD
+                "),
+                    DB::raw("
+                    SUM(CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= '$date2' THEN 
+                            CASE 
+                                WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                                WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                                ELSE t.Creditusd - t.Debitusd
+                            END
+                        ELSE 0 
+                    END) AS soldeFinUSD
+                "),
+                    DB::raw("
+                    SUM(CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= '$date1' THEN 
+                            CASE 
+                                WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                                WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                                ELSE t.Creditusd - t.Debitusd
+                            END
+                        ELSE 0 
+                    END) AS soldeDebutCDF
+                "),
+                    DB::raw("
+                    SUM(CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= '$date2' THEN 
+                            CASE 
+                                WHEN c.RefCadre = 7 THEN t.Creditusd - t.Debitusd
+                                WHEN c.RefCadre = 6 THEN t.Debitusd - t.Creditusd
+                                ELSE t.Creditusd - t.Debitusd
+                            END
+                        ELSE 0 
+                    END) AS soldeFinCDF
+                ")
                 )
-                // ->where('c.accountState', 'is_actif')
-                // ->whereNotIn('c.RefCadre', [38, 59])
                 ->where('c.isResultAccount', 1)
+                ->where('t.extourner', "!=", 1)
                 ->whereNotNull('c.NomCompte')
                 ->groupBy('c.RefCadre', 'c.NumAdherant', 'c.RefTypeCompte')
                 ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
                 ->get();
 
-
-            return response()->json(["status" => 1, "data" => $result]);
-        }
-
-        if (isset($request->radioValue) and $request->radioValue == "balance_convertie_usd"  and isset($request->radioValue2) and $request->radioValue2 == "porte_detaillee") {
-
-            $result = DB::table('comptes as c')
-                ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                ->select(
-                    DB::raw('MIN(c.NomCompte) AS NomCompte'),
-                    'c.RefCadre',
-                    'c.NumAdherant',
-                    'c.RefTypeCompte',
-                    DB::raw('MIN(c.NumCompte) AS Ncompte'),
-                    DB::raw('MIN(c.RefSousGroupe) AS RefSousGroupe'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeDebutUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeFinUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeDebutCDF'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeFinCDF')
-                )
-                // ->where('c.accountState', 'is_actif')
-                // ->whereNotIn('c.RefCadre', [38, 59])
-                ->where('c.isResultAccount', 1)
-                ->whereNotNull('c.NomCompte')
-                ->groupBy('c.RefCadre', 'c.NumAdherant', 'c.RefTypeCompte')
-                ->orderByRaw("FIELD(c.NomCompte, 'Résultat Avant Impôt', 'Résultat Net de l''exercice')")
-                ->get();
 
 
             return response()->json(["status" => 1, "data" => $result]);
@@ -2100,8 +2090,9 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         'echeanciers.*',
                         'portefeuilles.*',
                         DB::raw('IFNULL((SELECT SUM(transactions.Creditfc) - SUM(transactions.Debitfc) 
-                          FROM transactions 
-                          WHERE transactions.NumCompte = portefeuilles.NumCompteEpargne), 0) AS soldeMembreCDF')
+          FROM transactions 
+          WHERE transactions.NumCompte = portefeuilles.NumCompteEpargne 
+          AND transactions.extourner != 1), 0) AS soldeMembreCDF')
                     )
                     ->whereBetween('echeanciers.DateTranch', [$date1, $date2])
                     ->where('portefeuilles.CodeMonnaie', 'CDF')
@@ -2117,6 +2108,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     })
                     ->orderBy('echeanciers.DateTranch')
                     ->get();
+
 
 
 
@@ -2149,7 +2141,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         'portefeuilles.*',
                         DB::raw('IFNULL((SELECT SUM(transactions.Creditusd) - SUM(transactions.Debitusd) 
                       FROM transactions 
-                      WHERE transactions.NumCompte = portefeuilles.NumCompteEpargne), 0) AS soldeMembreUSD')
+                      WHERE transactions.NumCompte = portefeuilles.NumCompteEpargne AND transactions.extourner != 1), 0) AS soldeMembreUSD')
                     )
                     ->whereBetween('echeanciers.DateTranch', [$date1, $date2])
                     ->where('portefeuilles.CodeMonnaie', 'USD')
@@ -2220,28 +2212,6 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                 ->where("isCompteInterne", $sousGroupeCompte)->first();
             // $getCodeMonnaie = Comptes::where("RefSousGroupe", $sousGroupeCompte)->first();
             if ($compte->CodeMonnaie == 1) {
-
-                // $getSoldeCompte = DB::table('comptes as c')
-                //     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                //     ->select(
-                //         'c.RefCadre',
-                //         'c.RefSousGroupe',
-                //         'c.RefTypeCompte',
-                //         'c.NomCompte',
-                //         'c.NumCompte',
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date1' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS soldeDebut"),
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditusd - t.Debitusd ELSE 0 END) AS soldeFin")
-                //     )
-                //     ->where('c.CodeMonnaie', 1)
-                //     // ->where('c.RefSousGroupe', $sousGroupeCompte)
-                //     ->where('c.RefCadre', $compte->RefCadre)
-                //     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
-                //     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
-                //     ->whereNotIn('c.NumCompte', [3300, 3301])
-                //     ->groupBy('c.RefCadre', 'c.RefSousGroupe', 'c.RefTypeCompte', 'c.NomCompte', 'c.NumCompte')
-                //     ->orderBy('c.NomCompte')
-                //     ->get();
-
                 $getSoldeCompte = DB::table('comptes as c')
                     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
                     ->select(
@@ -2298,27 +2268,6 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     ->orWhere("RefGroupe", $sousGroupeCompte)
                     ->orWhere("RefSousGroupe", $sousGroupeCompte)
                     ->where("isCompteInterne", $sousGroupeCompte)->first();
-                // $getSoldeCompte = DB::table('comptes as c')
-                //     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
-                //     ->select(
-                //         'c.RefCadre',
-                //         'c.RefSousGroupe',
-                //         'c.RefTypeCompte',
-                //         'c.NomCompte',
-                //         'c.NumCompte',
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction BETWEEN '$date1' AND '$date2' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS soldeDebut"),
-                //         DB::raw("SUM(CASE WHEN t.DateTransaction <= '$date2' THEN t.Creditfc - t.Debitfc ELSE 0 END) AS soldeFin")
-                //     )
-                //     ->where('c.CodeMonnaie', 2)
-                //     // ->where('c.RefSousGroupe', $sousGroupeCompte)
-                //     ->where('c.RefCadre', $compte->RefCadre)
-                //     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
-                //     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
-                //     ->whereNotIn('c.NumCompte', [3300, 3301])
-                //     ->groupBy('c.RefCadre', 'c.RefSousGroupe', 'c.RefTypeCompte', 'c.NomCompte', 'c.NumCompte')
-                //     ->orderBy('c.NomCompte')
-                //     ->get();
-
                 $getSoldeCompte = DB::table('comptes as c')
                     ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
                     ->select(
@@ -2366,65 +2315,174 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
             }
         }
         if (isset($request->radioValue) and $request->radioValue == "balance_convertie_cdf") {
-            $compte = Comptes::where("NumCompte", $sousGroupeCompte)
-                ->orWhere("RefTypeCompte", $sousGroupeCompte)
-                ->orWhere("RefCadre", $sousGroupeCompte)
-                ->orWhere("RefGroupe", $sousGroupeCompte)
-                ->orWhere("RefSousGroupe", $sousGroupeCompte)
-                ->where("isCompteInterne", $sousGroupeCompte)->first();
-            $getSoldeCompte = DB::table('comptes as c')
-                ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
+            $getSoldeCompte =  DB::table('transactions as t')
+                ->join('comptes as c', 'c.NumAdherant', '=', 't.refCompteMembre')
                 ->select(
-                    DB::raw('MIN(c.NomCompte) AS NomCompte'),
-                    'c.RefCadre',
+                    'c.RefSousGroupe',
+                    'c.NumCompte',
+                    'c.NomCompte',
                     'c.NumAdherant',
-                    'c.RefTypeCompte',
-                    DB::raw('MIN(c.NumCompte) AS Ncompte'),
-                    DB::raw('MIN(c.RefSousGroupe) AS RefSousGroupe'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeDebutUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeFinUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeDebutCDF'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditfc-t.Debitfc ELSE 0 END) AS soldeFinCDF')
+                    DB::raw("
+                    SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) AS solde_consolide_cdf
+                "),
+                    DB::raw("
+                    SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) AS solde_consolide_usd
+                "),
+                    DB::raw("
+                    SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) 
+                    + SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) AS solde_consolide_usd_to_cdf
+                "),
+                    DB::raw("
+                    (SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) 
+                    + SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END)) / MAX(t.Taux) AS solde_consolide_cdf_to_usd
+                ")
                 )
-                //->where('c.CodeMonnaie', 1)
-                ->where('c.RefCadre', $compte->RefCadre)
-                ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
-                ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
+                ->where('t.DateTransaction', '<=', $date2)
+                ->where('c.RefSousGroupe', $sousGroupeCompte)
                 ->whereNotIn('c.NumCompte', [3300, 3301])
-                ->groupBy('c.RefCadre', 'c.NumAdherant', 'c.RefTypeCompte')
+                ->groupBy('c.RefSousGroupe', 'c.NumCompte', 'c.NomCompte', 'c.NumAdherant')
                 ->orderBy('c.NomCompte')
+                ->when(
+                    $request->has('critereSolde') && $request->has('critereSoldeAmount'),
+                    function ($query) use ($request) {
+                        $critere = $request->critereSolde;
+                        $amount = $request->critereSoldeAmount;
+
+                        switch ($critere) {
+                            case '>':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf > ?', [$amount]);
+                            case '>=':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf >= ?', [$amount]);
+                            case '<':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf < ?', [$amount]);
+                            case '<=':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf <= ?', [$amount]);
+                            case '=':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf = ?', [$amount]);
+                            case '<>':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf <> ?', [$amount]);
+                            default:
+                                return $query;
+                        }
+                    }
+                )
+                ->setBindings(
+                    array_fill(0, 6, $date2), // Date répétée pour chaque `?`
+                    'select'
+                )
                 ->get();
+
             // dd($getSoldeCompte);
+
             return response()->json(["status" => 1, "data" => $getSoldeCompte]);
         }
         if (isset($request->radioValue) and $request->radioValue == "balance_convertie_usd") {
-            $compte = Comptes::where("NumCompte", $sousGroupeCompte)
-                ->orWhere("RefTypeCompte", $sousGroupeCompte)
-                ->orWhere("RefCadre", $sousGroupeCompte)
-                ->orWhere("RefGroupe", $sousGroupeCompte)
-                ->orWhere("RefSousGroupe", $sousGroupeCompte)
-                ->where("isCompteInterne", $sousGroupeCompte)->first();
-            $getSoldeCompte = DB::table('comptes as c')
-                ->leftJoin('transactions as t', 'c.NumCompte', '=', 't.NumCompte')
+            $getSoldeCompte =  DB::table('transactions as t')
+                ->join('comptes as c', 'c.NumAdherant', '=', 't.refCompteMembre')
                 ->select(
-                    DB::raw('MIN(c.NomCompte) AS NomCompte'),
-                    'c.RefCadre',
+                    'c.RefSousGroupe',
+                    'c.NumCompte',
+                    'c.NomCompte',
                     'c.NumAdherant',
-                    'c.RefTypeCompte',
-                    DB::raw('MIN(c.NumCompte) AS Ncompte'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeDebutUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeFinUSD'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date1 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeDebutCDF'),
-                    DB::raw('SUM(CASE WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= "' . $date2 . '" THEN t.Creditusd-t.Debitusd ELSE 0 END) AS soldeFinCDF')
+                    DB::raw("
+                    SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) AS solde_consolide_cdf
+                "),
+                    DB::raw("
+                    SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) AS solde_consolide_usd
+                "),
+                    DB::raw("
+                    SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) 
+                    + SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) AS solde_consolide_usd_to_cdf
+                "),
+                    DB::raw("
+                    (SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END) 
+                    + SUM(DISTINCT CASE 
+                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
+                        THEN (t.Creditfc - t.Debitfc) 
+                        ELSE 0 
+                    END)) / MAX(t.Taux) AS solde_consolide_cdf_to_usd
+                ")
                 )
-                // ->where('c.CodeMonnaie', 1)
-                ->where('c.RefCadre', $compte->RefCadre)
-                ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
-                ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
+                ->where('t.DateTransaction', '<=', $date2)
+                ->where('c.RefSousGroupe', $sousGroupeCompte)
                 ->whereNotIn('c.NumCompte', [3300, 3301])
-                ->groupBy('c.RefCadre', 'c.NumAdherant', 'c.RefTypeCompte')
+                ->groupBy('c.RefSousGroupe', 'c.NumCompte', 'c.NomCompte', 'c.NumAdherant')
                 ->orderBy('c.NomCompte')
+                ->when(
+                    $request->has('critereSolde') && $request->has('critereSoldeAmount'),
+                    function ($query) use ($request) {
+                        $critere = $request->critereSolde;
+                        $amount = $request->critereSoldeAmount;
+
+                        switch ($critere) {
+                            case '>':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf > ?', [$amount]);
+                            case '>=':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf >= ?', [$amount]);
+                            case '<':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf < ?', [$amount]);
+                            case '<=':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf <= ?', [$amount]);
+                            case '=':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf = ?', [$amount]);
+                            case '<>':
+                                return $query->havingRaw('solde_consolide_usd_to_cdf <> ?', [$amount]);
+                            default:
+                                return $query;
+                        }
+                    }
+                )
+                ->setBindings(
+                    array_fill(0, 6, $date2), // Date répétée pour chaque `?`
+                    'select'
+                )
                 ->get();
+
+            // dd($getSoldeCompte);
 
             return response()->json(["status" => 1, "data" => $getSoldeCompte]);
         }

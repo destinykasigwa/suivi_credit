@@ -565,4 +565,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
 
 
     Route::post('/download-report', [ReportsController::class, 'downloadReport'])->name('download.report');
+
+    //PERMET DE CLOTURER L'EXERCICE EN COURS 
+    Route::get('eco/comptes/cloture/annuelle', [PostageController::class, 'clotureAnnuelle']);
 });

@@ -492,6 +492,7 @@ const Tfr = () => {
                                         <td>
                                             <div class="form-check">
                                                 <input
+                                                    disabled
                                                     type="radio"
                                                     class="form-check-input"
                                                     id="balance_convertie_cdf"
@@ -512,7 +513,7 @@ const Tfr = () => {
                                                         fontWeight: "bold",
                                                     }}
                                                 >
-                                                    Balance convertie en CDF
+                                                    TFR convertie en CDF
                                                 </label>{" "}
                                             </div>
                                         </td>
@@ -521,6 +522,7 @@ const Tfr = () => {
                                         <td>
                                             <div class="form-check">
                                                 <input
+                                                    disabled
                                                     type="radio"
                                                     class="form-check-input"
                                                     id="balance_convertie_usd"
@@ -541,7 +543,7 @@ const Tfr = () => {
                                                         fontWeight: "bold",
                                                     }}
                                                 >
-                                                    Balance convertie en USD
+                                                    TFR convertie en USD
                                                 </label>{" "}
                                             </div>
                                         </td>
@@ -551,7 +553,7 @@ const Tfr = () => {
                             </table>
                         </form>
                     </div>
-                    <div className="col-md-4 card">
+                    {/* <div className="col-md-4 card">
                         <form action="">
                             <table>
                                 <fieldset className="border p-2">
@@ -623,71 +625,12 @@ const Tfr = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                    {/* <tr>
-                                        <td>
-                                            <label
-                                                class="form-check-label"
-                                                for="type_compte"
-                                                style={{
-                                                    fontSize: "15px",
-                                                    color: "steelblue",
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                                Compte de
-                                            </label>
-                                            <input
-                                                id="type_compte"
-                                                style={{
-                                                    padding: "1px ",
-                                                    border: `${"1px solid teal"}`,
-                                                    marginBottom: "5px",
-                                                    width: "80px",
-                                                    height: "25px",
-                                                }}
-                                                type="text"
-                                                name="compte_balance_debut"
-                                                onChange={(e) =>
-                                                    setcompte_balance_debut(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />{" "}
-                                            <label
-                                                class="form-check-label"
-                                                for="compte_balance_fin"
-                                                style={{
-                                                    fontSize: "15px",
-                                                    color: "steelblue",
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                                à
-                                            </label>{" "}
-                                            <input
-                                                id="compte_balance_fin"
-                                                name="compte_balance_fin"
-                                                style={{
-                                                    padding: "1px ",
-                                                    border: `${"1px solid teal"}`,
-                                                    marginBottom: "5px",
-                                                    width: "80px",
-                                                    height: "25px",
-                                                }}
-                                                onChange={(e) =>
-                                                    setcompte_balance_fin(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="text"
-                                            />
-                                        </td>
-                                    </tr> */}
+                                
                                 </fieldset>
                                 <br />
                             </table>
                         </form>
-                    </div>
+                    </div> */}
                     <div className="col-md-2 card">
                         <table>
                             <tr>
@@ -945,13 +888,22 @@ const Tfr = () => {
                                                                                     "center",
                                                                             }}
                                                                         >
-                                                                            {numberWithSpaces(
-                                                                                Math.abs(
-                                                                                    res.soldeFin
-                                                                                ).toFixed(
-                                                                                    2
-                                                                                )
-                                                                            )}
+                                                                            {res.RefCadre ==
+                                                                                "85" ||
+                                                                            res.RefCadre ==
+                                                                                "87"
+                                                                                ? numberWithSpaces(
+                                                                                      res.soldeFin.toFixed(
+                                                                                          2
+                                                                                      )
+                                                                                  )
+                                                                                : numberWithSpaces(
+                                                                                      Math.abs(
+                                                                                          res.soldeFin
+                                                                                      ).toFixed(
+                                                                                          2
+                                                                                      )
+                                                                                  )}
                                                                         </td>
                                                                         <td
                                                                             style={{
@@ -959,13 +911,22 @@ const Tfr = () => {
                                                                                     "center",
                                                                             }}
                                                                         >
-                                                                            {numberWithSpaces(
-                                                                                Math.abs(
-                                                                                    res.soldeDebut
-                                                                                ).toFixed(
-                                                                                    2
-                                                                                )
-                                                                            )}
+                                                                            {res.RefCadre ==
+                                                                                "85" ||
+                                                                            res.RefCadre ==
+                                                                                "87"
+                                                                                ? numberWithSpaces(
+                                                                                      res.soldeDebut.toFixed(
+                                                                                          2
+                                                                                      )
+                                                                                  )
+                                                                                : numberWithSpaces(
+                                                                                      Math.abs(
+                                                                                          res.soldeDebut
+                                                                                      ).toFixed(
+                                                                                          2
+                                                                                      )
+                                                                                  )}
                                                                         </td>
                                                                     </tr>
                                                                 </>
@@ -1026,16 +987,28 @@ const Tfr = () => {
                                                                                 "center",
                                                                         }}
                                                                     >
-                                                                        {numberWithSpaces(
-                                                                            Math.abs(
-                                                                                parseFloat(
-                                                                                    res.soldeFinUSD +
-                                                                                        res.soldeFinCDF
-                                                                                )
-                                                                            ).toFixed(
-                                                                                2
-                                                                            )
-                                                                        )}
+                                                                        {res.RefCadre ==
+                                                                            "85" ||
+                                                                        res.RefCadre ==
+                                                                            "87"
+                                                                            ? numberWithSpaces(
+                                                                                  parseFloat(
+                                                                                      res.soldeFinUSD +
+                                                                                          res.soldeFinCDF
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )
+                                                                            : numberWithSpaces(
+                                                                                  Math.abs(
+                                                                                      parseFloat(
+                                                                                          res.soldeFinUSD +
+                                                                                              res.soldeFinCDF
+                                                                                      )
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )}
                                                                     </td>
                                                                     <td
                                                                         style={{
@@ -1043,16 +1016,26 @@ const Tfr = () => {
                                                                                 "center",
                                                                         }}
                                                                     >
-                                                                        {numberWithSpaces(
-                                                                            Math.abs(
-                                                                                parseFloat(
-                                                                                    res.soldeDebutUSD +
-                                                                                        res.soldeDebutCDF
-                                                                                )
-                                                                            ).toFixed(
-                                                                                2
-                                                                            )
-                                                                        )}
+                                                                        {res.RefCadre ==
+                                                                            "85" ||
+                                                                        res.RefCadre ==
+                                                                            "87"
+                                                                            ? numberWithSpaces(
+                                                                                  parseFloat(
+                                                                                      res.soldeDebutUSD +
+                                                                                          res.soldeDebutCDF
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )
+                                                                            : Math.abs(
+                                                                                  parseFloat(
+                                                                                      res.soldeDebutUSD +
+                                                                                          res.soldeDebutCDF
+                                                                                  )
+                                                                              ).toFixed(
+                                                                                  2
+                                                                              )}
                                                                     </td>
                                                                 </tr>
                                                             ) : radioValue ==
@@ -1112,16 +1095,28 @@ const Tfr = () => {
                                                                                 "center",
                                                                         }}
                                                                     >
-                                                                        {numberWithSpaces(
-                                                                            Math.abs(
-                                                                                parseFloat(
-                                                                                    res.soldeFinUSD +
-                                                                                        res.soldeFinCDF
-                                                                                )
-                                                                            ).toFixed(
-                                                                                2
-                                                                            )
-                                                                        )}
+                                                                        {res.RefCadre ==
+                                                                            "85" ||
+                                                                        res.RefCadre ==
+                                                                            "87"
+                                                                            ? numberWithSpaces(
+                                                                                  parseFloat(
+                                                                                      res.soldeFinUSD +
+                                                                                          res.soldeFinCDF
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )
+                                                                            : numberWithSpaces(
+                                                                                  Math.abs(
+                                                                                      parseFloat(
+                                                                                          res.soldeFinUSD +
+                                                                                              res.soldeFinCDF
+                                                                                      )
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )}
                                                                     </td>
                                                                     <td
                                                                         style={{
@@ -1129,16 +1124,28 @@ const Tfr = () => {
                                                                                 "center",
                                                                         }}
                                                                     >
-                                                                        {numberWithSpaces(
-                                                                            Math.abs(
-                                                                                parseFloat(
-                                                                                    res.soldeDebutUSD +
-                                                                                        res.soldeDebutCDF
-                                                                                )
-                                                                            ).toFixed(
-                                                                                2
-                                                                            )
-                                                                        )}
+                                                                        {res.RefCadre ==
+                                                                            "85" ||
+                                                                        res.RefCadre ==
+                                                                            "87"
+                                                                            ? numberWithSpaces(
+                                                                                  parseFloat(
+                                                                                      res.soldeDebutUSD +
+                                                                                          res.soldeDebutCDF
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )
+                                                                            : numberWithSpaces(
+                                                                                  Math.abs(
+                                                                                      parseFloat(
+                                                                                          res.soldeDebutUSD +
+                                                                                              res.soldeDebutCDF
+                                                                                      )
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )}
                                                                     </td>
                                                                 </tr>
                                                             ) : (
@@ -1197,13 +1204,22 @@ const Tfr = () => {
                                                                                 "center",
                                                                         }}
                                                                     >
-                                                                        {numberWithSpaces(
-                                                                            Math.abs(
-                                                                                res.soldeDebut
-                                                                            ).toFixed(
-                                                                                2
-                                                                            )
-                                                                        )}
+                                                                        {res.RefCadre ==
+                                                                            "85" ||
+                                                                        res.RefCadre ==
+                                                                            "87"
+                                                                            ? numberWithSpaces(
+                                                                                  res.soldeDebut.toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )
+                                                                            : numberWithSpaces(
+                                                                                  Math.abs(
+                                                                                      res.soldeDebut
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )}
                                                                     </td>
 
                                                                     <td
@@ -1212,13 +1228,22 @@ const Tfr = () => {
                                                                                 "center",
                                                                         }}
                                                                     >
-                                                                        {numberWithSpaces(
-                                                                            Math.abs(
-                                                                                res.soldeFin
-                                                                            ).toFixed(
-                                                                                2
-                                                                            )
-                                                                        )}
+                                                                        {res.RefCadre ==
+                                                                            "85" ||
+                                                                        res.RefCadre ==
+                                                                            "87"
+                                                                            ? numberWithSpaces(
+                                                                                  res.soldeFin.toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )
+                                                                            : numberWithSpaces(
+                                                                                  Math.abs(
+                                                                                      res.soldeFin
+                                                                                  ).toFixed(
+                                                                                      2
+                                                                                  )
+                                                                              )}
                                                                     </td>
                                                                 </tr>
                                                             );

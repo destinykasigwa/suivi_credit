@@ -286,7 +286,7 @@ const Adhesion = () => {
                         className="nav nav-tabs mt-1"
                         id="custom-tabs-one-tab"
                         role="tablist"
-                        style={{ background: "teal", border: "0px" }}
+                        style={{ background: "teal", borderRadius: "10px" }}
                     >
                         <li className="nav-item">
                             <a
@@ -361,7 +361,7 @@ const Adhesion = () => {
                                 aria-selected="false"
                                 // style={{ color: "#000", fontSize: "17px" }}
                             >
-                                Activation comptes
+                                Création comptes
                             </a>
                         </li>
                     </ul>
@@ -3115,9 +3115,202 @@ const Adhesion = () => {
                                 role="tabpanel"
                                 aria-labelledby="custom-tabs-three-3-tab"
                             >
-                                <p>
+                                {/* <p>
                                     <h4 className="text-bold">Mandataire</h4>
-                                </p>
+                                </p> */}
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <form action="">
+                                            <fieldset className="border p-2">
+                                                <legend
+                                                    className="float-none w-auto p-0"
+                                                    style={{ fontSize: "15px" }}
+                                                >
+                                                    <h4 className="text-bold">
+                                                        Mandataire
+                                                    </h4>
+                                                </legend>
+                                                <table>
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="agence"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                }}
+                                                            >
+                                                                Compte abregé
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                id="compte_to_search"
+                                                                name="compte_to_search"
+                                                                type="text"
+                                                                style={{
+                                                                    padding:
+                                                                        "1px ",
+                                                                    border: `${
+                                                                        error.compte_to_search
+                                                                            ? "1px solid red"
+                                                                            : "1px solid #dcdcdc"
+                                                                    }`,
+                                                                    marginBottom:
+                                                                        "5px",
+                                                                    width: "80px",
+                                                                }}
+                                                                onChange={(e) =>
+                                                                    setcompte_to_search(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                            />
+                                                            <button
+                                                                className="btn btn-primary rounded-0"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    marginTop:
+                                                                        "-5px",
+                                                                }}
+                                                                onClick={
+                                                                    getSeachedData
+                                                                }
+                                                            >
+                                                                Rechercher
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            <label
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                    fontWeight:
+                                                                        "bold",
+                                                                }}
+                                                            >
+                                                                {intitule_compte
+                                                                    ? intitule_compte
+                                                                    : ""}
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {" "}
+                                                            <label
+                                                                htmlFor="mandataireName"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                }}
+                                                            >
+                                                                Nom mandataire
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            {" "}
+                                                            <input
+                                                                id="mandataireName"
+                                                                type="text"
+                                                                name="mandataireName"
+                                                                style={{
+                                                                    padding:
+                                                                        "1px ",
+                                                                    border: `${
+                                                                        error.mandataireName
+                                                                            ? "1px solid red"
+                                                                            : "1px solid #dcdcdc"
+                                                                    }`,
+                                                                    marginBottom:
+                                                                        "5px",
+                                                                    // width: "100px",
+                                                                }}
+                                                                onChange={(e) =>
+                                                                    setmandataireName(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {" "}
+                                                            <label
+                                                                htmlFor="mandatairePhone"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                }}
+                                                            >
+                                                                Téléphone
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            {" "}
+                                                            <input
+                                                                id="mandatairemandatairePhone"
+                                                                type="text"
+                                                                name="mandatairePhone"
+                                                                style={{
+                                                                    padding:
+                                                                        "1px ",
+                                                                    border: `${
+                                                                        error.mandatairePhone
+                                                                            ? "1px solid red"
+                                                                            : "1px solid #dcdcdc"
+                                                                    }`,
+                                                                    marginBottom:
+                                                                        "5px",
+                                                                    // width: "100px",
+                                                                }}
+                                                                onChange={(e) =>
+                                                                    setmandatairePhone(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <h4>Liste des mandataire</h4>
+                                    <div className="col-md-6">
+                                        <table className="table table-bordered table-striped">
+                                            <thead>
+                                                <th>Nom mandataire</th>
+                                                <th>Téléphone</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Destin kasigwa</td>
+                                                    <td>243976518324</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Destin kasigwa</td>
+                                                    <td>243976518324</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Destin kasigwa</td>
+                                                    <td>243976518324</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                             <div
                                 className="tab-pane fade"
@@ -3125,127 +3318,168 @@ const Adhesion = () => {
                                 role="tabpanel"
                                 aria-labelledby="custom-tabs-four-4-tab"
                             >
-                                <p>
+                                {/* <p>
                                     <h4 className="text-bold">
                                         Activation compte
                                     </h4>
-                                </p>
-                                <form action="">
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <label
-                                                        htmlFor="agence"
-                                                        style={{
-                                                            padding: "2px",
-                                                            color: "steelblue",
-                                                        }}
-                                                    >
-                                                        Compte abregé
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        id="compte_to_search"
-                                                        name="compte_to_search"
-                                                        type="text"
-                                                        style={{
-                                                            padding: "1px ",
-                                                            border: `${
-                                                                error.compte_to_search
-                                                                    ? "1px solid red"
-                                                                    : "1px solid #dcdcdc"
-                                                            }`,
-                                                            marginBottom: "5px",
-                                                            width: "80px",
-                                                        }}
-                                                        onChange={(e) =>
-                                                            setcompte_to_search(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                    <button
-                                                        className="btn btn-primary rounded-0"
-                                                        style={{
-                                                            padding: "2px",
-                                                            marginTop: "-5px",
-                                                        }}
-                                                        onClick={getSeachedData}
-                                                    >
-                                                        Rechercher
-                                                    </button>
-                                                </td>
-                                                <td>
-                                                    <label
-                                                        style={{
-                                                            padding: "2px",
-                                                            color: "steelblue",
-                                                            fontWeight: "bold",
-                                                        }}
-                                                    >
-                                                        {intitule_compte
-                                                            ? intitule_compte
-                                                            : ""}
-                                                    </label>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label
-                                                        htmlFor="devise_compte"
-                                                        style={{
-                                                            padding: "2px",
-                                                            color: "steelblue",
-                                                        }}
-                                                    >
-                                                        Compte à créer
-                                                    </label>
-                                                </td>
+                                </p> */}
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <form action="">
+                                            <fieldset className="border p-2">
+                                                <legend
+                                                    className="float-none w-auto p-0"
+                                                    style={{ fontSize: "15px" }}
+                                                >
+                                                    <h4 className="text-bold">
+                                                        Création compte
+                                                    </h4>
+                                                </legend>
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="agence"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Compte
+                                                                    abregé
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    id="compte_to_search"
+                                                                    name="compte_to_search"
+                                                                    type="text"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.compte_to_search
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                        width: "80px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setcompte_to_search(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <button
+                                                                    className="btn btn-primary rounded-0"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        marginTop:
+                                                                            "-5px",
+                                                                    }}
+                                                                    onClick={
+                                                                        getSeachedData
+                                                                    }
+                                                                >
+                                                                    Rechercher
+                                                                </button>
+                                                            </td>
+                                                            <td>
+                                                                <label
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                        fontWeight:
+                                                                            "bold",
+                                                                    }}
+                                                                >
+                                                                    {intitule_compte
+                                                                        ? intitule_compte
+                                                                        : ""}
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="devise_compte"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Compte à
+                                                                    créer
+                                                                </label>
+                                                            </td>
 
-                                                <td>
-                                                    <select
-                                                        style={{
-                                                            padding: "1px ",
-                                                            border: `${
-                                                                error.agence
-                                                                    ? "1px solid red"
-                                                                    : "1px solid #dcdcdc"
-                                                            }`,
-                                                            marginBottom: "5px",
-                                                        }}
-                                                        name="devise_compte"
-                                                        id="devise_compte"
-                                                        onChange={(e) =>
-                                                            setdevise_compte(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    >
-                                                        <option value="CDF">
-                                                            Compte en CDF
-                                                        </option>
-                                                        <option value="USD">
-                                                            Compte en USD
-                                                        </option>
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td></td>
-                                                <td>
-                                                    <button
-                                                        onClick={createAccount}
-                                                        className="btn btn-primary rounded-10"
-                                                    >
-                                                        Créer le compte
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </form>
+                                                            <td>
+                                                                <select
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.agence
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                    name="devise_compte"
+                                                                    id="devise_compte"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setdevise_compte(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option value="CDF">
+                                                                        Compte
+                                                                        en CDF
+                                                                    </option>
+                                                                    <option value="USD">
+                                                                        Compte
+                                                                        en USD
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>
+                                                                <button
+                                                                    onClick={
+                                                                        createAccount
+                                                                    }
+                                                                    className="btn btn-primary rounded-10"
+                                                                >
+                                                                    Créer le
+                                                                    compte
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

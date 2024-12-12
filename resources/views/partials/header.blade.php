@@ -263,3 +263,7 @@
         </div>
     </nav>
     <!-- /.navbar -->
+    <div class="d-flex flex-column min-vh-100">
+        <!-- Contenu principal -->
+        <main class="flex-grow-1">
+            <!-- Insérez ici le contenu principal de votre page -->

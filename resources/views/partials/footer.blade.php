@@ -3,18 +3,24 @@ use Illuminate\Support\Facades\DB;
 $dateSaisie = DB::select('SELECT DateSystem FROM taux_et_date_systems ORDER BY id DESC LIMIT 1')[0];
 $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"')[0];
 ?>
-<div class="container-fluid footer" style="background: teal;">
+
+</main>
+<!-- Footer -->
+<div class="container-fluid footer bg-teal text-white">
     <div class="row">
-        <div class="h-130 d-flex align-items-center justify-content-center">
-            <p><strong>Designed by Destin KASIGWA</strong> ::
-                <strong style="color: brown">Date Système:<?php $dataDuJour = date_create($dateSaisie->DateSystem); ?>
-                    {{ date_format($dataDuJour, 'd/m/Y') }}</strong>::
-                <strong>Utilisateur connecté : {{ $userInfo->name }} </strong>
+        <div class="col-12 text-center py-3">
+            <p>
+                <strong>Designed by Destin KASIGWA</strong> ::
+                <strong style="color: brown">Date Système:
+                    {{ date_format(date_create($dateSaisie->DateSystem), 'd/m/Y') }}
+                </strong> ::
+                <strong>Utilisateur connecté : {{ $userInfo->name }}</strong>
             </p>
         </div>
-
     </div>
 </div>
+</div>
+
 
 
 <!-- jQuery footer-section -->

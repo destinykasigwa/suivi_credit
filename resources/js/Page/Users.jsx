@@ -152,6 +152,7 @@ const Users = () => {
                 background: "teal",
                 fontSize: "16px",
                 fontWeight: "bold",
+                borderRadius: "10px",
             },
         },
         cells: {
@@ -527,7 +528,7 @@ const Users = () => {
                     className="nav nav-tabs"
                     id="custom-tabs-one-tab"
                     role="tablist"
-                    style={{ background: "teal", border: "0px" }}
+                    style={{ background: "teal", borderRadius: "10px" }}
                 >
                     <li className="nav-item">
                         <a

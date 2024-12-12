@@ -205,6 +205,27 @@ padding: 0;
 } */
 
 
+html, body {
+  height: 100% !important; /* Le corps et la page occupent toujours toute la hauteur */
+  margin: 0 !important;    /* Éliminer les marges par défaut */
+}
+
+.min-vh-100 {
+  min-height: 100vh !important; /* La page occupe toute la hauteur de la fenêtre */
+}
+
+.bg-teal {
+  background-color: teal !important;
+}
+
+.footer {
+  position: relative !important; /* Position normale pour éviter des chevauchements */
+  width: 100% !important;        /* Le footer prend toute la largeur */
+  text-align: center !important;
+}
+
+
+
 
  
 

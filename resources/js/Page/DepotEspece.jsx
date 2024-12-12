@@ -189,7 +189,8 @@ const DepotEspece = () => {
                 setloadingData(false);
                 setfetchData2(res.data.data);
                 setGetNumCompte(event.target.innerHTML);
-                console.log(fetchData2);
+                fetchData2 && setDeposantName(fetchData2.NomCompte);
+                console.log(DeposantName);
             } else {
                 setloadingData(false);
                 Swal.fire({
@@ -604,7 +605,14 @@ const DepotEspece = () => {
                                                             color: "steelblue",
                                                         }}
                                                     >
-                                                        Déposant
+                                                        Déposant{" "}
+                                                        <i
+                                                            style={{
+                                                                color: "red",
+                                                            }}
+                                                        >
+                                                            *
+                                                        </i>
                                                     </label>
                                                 </td>
                                                 <td>
@@ -612,6 +620,7 @@ const DepotEspece = () => {
                                                     <input
                                                         id="DeposantName"
                                                         name="DeposantName"
+                                                        required
                                                         type="text"
                                                         style={{
                                                             padding: "1px ",

@@ -8,6 +8,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import * as FileSaver from "file-saver";
 import html2canvas from "html2canvas";
+import { Bars } from "react-loader-spinner";
 // import DataTable from "react-data-table-component";
 
 const Comptes = () => {
@@ -200,7 +201,7 @@ const Comptes = () => {
     const [fetchCreatedAccount, setfetchCreatedAccount] = useState();
     const [showAccountSession, setshowAccountSession] = useState(true);
     const [showCommissionPanel, setShowCommissionPanel] = useState();
-
+    const [isClosing, setisClosing] = useState(false);
     useEffect(() => {
         getCompanyData();
     }, []);
@@ -782,6 +783,70 @@ const Comptes = () => {
             .removeAttribute("disabled", "disabled");
     };
 
+    //PERMET DE CLOTURER L'EXERCICE EN COURS
+
+    const clotureAnuelle = async (e) => {
+        e.preventDefault();
+        setisClosing(true);
+        Swal.fire({
+            title: "Confirmation !",
+            text: "Etes vous sûr d'effectuer la clotûre annuelle ?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Oui Clotûrer!",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    "Confirmation!",
+                    "La clotûre annuelle se passe en arrière-plan, veuillez patienter.",
+                    "success"
+                ).then(async function () {
+                    try {
+                        const res = await axios.get(
+                            "/eco/comptes/cloture/annuelle"
+                        );
+                        if (res.data.status === 1) {
+                            Swal.fire({
+                                title: "Succès",
+                                text: res.data.msg,
+                                icon: "success",
+                                timer: 8000,
+                                confirmButtonText: "Okay",
+                            });
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            Swal.fire({
+                                title: "Erreur",
+                                text: res.data.msg,
+                                icon: "error",
+                                timer: 8000,
+                                confirmButtonText: "Okay",
+                            });
+                        }
+                    } catch (error) {
+                        setisClosing(false);
+                        Swal.fire({
+                            title: "Erreur",
+                            text: "Une erreur est survenue pendant la clotûre annuelle.",
+                            icon: "error",
+                            timer: 8000,
+                            confirmButtonText: "Okay",
+                        });
+                        console.error(error);
+                    } finally {
+                        setisClosing(false);
+                    }
+                });
+            } else {
+                setisClosing(false);
+            }
+        });
+    };
+
     const exportTableData = (tableId) => {
         const s2ab = (s) => {
             const buf = new ArrayBuffer(s.length);
@@ -849,7 +914,7 @@ const Comptes = () => {
                     className="nav nav-tabs"
                     id="custom-tabs-one-tab"
                     role="tablist"
-                    style={{ background: "teal", border: "0px" }}
+                    style={{ background: "teal", borderRadius: "10px" }}
                 >
                     <li className="nav-item">
                         <a
@@ -948,6 +1013,38 @@ const Comptes = () => {
                     </li>
                 </ul>
                 <div className="card-body">
+                    {isClosing && (
+                        <div
+                            style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                zIndex: 1000,
+                            }}
+                        >
+                            <div>
+                                <Bars
+                                    height="80"
+                                    width="80"
+                                    color="#4fa94d"
+                                    ariaLabel="loading"
+                                />
+                                <h5
+                                    style={{
+                                        color: "#fff",
+                                    }}
+                                >
+                                    Patientez...
+                                </h5>
+                            </div>
+                        </div>
+                    )}
                     <div
                         className="tab-content"
                         id="custom-tabs-one-tabContent"
@@ -4315,9 +4412,9 @@ const Comptes = () => {
                             role="tabpanel"
                             aria-labelledby="custom-tabs-four-4-tab"
                         >
-                            <h4 className="fw-bold">Autres</h4>
                             <div className="row">
                                 <div className="col-md-5">
+                                    <h4 className="fw-bold">Autres</h4>
                                     <form action="">
                                         <table>
                                             <tbody>
@@ -4435,7 +4532,7 @@ const Comptes = () => {
                                                             onClick={
                                                                 updateExpirateDays
                                                             }
-                                                            className="btn btn-success rounded-0"
+                                                            className="btn btn-success rounded-10"
                                                         >
                                                             Mettre à jour
                                                         </button>
@@ -4443,6 +4540,17 @@ const Comptes = () => {
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </form>
+                                </div>
+                                <div className=" col-md-4">
+                                    <h4 className="fw-bold">Clotûre Anuelle</h4>
+                                    <form action="">
+                                        <button
+                                            onClick={clotureAnuelle}
+                                            className="btn btn-danger rounded-10"
+                                        >
+                                            Clotûrer ...
+                                        </button>
                                     </form>
                                 </div>
                             </div>

@@ -2632,7 +2632,7 @@ const MontageCredit = () => {
                     className="nav nav-tabs"
                     id="custom-tabs-one-tab"
                     role="tablist"
-                    style={{ background: "teal", border: "0px" }}
+                    style={{ background: "teal", borderRadius: "10px" }}
                 >
                     <li className="nav-item">
                         <a

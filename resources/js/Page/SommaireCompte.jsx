@@ -700,7 +700,7 @@ const SommaireCompte = () => {
                                                         fontWeight: "bold",
                                                     }}
                                                 >
-                                                    Convertie en CDF
+                                                    ConvertiEnCDF
                                                 </label>{" "}
                                             </div>
                                         </td>
@@ -969,51 +969,115 @@ const SommaireCompte = () => {
                                                     color: "#fff",
                                                 }}
                                             >
-                                                <tr>
-                                                    <th
-                                                        style={{
-                                                            textAlign: "center",
-                                                        }}
-                                                        className="col-1"
-                                                    >
-                                                        Numero
-                                                    </th>
+                                                {radioValue ==
+                                                "rapport_non_converti" ? (
+                                                    <tr>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                            className="col-1"
+                                                        >
+                                                            N°
+                                                        </th>
 
-                                                    <th
-                                                        style={{
-                                                            textAlign: "center",
-                                                        }}
-                                                    >
-                                                        Num Compte
-                                                    </th>
-                                                    <th
-                                                        style={{
-                                                            textAlign: "center",
-                                                        }}
-                                                    >
-                                                        Nom Compte
-                                                    </th>
-                                                    <th
-                                                        style={{
-                                                            textAlign: "center",
-                                                        }}
-                                                    >
-                                                        Solde au{" "}
-                                                        {dateParser(
-                                                            date_debut_balance
-                                                        )}
-                                                    </th>
-                                                    <th
-                                                        style={{
-                                                            textAlign: "center",
-                                                        }}
-                                                    >
-                                                        Solde au{" "}
-                                                        {dateParser(
-                                                            date_fin_balance
-                                                        )}
-                                                    </th>
-                                                </tr>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            NumCompte
+                                                        </th>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            NomCompte
+                                                        </th>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            Solde au{" "}
+                                                            {dateParser(
+                                                                date_debut_balance
+                                                            )}
+                                                        </th>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            Solde au{" "}
+                                                            {dateParser(
+                                                                date_fin_balance
+                                                            )}
+                                                        </th>
+                                                    </tr>
+                                                ) : (
+                                                    <tr>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                            className="col-1"
+                                                        >
+                                                            N°
+                                                        </th>
+
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            NumCompte
+                                                        </th>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            NomCompte
+                                                        </th>
+                                                        {/* <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            SoldeEnCDF
+                                                        </th>
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            USD_Converti_En_CDF
+                                                        </th> */}
+                                                        <th
+                                                            style={{
+                                                                textAlign:
+                                                                    "center",
+                                                            }}
+                                                        >
+                                                            {radioValue ==
+                                                            "balance_convertie_cdf"
+                                                                ? "Convertie en CDF"
+                                                                : "Convertie en USD"}
+                                                        </th>
+                                                    </tr>
+                                                )}
                                             </thead>
                                             <tbody>
                                                 {currentItems &&
@@ -1074,9 +1138,9 @@ const SommaireCompte = () => {
                                                                         }
                                                                     </td>
                                                                     <td>
-                                                                        {numberWithSpaces(
-                                                                            res.Ncompte
-                                                                        )}
+                                                                        {
+                                                                            res.NumCompte
+                                                                        }
                                                                     </td>
 
                                                                     <td>
@@ -1084,7 +1148,7 @@ const SommaireCompte = () => {
                                                                             res.NomCompte
                                                                         }
                                                                     </td>
-                                                                    <td
+                                                                    {/* <td
                                                                         style={{
                                                                             textAlign:
                                                                                 "center",
@@ -1093,8 +1157,7 @@ const SommaireCompte = () => {
                                                                         {" "}
                                                                         {numberWithSpaces(
                                                                             parseFloat(
-                                                                                res.soldeDebutUSD +
-                                                                                    res.soldeDebutCDF
+                                                                                res.solde_consolide_cdf
                                                                             ).toFixed(
                                                                                 2
                                                                             )
@@ -1109,8 +1172,22 @@ const SommaireCompte = () => {
                                                                         {" "}
                                                                         {numberWithSpaces(
                                                                             parseFloat(
-                                                                                res.soldeFinUSD +
-                                                                                    res.soldeFinCDF
+                                                                                res.solde_consolide_usd
+                                                                            ).toFixed(
+                                                                                2
+                                                                            )
+                                                                        )}
+                                                                    </td> */}
+                                                                    <td
+                                                                        style={{
+                                                                            textAlign:
+                                                                                "center",
+                                                                        }}
+                                                                    >
+                                                                        {" "}
+                                                                        {numberWithSpaces(
+                                                                            parseFloat(
+                                                                                res.solde_consolide_usd_to_cdf
                                                                             ).toFixed(
                                                                                 2
                                                                             )
@@ -1126,9 +1203,9 @@ const SommaireCompte = () => {
                                                                         }
                                                                     </td>
                                                                     <td>
-                                                                        {numberWithSpaces(
-                                                                            res.Ncompte
-                                                                        )}
+                                                                        {
+                                                                            res.NumCompte
+                                                                        }
                                                                     </td>
 
                                                                     <td>
@@ -1136,7 +1213,7 @@ const SommaireCompte = () => {
                                                                             res.NomCompte
                                                                         }
                                                                     </td>
-                                                                    <td
+                                                                    {/* <td
                                                                         style={{
                                                                             textAlign:
                                                                                 "center",
@@ -1145,8 +1222,7 @@ const SommaireCompte = () => {
                                                                         {" "}
                                                                         {numberWithSpaces(
                                                                             parseFloat(
-                                                                                res.soldeDebutUSD +
-                                                                                    res.soldeDebutCDF
+                                                                                res.solde_consolide_cdf
                                                                             ).toFixed(
                                                                                 2
                                                                             )
@@ -1161,8 +1237,22 @@ const SommaireCompte = () => {
                                                                         {" "}
                                                                         {numberWithSpaces(
                                                                             parseFloat(
-                                                                                res.soldeFinUSD +
-                                                                                    res.soldeFinCDF
+                                                                                res.solde_consolide_usd
+                                                                            ).toFixed(
+                                                                                2
+                                                                            )
+                                                                        )}
+                                                                    </td> */}
+                                                                    <td
+                                                                        style={{
+                                                                            textAlign:
+                                                                                "center",
+                                                                        }}
+                                                                    >
+                                                                        {" "}
+                                                                        {numberWithSpaces(
+                                                                            parseFloat(
+                                                                                res.solde_consolide_cdf_to_usd
                                                                             ).toFixed(
                                                                                 2
                                                                             )
@@ -1170,56 +1260,6 @@ const SommaireCompte = () => {
                                                                     </td>
                                                                 </tr>
                                                             ) : (
-                                                                // <tr key={index}>
-                                                                //     <td>
-                                                                //         {
-                                                                //             compteur++
-                                                                //         }
-                                                                //     </td>
-                                                                //     <td>
-                                                                //         {numberWithSpaces(
-                                                                //             res.NumCompte
-                                                                //         )}
-                                                                //     </td>
-
-                                                                //     <td>
-                                                                //         {
-                                                                //             res.NomCompte
-                                                                //         }
-                                                                //     </td>
-                                                                //     <td
-                                                                //         style={{
-                                                                //             textAlign:
-                                                                //                 "center",
-                                                                //         }}
-                                                                //     >
-                                                                //         {" "}
-                                                                //         {numberWithSpaces(
-                                                                //             parseFloat(
-                                                                //                 res.soldeDebutUSD +
-                                                                //                     res.soldeDebutCDF
-                                                                //             ).toFixed(
-                                                                //                 2
-                                                                //             )
-                                                                //         )}
-                                                                //     </td>
-                                                                //     <td
-                                                                //         style={{
-                                                                //             textAlign:
-                                                                //                 "center",
-                                                                //         }}
-                                                                //     >
-                                                                //         {" "}
-                                                                //         {numberWithSpaces(
-                                                                //             parseFloat(
-                                                                //                 res.soldeFinUSD +
-                                                                //                     res.soldeFinCDF
-                                                                //             ).toFixed(
-                                                                //                 2
-                                                                //             )
-                                                                //         )}
-                                                                //     </td>
-                                                                // </tr>
                                                                 ""
                                                             );
                                                         }
