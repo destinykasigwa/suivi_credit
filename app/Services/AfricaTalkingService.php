@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+
 use AfricasTalking\SDK\AfricasTalking;
 
 class AfricaTalkingService

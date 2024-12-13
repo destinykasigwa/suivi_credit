@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Comptes;
 use Twilio\Rest\Client;
+use App\Models\SendedSMS;
 use App\Models\Delestages;
 use App\Models\SMSBanking;
 use App\Models\Mandataires;
@@ -21,13 +22,13 @@ use App\Models\CompteurDocument;
 use App\Models\TauxEtDateSystem;
 use App\Models\BilletageAppro_cdf;
 use App\Models\BilletageAppro_usd;
+use App\Services\SendNotification;
+
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-
 use App\Models\CompteurTransaction;
 use Illuminate\Support\Facades\Log;
 use App\Models\EpargneAdhesionModel;
-use App\Models\SendedSMS;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Services\AfricaTalkingService;
@@ -36,12 +37,14 @@ use Illuminate\Support\Facades\Validator;
 class TransactionsController extends Controller
 {
     //
-    protected $africaTalking;
+    //protected $africaTalking;
 
-    public function __construct(AfricaTalkingService $africaTalking)
+    protected $sendNotification;
+
+    public function __construct()
     {
         $this->middleware("auth");
-        $this->africaTalking = $africaTalking;
+        $this->sendNotification = app(SendNotification::class);
     }
 
 
@@ -308,7 +311,7 @@ class TransactionsController extends Controller
                         ]);
 
                         //SEND NOTIFICATION
-                        $this->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C");
                         return response()->json(["status" => 1, "msg" => "Opération bien enregistrée"]);
                     } else {
                         return response()->json([
@@ -475,7 +478,7 @@ class TransactionsController extends Controller
 
                         //SEND NOTIFICATION
 
-                        $this->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C");
                         return response()->json(["status" => 1, "msg" => "Opération bien enregistrée"]);
                     } else {
                         return response()->json([
@@ -493,160 +496,7 @@ class TransactionsController extends Controller
         }
     }
 
-    //PERMET D'ENVOYER DES NOTIFICATION
-    public function sendNotification($NumCompte, $devise, $montant, $typeTransaction)
-    {
-        // if ($codeMonnaie == 1) {
-        //     $devise = "USD"; //USD
-        // } else if ($codeMonnaie == 2) {
-        //     $devise = "CDF"; //CDF
-        // }
 
-
-        //RECUPERE LES INFORMATIONS DE LA PERSONNE QUI VENAIT D'EFFECTUER UN MOUVEMENT
-        $getMembreInfo = SMSBanking::where("NumAbrege", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
-        if ($getMembreInfo) {
-            if ($getMembreInfo->Email != null and $getMembreInfo->ActivatedEmail == 1) {
-                if ($devise == "CDF") {
-                    $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 2)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
-                    //RECUPERE LE SOLDE DU MEMBRE EN FC 
-                    $compteCDF = $getMembreInfo2->NumCompte;
-                    $soldeMembreCDF = Transactions::select(
-                        DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
-                    )->where("NumCompte", '=', $compteCDF)
-                        ->groupBy("NumCompte")
-                        ->first();
-
-
-                    $data = ($getMembreInfo2->sexe == "Homme" ? " Bonjour Monsieur " : ($getMembreInfo2->sexe == "Femme" ? " Bonjour Madame " : " Bonjour ")) .
-                        $getMembreInfo2->NomCompte . " Votre compte CDF " . $compteCDF . ($typeTransaction == "C" ? " est crédité " : "debité ") . " de " . $montant . " CDF  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
-                    Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
-                    // return view('emails.test');
-                } else if ($devise == "USD") {
-                    $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 1)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
-
-                    $NumCompteUSD = $getMembreInfo2->NumCompte;
-
-                    //RECUPERE LE SOLDE DU MEMBRE EN USD
-                    $soldeMembreUSD = Transactions::select(
-                        DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembreUSD"),
-                    )->where("NumCompte", '=', $NumCompteUSD)
-                        ->groupBy("NumCompte")
-                        ->first();
-
-                    // $data = $getMembreInfo2->sexe == "Homme" ? "Bonjour Monsieur" : ($getMembreInfo2->sexe == "Femme"  ? "Bonjour Madame" : "Bonjour") .
-                    //     $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD . " est crédité de " . $montantDepot . " USD Votre nouveau solde est de  " . $soldeMembreUSD->soldeMembreUSD . "USD";
-
-
-                    $data = ($getMembreInfo2->sexe == "Homme"
-                        ? "Bonjour Monsieur"
-                        : ($getMembreInfo2->sexe == "Femme"
-                            ? "Bonjour Madame"
-                            : "Bonjour"))
-                        . " " . $getMembreInfo2->NomCompte
-                        . " Votre compte USD " . $NumCompte .
-                        ($typeTransaction == "C" ? " est crédité " : "debité " .
-                            " est crédité de ") . $montant
-                        . " USD. Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD.";
-
-                    Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
-                }
-            }
-            if ($getMembreInfo->Telephone != null and $getMembreInfo->ActivatedSMS == 1) {
-
-                if ($devise == "CDF") {
-                    try {
-                        $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 2)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
-                        //RECUPERE LE SOLDE DU MEMBRE EN USD
-                        $NumCompteCDF = $getMembreInfo2->NumCompte;
-                        $soldeMembreCDF = Transactions::select(
-                            DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
-                        )->where("NumCompte", '=', $NumCompteCDF)
-                            ->groupBy("NumCompte")
-                            ->first();
-
-                        $message = ($getMembreInfo2->sexe == "Homme")
-                            ? "Bonjour Monsieur "
-                            : (($getMembreInfo2->sexe == "Femme")
-                                ? "Bonjour Madame "
-                                : "Bonjour ");
-
-                        $message .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompteCDF .
-                            ($typeTransaction == "C" ? " est crédité " : " est débité ") .
-                            "de " . $montant . " . Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . ".";
-
-                        $receiver_number = $getMembreInfo->Telephone;
-                        $response = $this->africaTalking->sendSms($receiver_number, $message);
-
-                        if ($response['status'] == 'success') {
-                            // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
-                            SendedSMS::create([
-                                "numPhone" => $receiver_number,
-                                "messageStatus" => 1,
-                                "paidStatus" => 0,
-                                "dateEnvoie" => date("Y-m-d"),
-                            ]);
-                        } else {
-                            // Traiter l'échec, par exemple, loguer l'erreur
-                            SendedSMS::create([
-                                "numPhone" => $receiver_number,
-                                "messageStatus" => 0,
-                                "paidStatus" => 0,
-                                "dateEnvoie" => date("Y-m-d"),
-                            ]);
-                        }
-                    } catch (\Throwable $th) {
-                        throw $th;
-                    }
-                } else if ($devise == "USD") {
-                    try {
-                        $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 1)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
-                        //RECUPERE LE SOLDE DU MEMBRE EN USD
-                        $NumCompteUSD = $getMembreInfo2->NumCompte;
-                        $soldeMembreUSD = Transactions::select(
-                            DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembreUSD"),
-                        )->where("NumCompte", '=', $NumCompteUSD)
-                            ->groupBy("NumCompte")
-                            ->first();
-
-                        $receiver_number = $getMembreInfo->Telephone;
-                        $message = ($getMembreInfo2->sexe == "Homme")
-                            ? "Bonjour Monsieur "
-                            : (($getMembreInfo2->sexe == "Femme")
-                                ? "Bonjour Madame "
-                                : "Bonjour ");
-
-                        $message .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
-                            ($typeTransaction == "C" ? " est crédité " : " est débité ") .
-                            "de " . $montant . ". Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . ".";
-
-                        $receiver_number = $getMembreInfo->Telephone;
-                        $response = $this->africaTalking->sendSms($receiver_number, $message);
-
-                        if ($response['status'] == 'success') {
-                            // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
-                            SendedSMS::create([
-                                "numPhone" => $receiver_number,
-                                "messageStatus" => 1,
-                                "paidStatus" => 0,
-                                "dateEnvoie" => date("Y-m-d"),
-                            ]);
-                        } else {
-                            // Traiter l'échec, par exemple, loguer l'erreur
-                            SendedSMS::create([
-                                "numPhone" => $receiver_number,
-                                "messageStatus" => 0,
-                                "paidStatus" => 0,
-                                "dateEnvoie" => date("Y-m-d"),
-                            ]);
-                        }
-                    } catch (\Throwable $th) {
-                        throw $th;
-                    }
-                }
-            }
-        }
-    }
 
     //GET VISA HOME PAGE 
 
@@ -1016,7 +866,7 @@ class TransactionsController extends Controller
                             "Servie" => 1,
                         ]);
                         //SEND NOTIFICATION TO CUSTUMER
-                        $this->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D");
                         return response()->json(['status' => 1, 'msg' => "Opération bien enregistrée."]);
                     } else {
                         return response()->json(['status' => 0, 'msg' => "Oooops! une erreur est survenue lors de l'éxécution de cette requête verifier bien que votre caisse est approvissionnée si l'erreur persiste veuillez contactez votre Administrateur système."]);
@@ -1214,7 +1064,7 @@ class TransactionsController extends Controller
 
                         //SEND NOTIFICATION TO CUSTOMER 
 
-                        $this->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D");
                         return response()->json(['status' => 1, 'msg' => "Opération bien enregistrée."]);
                     }
                 } else {

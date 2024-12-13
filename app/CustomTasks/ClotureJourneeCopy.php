@@ -2,21 +2,22 @@
 
 namespace App\CustomTasks;
 
-
 use App\Models\Comptes;
-// use App\Models\t_cloture;
 use App\Models\Echeancier;
+// use App\Models\t_cloture;
 use App\Models\JourRetard;
 use App\Models\Portefeuille;
-use Illuminate\Support\Carbon;
 use App\Models\Transactions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Models\TauxEtDateSystem;
+use App\Services\SendNotification;
 use Illuminate\Support\Facades\DB;
 use App\Models\CompteurTransaction;
 use App\Models\PorteFeuilleConfing;
 use App\Models\Remboursementcredit;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\TransactionsController;
 
 
 class ClotureJourneeCopy
@@ -45,6 +46,7 @@ class ClotureJourneeCopy
     // protected $compteProvisionCDF91A180Jr;
     // protected $compteProvisionCDF180Et180Jr;
     protected $accountsConfig;
+    protected $sendNotification;
 
 
     public function __construct(Request $request)
@@ -70,6 +72,7 @@ class ClotureJourneeCopy
         $this->montantRemboursementManuel = $request->montantRemboursementManuel;
         $this->remboursAnticipe = $request->remboursAnticipe;
         $this->numDossier = $request->numDossier;
+        $this->sendNotification = app(SendNotification::class);
         // $this->compteProvisionCDF1A30Jr = "3800";
         // $this->compteProvisionCDF31A60Jr = "3801";
         // $this->compteProvisionCDF61A90Jr = "3802";
@@ -231,6 +234,9 @@ class ClotureJourneeCopy
             $libelle,
             $credit->Gestionnaire,
         );
+
+        //ENVOIE UN MESSAGE AU CLIENT
+        $this->sendNotification->sendNotification($credit->numAdherant, $credit->CodeMonnaie, $credit->Interet, "D");
     }
 
     protected function payerCapital($credit)
@@ -271,6 +277,9 @@ class ClotureJourneeCopy
         );
         //RENSEIGNE LE REMBOURSEMENT 
         $this->ClotureTranche($credit->ReferenceEch);
+
+        //ENVOIE UN MESSAGE AU CLIENT
+        $this->sendNotification->sendNotification($credit->numAdherant, $credit->CodeMonnaie, $credit->CapAmmorti, "D");
     }
 
     /**
@@ -392,6 +401,9 @@ class ClotureJourneeCopy
                                 $creditRet->CodeAgence,
                                 $creditRet->numAdherant,
                             );
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie, round($interetRestant, 2), "D");
                         } else if ($soldeMembre == $interetRestant) { // SI LE SOLDE EST EGALE A L'INTERET RESTANT
                             //PASSE ICI UNE ECRITURE POUR RECUPERER LE COMPLEMENT D'INTERET
                             // PASSE ICI UNE ECRITURE POUR RECUPERER LE COMPLEMENT D'INTERET
@@ -426,6 +438,8 @@ class ClotureJourneeCopy
                                 $creditRet->CodeAgence,
                                 $creditRet->numAdherant,
                             );
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie, round($interetRestant, 2), "D");
                         } else if ($soldeMembre < $interetRestant) { // SI LE SOLDE DU MEMBRE EST INFERIEUR AU SOLDE IL VA RESTER EN RETARD 
                             $libelle = "Remboursement complement intérêt du crédit de "
                                 . $creditRet->MontantAccorde . "  pour la "
@@ -468,6 +482,8 @@ class ClotureJourneeCopy
                                 $creditRet->NumCompteEpargne,
                                 $creditRet->NumCompteCredit
                             );
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie, round($soldeMembre, 2), "D");
                         }
                     } else if ($creditEnRetard->InteretPaye == 0) {
                         //SI L'INTERET DEJA REMBOURSE EST EGAL ZERO CELA SIGNIFIE QU'AUCUN REMBOURS EN INTERET N'EST ENCORE FAIT
@@ -506,6 +522,9 @@ class ClotureJourneeCopy
                                 $creditRet->CodeAgence,
                                 $creditRet->numAdherant,
                             );
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie, round($interetApayer, 2), "D");
                             // PASSE ICI UNE ECRITURE POUR RECUPERER L'INTERET
                         } else if ($soldeMembre == $interetApayer) { // SI LE SOLDE EST EGALE A L'INTERET RESTANT
                             //PASSE ICI UNE ECRITURE POUR RECUPERER LE COMPLEMENT D'INTERET
@@ -540,6 +559,8 @@ class ClotureJourneeCopy
                                 $creditRet->CodeAgence,
                                 $creditRet->numAdherant,
                             );
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,  round($interetApayer, 2), "D");
                         } else if ($soldeMembre > 0 and $soldeMembre < $interetApayer) { // SI LE SOLDE DU MEMBRE EST INFERIEUR AU SOLDE IL VA RESTER EN RETARD 
                             $libelle = "Remboursement partiel intérêt du crédit de "
                                 . $creditRet->MontantAccorde . "  pour la "
@@ -581,6 +602,9 @@ class ClotureJourneeCopy
                                 $creditRet->NumCompteEpargne,
                                 $creditRet->NumCompteCredit
                             );
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,  round($soldeMembre, 2), "D");
                         }
                     }
                 }
@@ -713,6 +737,8 @@ class ClotureJourneeCopy
 
                             //CLOTURE LA TRANCHE
                             $this->ClotureTranche($creditRet->ReferenceEch);
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,  round($soldeMembre, 2), "D");
                             // $this->AnnuleMontantRetardEtJourRetard($creditRet->ReferenceEch, $creditRet->NumDossier);
                         } else if ($soldeMembre == $CapitalRestant) { // SI LE SOLDE EST EGALE A L'INTERET RESTANT
 
@@ -771,6 +797,9 @@ class ClotureJourneeCopy
                             //CLOTURE LA TRANCHE
                             $this->ClotureTranche($creditRet->ReferenceEch);
                             // $this->AnnuleMontantRetardEtJourRetard($creditRet->ReferenceEch, $creditRet->NumDossier);
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,   round($CapitalRestant, 2), "D");
                         } else if ($soldeMembre < $CapitalRestant) { // SI LE SOLDE DU MEMBRE EST INFERIEUR AU SOLDE IL VA RESTER EN RETARD 
                             // $libelle = "Remboursement complement capital du crédit de "
                             //     . $creditRet->MontantAccorde . "  pour la "
@@ -832,6 +861,9 @@ class ClotureJourneeCopy
                                 $creditRet->NumDossier,
                                 $creditRet->Gestionnaire,
                             );
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,   round($soldeMembre, 2), "D");
                         }
                     } else if ($creditEnRetard->CapitalPaye == 0) {
                         //SI LE CAPITAL DEJA REMBOURSE EST EGAL ZERO CELA SIGNIFIE QU'AUCUN REMBOURS EN CAPITAL N'EST ENCORE FAIT
@@ -889,6 +921,8 @@ class ClotureJourneeCopy
                             );
                             //CLOTURE LA TRANCHE
                             $this->ClotureTranche($creditRet->ReferenceEch);
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,   round($capitalApayer, 2), "D");
                         } else if ($soldeMembre == $capitalApayer) { // SI LE SOLDE EST EGALE AU CAPITAL RESTANT
                             //PASSE ICI UNE ECRITURE POUR RECUPERER LE COMPLEMENT DE CAPIAL
                             // $libelle = "Remboursement complement capital du crédit de "
@@ -940,6 +974,10 @@ class ClotureJourneeCopy
                             );
                             //CLOTURE LA TRANCHE
                             $this->ClotureTranche($creditRet->ReferenceEch);
+
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,   round($capitalApayer, 2), "D");
                         } else if ($soldeMembre > 0 and $soldeMembre < $capitalApayer) { // SI LE SOLDE DU MEMBRE EST INFERIEUR AU SOLDE IL VA RESTER EN RETARD 
                             // $libelle = "Remboursement partiel capital du crédit de "
                             //     . $creditRet->MontantAccorde . "  pour la "
@@ -998,6 +1036,9 @@ class ClotureJourneeCopy
                                 $creditRet->NumDossier,
                                 $creditRet->Gestionnaire,
                             );
+
+                            //ENVOIE UN MESSAGE AU CLIENT
+                            $this->sendNotification->sendNotification($creditRet->numAdherant, $creditRet->CodeMonnaie,    round($soldeMembre, 2), "D");
                         }
                     }
                 }
