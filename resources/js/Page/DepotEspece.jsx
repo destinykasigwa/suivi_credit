@@ -1429,7 +1429,10 @@ const DepotEspece = () => {
                                     "Opérations recentes CDF"}
                             </h4>
                             {getBilletageCDF && getBilletageCDF.length > 0 && (
-                                <table className="table table-bordered table-striped">
+                                <table
+                                    className="table table-bordered table-striped"
+                                    style={{ fontSize: "13px" }}
+                                >
                                     <thead>
                                         <tr>
                                             <th>Réference</th>
@@ -1490,7 +1493,10 @@ const DepotEspece = () => {
                                     "Opérations recentes USD"}
                             </h4>
                             {getBilletageUSD && getBilletageUSD.length > 0 && (
-                                <table className="table table-bordered table-striped">
+                                <table
+                                    className="table table-bordered table-striped"
+                                    style={{ fontSize: "13px" }}
+                                >
                                     <thead>
                                         <tr>
                                             <th>Réference</th>

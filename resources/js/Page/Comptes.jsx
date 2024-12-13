@@ -201,7 +201,11 @@ const Comptes = () => {
     const [fetchCreatedAccount, setfetchCreatedAccount] = useState();
     const [showAccountSession, setshowAccountSession] = useState(true);
     const [showCommissionPanel, setShowCommissionPanel] = useState();
-    const [isClosing, setisClosing] = useState(false);
+    const [showAccountSessionEpargne, setshowAccountSessionEpargne] =
+        useState(true);
+    const [chargement, setchargement] = useState(false);
+    const [fetchCompteEpargne, setFetchCompteEpargne] = useState();
+    const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
         getCompanyData();
     }, []);
@@ -212,10 +216,30 @@ const Comptes = () => {
 
     const ChargeCompte = async (e) => {
         e.preventDefault();
+        setchargement(true);
         setshowAccountSession(false);
+        setshowAccountSessionEpargne(false);
         const res = await axios.get("/eco/pages/comptes-cree/data");
         if (res.data.status == 1) {
+            setchargement(false);
             setfetchCreatedAccount(res.data.data);
+            setFetchCompteEpargne(res.data.compteEpargne);
+        }
+    };
+
+    const ChargeCompteEpargne = async (e) => {
+        e.preventDefault();
+        setchargement(true);
+        setshowAccountSession(false);
+        setshowAccountSessionEpargne(false);
+        const res = await axios.get(
+            "/eco/pages/comptes-cree/data/compte-epargne"
+        );
+        if (res.data.status == 1) {
+            setchargement(false);
+            setFetchCompteEpargne(res.data.compteEpargne);
+        } else {
+            setchargement(false);
         }
     };
 
@@ -223,7 +247,15 @@ const Comptes = () => {
         e.preventDefault();
         setfetchCreatedAccount(false);
         setshowAccountSession(true);
+        setshowAccountSessionEpargne(false);
     };
+    const hideAccountEpargneSession = async (e) => {
+        e.preventDefault();
+        setFetchCompteEpargne(false);
+        setshowAccountSessionEpargne(true);
+        setshowAccountSession(false);
+    };
+
     //GET COMPANY DATA
     const getCompanyData = async () => {
         const res = await axios.get("/eco/page/params/company");
@@ -787,7 +819,7 @@ const Comptes = () => {
 
     const clotureAnuelle = async (e) => {
         e.preventDefault();
-        setisClosing(true);
+        setchargement(true);
         Swal.fire({
             title: "Confirmation !",
             text: "Etes vous sûr d'effectuer la clotûre annuelle ?",
@@ -808,6 +840,7 @@ const Comptes = () => {
                             "/eco/comptes/cloture/annuelle"
                         );
                         if (res.data.status === 1) {
+                            setchargement(false);
                             Swal.fire({
                                 title: "Succès",
                                 text: res.data.msg,
@@ -815,9 +848,6 @@ const Comptes = () => {
                                 timer: 8000,
                                 confirmButtonText: "Okay",
                             });
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 2000);
                         } else {
                             Swal.fire({
                                 title: "Erreur",
@@ -828,7 +858,7 @@ const Comptes = () => {
                             });
                         }
                     } catch (error) {
-                        setisClosing(false);
+                        setchargement(false);
                         Swal.fire({
                             title: "Erreur",
                             text: "Une erreur est survenue pendant la clotûre annuelle.",
@@ -838,11 +868,11 @@ const Comptes = () => {
                         });
                         console.error(error);
                     } finally {
-                        setisClosing(false);
+                        setchargement(false);
                     }
                 });
             } else {
-                setisClosing(false);
+                setchargement(false);
             }
         });
     };
@@ -904,6 +934,164 @@ const Comptes = () => {
             window.open(pdf.output("bloburl"), "_blank");
             // pdf.save("releve-de-compte.pdf");
         });
+    };
+
+    const downloadReport = (type) => {
+        setchargement(true);
+        // Générer le nom du fichier avec la date du jour
+        const filename = `liste_compte_epargne_${
+            new Date().toISOString().split("T")[0]
+        }`; // "YYYY-MM-DD"
+        axios
+            .post(
+                "/download-report/liste-compte/epargne",
+                {
+                    fetchData: fetchCompteEpargne, // Assurez-vous que fetchData contient vos données
+                    type: type, // Ajouter le paramètre type à la requête
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"), // Ajouter le token CSRF
+                    },
+                    responseType: "blob", // Définir le type de réponse comme un blob (pour le fichier)
+                }
+            )
+            .then((response) => {
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${filename}.${type === "pdf" ? "pdf" : "xlsx"}`; // Utiliser le nom dynamique du fichier
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setchargement(false);
+            })
+            .catch((error) => console.error("Error:", error));
+    };
+
+    //CREATE PAGINATION
+
+    const itemsPerPage = 40;
+    const totalPages = Math.ceil(
+        fetchCompteEpargne && fetchCompteEpargne.length / itemsPerPage
+    );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems =
+        fetchCompteEpargne &&
+        fetchCompteEpargne.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const goToNextPage = () => {
+        setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+    };
+
+    const goToPrevPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+    };
+    const renderPagination = () => {
+        const pageNumbers = [];
+        const maxPagesToShow = 5;
+        const halfMaxPagesToShow = Math.floor(maxPagesToShow / 2);
+        let startPage, endPage;
+
+        if (totalPages <= maxPagesToShow) {
+            startPage = 1;
+            endPage = totalPages;
+        } else if (currentPage <= halfMaxPagesToShow) {
+            startPage = 1;
+            endPage = maxPagesToShow;
+        } else if (currentPage + halfMaxPagesToShow >= totalPages) {
+            startPage = totalPages - maxPagesToShow + 1;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - halfMaxPagesToShow;
+            endPage = currentPage + halfMaxPagesToShow;
+        }
+
+        if (startPage > 1) {
+            pageNumbers.push(
+                <li key={1}>
+                    <button onClick={() => handlePageChange(1)}>1</button>
+                </li>
+            );
+            if (startPage > 2) {
+                pageNumbers.push(<li key="start-ellipsis">...</li>);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(
+                <li key={i} className={i === currentPage ? "active" : ""}>
+                    <button
+                        style={
+                            i === currentPage
+                                ? selectedButtonStyle
+                                : buttonStyle
+                        }
+                        onClick={() => handlePageChange(i)}
+                    >
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pageNumbers.push(<li key="end-ellipsis">...</li>);
+            }
+            pageNumbers.push(
+                <li key={totalPages}>
+                    <button onClick={() => handlePageChange(totalPages)}>
+                        {totalPages}
+                    </button>
+                </li>
+            );
+        }
+
+        return pageNumbers;
+    };
+
+    const paginationStyle = {
+        listStyle: "none",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "",
+    };
+
+    const buttonStylePrevNext = {
+        padding: "2px 20px",
+        backgroundColor: "steelblue",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "0 5px",
+    };
+    const buttonStyle = {
+        padding: "1px 5px",
+        backgroundColor: "steelblue",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "0 5px",
+    };
+
+    const selectedButtonStyle = {
+        ...buttonStyle,
+        backgroundColor: "#FFC107", // Change color for selected button
     };
 
     let compteur = 1;
@@ -1008,12 +1196,12 @@ const Comptes = () => {
                             aria-selected="false"
                             // style={{ color: "#000", fontSize: "17px" }}
                         >
-                            Nouveau compte
+                            Comptes
                         </a>
                     </li>
                 </ul>
                 <div className="card-body">
-                    {isClosing && (
+                    {chargement && (
                         <div
                             style={{
                                 position: "fixed",
@@ -4414,143 +4602,169 @@ const Comptes = () => {
                         >
                             <div className="row">
                                 <div className="col-md-5">
-                                    <h4 className="fw-bold">Autres</h4>
                                     <form action="">
-                                        <table>
-                                            <tbody>
-                                                <p>
-                                                    Expiration du mot de passe
-                                                </p>
-                                                <tr>
-                                                    <td>
-                                                        <label
-                                                            htmlFor="password_expired_days"
-                                                            style={{
-                                                                padding: "2px",
-                                                                color: "steelblue",
-                                                            }}
-                                                        >
-                                                            Durée d'expiration
-                                                        </label>
-                                                    </td>
-                                                    <td>
-                                                        <input
-                                                            style={{
-                                                                padding: "1px ",
-                                                                border: "1px solid #dcdcdc",
-                                                                marginBottom:
-                                                                    "5px",
-                                                                width: "60px",
-                                                            }}
-                                                            type="text"
-                                                            id="password_expired_days"
-                                                            name="password_expired_days"
-                                                            onChange={(e) =>
-                                                                setpassword_expired_days(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            value={
-                                                                password_expired_days
-                                                            }
-                                                        />
-                                                        {" Jours"}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <label
-                                                            htmlFor="login_attempt"
-                                                            style={{
-                                                                padding: "2px",
-                                                                color: "steelblue",
-                                                            }}
-                                                        >
-                                                            Login Attempt
-                                                        </label>
-                                                    </td>
-                                                    <td>
-                                                        <input
-                                                            style={{
-                                                                padding: "1px ",
-                                                                border: "1px solid #dcdcdc",
-                                                                marginBottom:
-                                                                    "5px",
-                                                                width: "60px",
-                                                            }}
-                                                            type="text"
-                                                            id="login_attempt"
-                                                            name="login_attempt"
-                                                            onChange={(e) =>
-                                                                setlogin_attempt(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            value={
-                                                                login_attempt
-                                                            }
-                                                        />
-                                                    </td>
-                                                </tr>
-                                                <p>Commission</p>
-                                                <tr>
-                                                    <td>
-                                                        <label
-                                                            htmlFor="login_attempt"
-                                                            style={{
-                                                                padding: "2px",
-                                                                color: "steelblue",
-                                                            }}
-                                                        >
-                                                            Afficher le champ de
-                                                            commission
-                                                        </label>
-                                                    </td>
-                                                    <td>
-                                                        <div className="form-check form-switch ml-4">
+                                        <fieldset className="border p-2">
+                                            <legend
+                                                className="float-none w-auto p-0"
+                                                style={{ fontSize: "15px" }}
+                                            >
+                                                <h4 className="fw-bold">
+                                                    Autres
+                                                </h4>
+                                            </legend>
+                                            <table>
+                                                <tbody>
+                                                    <p>
+                                                        Expiration du mot de
+                                                        passe
+                                                    </p>
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="password_expired_days"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                }}
+                                                            >
+                                                                Durée
+                                                                d'expiration
+                                                            </label>
+                                                        </td>
+                                                        <td>
                                                             <input
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                id="flexSwitchCheckDefault"
-                                                                checked={
-                                                                    showCommissionPanel
+                                                                style={{
+                                                                    padding:
+                                                                        "1px ",
+                                                                    border: "1px solid #dcdcdc",
+                                                                    marginBottom:
+                                                                        "5px",
+                                                                    width: "60px",
+                                                                }}
+                                                                type="text"
+                                                                id="password_expired_days"
+                                                                name="password_expired_days"
+                                                                onChange={(e) =>
+                                                                    setpassword_expired_days(
+                                                                        e.target
+                                                                            .value
+                                                                    )
                                                                 }
-                                                                onChange={
-                                                                    handleToggleChange
+                                                                value={
+                                                                    password_expired_days
                                                                 }
                                                             />
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    {/* <td></td> */}
-                                                    <td>
-                                                        {" "}
-                                                        <button
-                                                            onClick={
-                                                                updateExpirateDays
-                                                            }
-                                                            className="btn btn-success rounded-10"
-                                                        >
-                                                            Mettre à jour
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                            {" Jours"}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="login_attempt"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                }}
+                                                            >
+                                                                Login Attempt
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                style={{
+                                                                    padding:
+                                                                        "1px ",
+                                                                    border: "1px solid #dcdcdc",
+                                                                    marginBottom:
+                                                                        "5px",
+                                                                    width: "60px",
+                                                                }}
+                                                                type="text"
+                                                                id="login_attempt"
+                                                                name="login_attempt"
+                                                                onChange={(e) =>
+                                                                    setlogin_attempt(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                value={
+                                                                    login_attempt
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <p>Commission</p>
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="login_attempt"
+                                                                style={{
+                                                                    padding:
+                                                                        "2px",
+                                                                    color: "steelblue",
+                                                                }}
+                                                            >
+                                                                Afficher le
+                                                                champ de
+                                                                commission
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <div className="form-check form-switch ml-4">
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="flexSwitchCheckDefault"
+                                                                    checked={
+                                                                        showCommissionPanel
+                                                                    }
+                                                                    onChange={
+                                                                        handleToggleChange
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        {/* <td></td> */}
+                                                        <td>
+                                                            {" "}
+                                                            <button
+                                                                onClick={
+                                                                    updateExpirateDays
+                                                                }
+                                                                className="btn btn-success rounded-10"
+                                                            >
+                                                                Mettre à jour
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </fieldset>
                                     </form>
                                 </div>
                                 <div className=" col-md-4">
-                                    <h4 className="fw-bold">Clotûre Anuelle</h4>
                                     <form action="">
-                                        <button
-                                            onClick={clotureAnuelle}
-                                            className="btn btn-danger rounded-10"
-                                        >
-                                            Clotûrer ...
-                                        </button>
+                                        <fieldset className="border p-2">
+                                            <legend
+                                                className="float-none w-auto p-0"
+                                                style={{ fontSize: "15px" }}
+                                            >
+                                                <h4 className="fw-bold">
+                                                    Clotûre Anuelle
+                                                </h4>
+                                            </legend>
+                                            <button
+                                                onClick={clotureAnuelle}
+                                                className="btn btn-danger rounded-10"
+                                            >
+                                                Clotûrer ...
+                                            </button>
+                                        </fieldset>
                                     </form>
                                 </div>
                             </div>
@@ -4825,7 +5039,7 @@ const Comptes = () => {
                                         ></div>
                                     </div>
 
-                                    <div className="col-md-2">
+                                    <div className="col-md-6">
                                         <table>
                                             <tr>
                                                 <td>
@@ -4836,7 +5050,8 @@ const Comptes = () => {
                                                             }
                                                             className="btn btn-success rounded-0"
                                                         >
-                                                            Charger les comptes{" "}
+                                                            Charger les comptes
+                                                            internes{" "}
                                                         </button>
                                                     ) : (
                                                         <button
@@ -4845,7 +5060,31 @@ const Comptes = () => {
                                                             }
                                                             className="btn btn-success rounded-0"
                                                         >
-                                                            Masquer les comptes{" "}
+                                                            Masquer les comptes
+                                                            internes{" "}
+                                                        </button>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    {showAccountSessionEpargne ? (
+                                                        <button
+                                                            onClick={
+                                                                ChargeCompteEpargne
+                                                            }
+                                                            className="btn btn-info rounded-0"
+                                                        >
+                                                            Charger les comptes
+                                                            epargnes{" "}
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={
+                                                                hideAccountEpargneSession
+                                                            }
+                                                            className="btn btn-primary rounded-0"
+                                                        >
+                                                            Masquer les comptes
+                                                            epargnes{" "}
                                                         </button>
                                                     )}
                                                 </td>
@@ -4988,6 +5227,207 @@ const Comptes = () => {
                                                             borderRadius: "0px",
                                                         }}
                                                         onClick={exportToPDF}
+                                                    >
+                                                        {" "}
+                                                        <i class="fas fa-file-pdf"></i>{" "}
+                                                        Exporter en PDF
+                                                    </button>
+                                                </div>
+                                            )}
+                                            <br /> <br /> <br />
+                                        </div>
+                                    </div>
+                                )}
+                                {currentItems && (
+                                    <div className="row">
+                                        <>
+                                            <table
+                                                id="main-table-balance"
+                                                style={{
+                                                    border: "0px",
+                                                    width: "100%",
+                                                }}
+                                            >
+                                                <div
+                                                    id="content-to-download-balance"
+                                                    style={{
+                                                        width: "90%",
+                                                        margin: "0px auto",
+                                                    }}
+                                                >
+                                                    <div className="col-md-12 table-search-by-name">
+                                                        <table
+                                                            className="table table-bordered mt-3"
+                                                            style={{
+                                                                // background: "#444",
+                                                                padding: "5px",
+                                                                color: "#000",
+                                                            }}
+                                                        >
+                                                            <thead
+                                                                style={{
+                                                                    background:
+                                                                        "#000",
+                                                                    color: "#fff",
+                                                                }}
+                                                            >
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>
+                                                                        NumCompte
+                                                                    </th>
+                                                                    <th>
+                                                                        NomCompte
+                                                                    </th>
+
+                                                                    <th>
+                                                                        Genre
+                                                                    </th>
+                                                                    <th>
+                                                                        CompteAbregé
+                                                                    </th>
+                                                                    <th>
+                                                                        Solde
+                                                                    </th>
+                                                                    <th>
+                                                                        Devise
+                                                                    </th>
+                                                                    <th>
+                                                                        DateDernièreTrans
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {currentItems &&
+                                                                    currentItems.map(
+                                                                        (
+                                                                            res,
+                                                                            index
+                                                                        ) => {
+                                                                            return (
+                                                                                <tr
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                >
+                                                                                    <td>
+                                                                                        {
+                                                                                            compteur++
+                                                                                        }{" "}
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {
+                                                                                            res.NumCompte
+                                                                                        }
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {
+                                                                                            res.NomCompte
+                                                                                        }
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {
+                                                                                            res.sexe
+                                                                                        }
+                                                                                    </td>
+
+                                                                                    <td>
+                                                                                        {
+                                                                                            res.NumAdherant
+                                                                                        }
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {res.solde &&
+                                                                                            res.solde.toFixed(
+                                                                                                2
+                                                                                            )}
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {res.CodeMonnaie ==
+                                                                                        1
+                                                                                            ? "USD"
+                                                                                            : "CDF"}
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {
+                                                                                            res.derniere_date_transaction
+                                                                                        }
+                                                                                    </td>
+                                                                                </tr>
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </table>
+                                            <div className="h-130 d-flex align-items-center justify-content-center">
+                                                <ul style={paginationStyle}>
+                                                    <li>
+                                                        <button
+                                                            onClick={
+                                                                goToPrevPage
+                                                            }
+                                                            disabled={
+                                                                currentPage ===
+                                                                1
+                                                            }
+                                                            style={
+                                                                buttonStylePrevNext
+                                                            }
+                                                        >
+                                                            Previous
+                                                        </button>
+                                                    </li>
+                                                    {renderPagination()}
+                                                    <li>
+                                                        <button
+                                                            onClick={
+                                                                goToNextPage
+                                                            }
+                                                            disabled={
+                                                                currentPage ===
+                                                                totalPages
+                                                            }
+                                                            style={
+                                                                buttonStylePrevNext
+                                                            }
+                                                        >
+                                                            Next
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </>
+
+                                        <div className="container">
+                                            {fetchCompteEpargne && (
+                                                <div className="float-end mt-2">
+                                                    <button
+                                                        onClick={() =>
+                                                            downloadReport(
+                                                                "excel"
+                                                            )
+                                                        }
+                                                        className="btn btn-success"
+                                                        style={{
+                                                            borderRadius: "0px",
+                                                        }}
+                                                    >
+                                                        <i class="fas fa-file-excel"></i>{" "}
+                                                        Exporter en Excel
+                                                    </button>{" "}
+                                                    <button
+                                                        className="btn btn-primary"
+                                                        style={{
+                                                            borderRadius: "0px",
+                                                        }}
+                                                        onClick={() =>
+                                                            downloadReport(
+                                                                "pdf"
+                                                            )
+                                                        }
                                                     >
                                                         {" "}
                                                         <i class="fas fa-file-pdf"></i>{" "}

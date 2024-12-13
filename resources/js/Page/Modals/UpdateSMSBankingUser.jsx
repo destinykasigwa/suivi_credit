@@ -284,6 +284,7 @@ export default class UpdateSMSBankingUser extends React.Component {
                                                             </tr>
 
                                                             <tr>
+                                                                <td></td>
                                                                 <td
                                                                     style={
                                                                         tableBorder
@@ -306,7 +307,9 @@ export default class UpdateSMSBankingUser extends React.Component {
                                                                                 .UpdateSMSBankingUserData
                                                                         }
                                                                     >
-                                                                        Valider{" "}
+                                                                        Valider
+                                                                        la
+                                                                        modification{" "}
                                                                         <i className="fas fa-database"></i>
                                                                     </button>
                                                                 </td>

@@ -11,7 +11,7 @@
              </div> --}}
              <div class="info">
                  <a href="eco/home" class="d-block text-light"
-                     style="font-size: 22px;margin-top:-10px"><strong>EpargnePro</strong></a>
+                     style="font-size: 18px;margin-top:-10px"><strong>IHDEMUNIS</strong></a>
              </div>
          </div>
          <nav class="mt-2">

@@ -2575,7 +2575,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
 
 
 
-    public function downloadReport(Request $request)
+    public function downloadReportSommaireCompte(Request $request)
     {
         $fetchData = $request->input('fetchData');
         $date_debut_balance = $request->input('date_debut_balance');
@@ -2634,6 +2634,67 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
             $sheetName = 'Soldes des Comptes';
             $filename = 'Sommaire_Compte_' . date('Y-m-d'); // Exemple de nom dynamique
 
+            // Appeler la méthode pour générer le fichier Excel
+            return $this->reportService->generateExcelWithHeaders($reorderedData, $headers, $sheetName, $filename);
+        }
+    }
+
+    //PERMET D'EXPORTE LE RAPPORT LISTE DES COMPTES
+
+    public function downloadReportCompteEpargne(Request $request)
+    {
+        $fetchData = $request->input('fetchData');
+        $type = $request->input('type'); // Type du fichier (pdf ou excel)
+
+        // Filtrer les colonnes que vous souhaitez pour Excel et remplacer les nulls par 0
+
+
+        $view = 'reports.sommaire-compte'; // Vue Blade pour le PDF
+        $filename = 'sommaire_de_compte'; // Nom du fichier
+
+        // Générer le PDF si le type est pdf
+        if ($type === "pdf") {
+            $pdf = PDF::loadView('reports.liste-compte-pargne', compact('fetchData'));
+            ini_set('memory_limit', '1024M');
+            return $pdf->download('reports.liste-compte-pargne.pdf');
+        } else if ($type === 'excel') {
+            // Définir les colonnes à sélectionner
+            $columnsToSelect = ['NumCompte', 'NomCompte', 'sexe', 'NumAdherant', 'solde', 'CodeMonnaie', 'derniere_date_transaction'];
+
+            // Filtrer et réorganiser les données pour respecter l'ordre attendu
+            $filteredData = array_map(function ($row) use ($columnsToSelect) {
+                // Filtrer les colonnes pour récupérer les bonnes valeurs
+                $filteredRow = array_intersect_key($row, array_flip($columnsToSelect));
+
+                // S'assurer que les valeurs de 'NumCompte' et 'NomCompte' sont correctement assignées
+                // Convertir NumCompte en chaîne de caractères pour éviter la notation scientifique
+                $filteredRow['NumCompte'] = "'" . (string) $filteredRow['NumCompte']; // Ajout d'une apostrophe pour éviter la notation scientifiqu
+
+                // Assurez-vous que la colonne NomCompte contient bien les valeurs des noms
+                $filteredRow['NomCompte'] = (isset($filteredRow['NomCompte'])) ? $filteredRow['NomCompte'] : '';
+
+                return $filteredRow;
+            }, $fetchData);
+
+            // En-têtes pour le fichier Excel
+            $headers = ['NumCompte', 'NomCompte', 'Genre', 'NumAbregé', 'Solde', 'CodeMonnaie', 'DateDernièreTransaction'];
+
+            // Réorganiser les colonnes pour garantir que NumCompte, NomCompte et soldeFin sont dans l'ordre correct
+            $reorderedData = array_map(function ($row) {
+                return [
+                    'NumCompte' => $row['NumCompte'],               // La colonne 'NumCompte' doit venir en premier
+                    'NomCompte' => $row['NomCompte'],               // La colonne 'NomCompte' doit venir en second
+                    'Genre' => $row['sexe'],                        // Le genre basé sur 'sexe'
+                    'NumAbregé' => $row['NumAdherant'],             // La colonne 'NumAdherant' doit être la troisième
+                    'Solde' => $row['solde'],                       // Le solde
+                    'CodeMonnaie' => $row['CodeMonnaie'] == 1 ? 'USD' : 'CDF', // Affichage conditionnel
+                    'DateDernièreTransaction' => $row['derniere_date_transaction'], // La dernière date de transaction
+                ];
+            }, $filteredData);
+
+            // Définir le nom du fichier Excel
+            $sheetName = 'Liste_des_comptes_epargne';
+            $filename = 'Liste_des_comptes' . date('Y-m-d'); // Exemple de nom dynamique
             // Appeler la méthode pour générer le fichier Excel
             return $this->reportService->generateExcelWithHeaders($reorderedData, $headers, $sheetName, $filename);
         }

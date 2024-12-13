@@ -73,7 +73,7 @@ const SommaireCompte = () => {
         }`; // "YYYY-MM-DD"
         axios
             .post(
-                "/download-report",
+                "/download-report/sommaire-compte",
                 {
                     fetchData: fetchData, // Assurez-vous que fetchData contient vos données
                     date_debut_balance: date_debut_balance,
@@ -1356,10 +1356,12 @@ const SommaireCompte = () => {
                 {fetchData && (
                     <div className="float-end mt-2">
                         <button
-                            // onClick={() =>
-                            //     exportTableData("main-table-balance")
-                            // }
-                            onClick={() => downloadReport("excel")}
+                            onClick={() =>
+                                radioValue == "balance_convertie_cdf" ||
+                                radioValue == "balance_convertie_usd"
+                                    ? exportTableData("main-table-balance")
+                                    : downloadReport("excel")
+                            }
                             className="btn btn-success"
                             style={{
                                 borderRadius: "0px",
@@ -1372,8 +1374,12 @@ const SommaireCompte = () => {
                             style={{
                                 borderRadius: "0px",
                             }}
-                            // onClick={exportToPDF}
-                            onClick={() => downloadReport("pdf")}
+                            onClick={() =>
+                                radioValue == "balance_convertie_cdf" ||
+                                radioValue == "balance_convertie_usd"
+                                    ? exportToPDF
+                                    : downloadReport("pdf")
+                            }
                         >
                             {" "}
                             <i class="fas fa-file-pdf"></i> Exporter en PDF

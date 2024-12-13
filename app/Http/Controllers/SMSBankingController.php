@@ -37,6 +37,25 @@ class SMSBankingController extends Controller
         }
     }
 
+    public function normalizePhoneNumber($phone)
+    {
+        // Retirer tous les espaces et les caractères spéciaux du numéro pour faciliter le formatage
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+        // Vérifier si le numéro commence par '0', '243', ou '+243'
+        if (preg_match('/^0/', $phone)) {
+            // Remplacer '0' au début par '+243'
+            $phone = preg_replace('/^0/', '+243', $phone);
+        } elseif (preg_match('/^243/', $phone)) {
+            // Remplacer '243' au début par '+243'
+            $phone = preg_replace('/^243/', '+243', $phone);
+        } elseif (preg_match('/^\+243/', $phone) === 0) {
+            // Si le numéro ne commence pas par '+243', l'ajouter
+            $phone = '+243' . $phone;
+        }
+
+        return $phone;
+    }
+
     public function AddNewCustomer(Request $request)
     {
 
@@ -44,13 +63,14 @@ class SMSBankingController extends Controller
         if (isset($request->NumCompte)) {
             //VERIFIE SI LE NUMERO DE COMPTE ABREGE SAISIE PAR L'UTILISATEUR EST CORRECT
             $NumAdherant   = Comptes::where("NumAdherant", "=", $request->NumCompte)->first();
+            $phone = $this->normalizePhoneNumber($request->Telephone);
             if ($NumAdherant) {
                 SMSBanking::create([
                     "NumCompte" => $NumAdherant->NumCompte,
                     "NomCompte" => $NumAdherant->NomCompte,
                     "Civilite" => $request->Civilite,
                     "Email" => $request->Email,
-                    "Telephone" => $request->Telephone,
+                    "Telephone" => $phone,
                     "DateActivation" => $date,
                     "NumAbrege" => $request->NumCompte
                 ]);

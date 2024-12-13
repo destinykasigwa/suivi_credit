@@ -306,15 +306,53 @@ class ComptesParamController extends Controller
 
     public function getCreatedAccount()
     {
-
-
         $data = Comptes::where("RefTypeCompte", "=", 6)
             ->orWhere("RefTypeCompte", "=", 7)
             ->orWhere("RefTypeCompte", "=", 4)
             ->orWhere("RefTypeCompte", "=", 1)
             ->get();
 
+        return response()->json([
+            "status" => 1,
+            "data" => $data,
+        ]);
+    }
 
-        return response()->json(["status" => 1, "data" => $data]);
+    //GET ALL EPARGNE ACCOUNTS
+
+    public function getEpargneAccount()
+    {
+        $compteEpargne = Comptes::select(
+            'comptes.NumCompte',
+            'comptes.NomCompte',
+            'adhesion_membres.sexe', // Exemple de colonne spécifique
+            'comptes.NumAdherant',
+            'comptes.CodeMonnaie',
+            'comptes.RefCompte',
+            DB::raw("
+                    CASE 
+                        WHEN comptes.CodeMonnaie = 2 THEN 
+                            SUM(transactions.Creditfc - transactions.Debitfc)
+                        ELSE 
+                            SUM(transactions.Creditusd - transactions.Debitusd)
+                    END as solde
+                "),
+            DB::raw("MAX(transactions.DateTransaction) as derniere_date_transaction")
+        )
+            ->join("adhesion_membres", "comptes.NumAdherant", "=", "adhesion_membres.compte_abrege")
+            ->leftJoin("transactions", "comptes.NumCompte", "=", "transactions.NumCompte")
+            ->where("comptes.RefCadre", 33)
+            ->where("comptes.NumCompte", "!=", 3300)
+            ->where("comptes.NumCompte", "!=", 3301)
+            ->groupBy('comptes.NumCompte', 'comptes.NomCompte', 'comptes.NumAdherant', 'adhesion_membres.sexe', 'comptes.CodeMonnaie', 'comptes.RefCompte') // Ajoutez les colonnes ici
+            ->orderBy("comptes.RefCompte", "desc")
+            ->get();
+        $compteEpargne = $compteEpargne->toArray();
+
+
+        return response()->json([
+            "status" => 1,
+            "compteEpargne" => $compteEpargne
+        ]);
     }
 }

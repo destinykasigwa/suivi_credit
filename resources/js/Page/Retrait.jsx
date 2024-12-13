@@ -1166,12 +1166,15 @@ const RetraitEspece = () => {
                             "Opérations recentes CDF"}
                     </h4>
                     {getBilletageCDF && getBilletageCDF.length > 0 && (
-                        <table className="table table-bordered table-striped">
+                        <table
+                            className="table table-bordered table-striped"
+                            style={{ fontSize: "13px" }}
+                        >
                             <thead>
                                 <tr>
                                     <th>Réference</th>
                                     <th>Montant</th>
-                                    <th>Déposant</th>
+                                    <th>Bénéficiare</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -1211,12 +1214,15 @@ const RetraitEspece = () => {
                             "Opérations recentes USD"}
                     </h4>
                     {getBilletageUSD && getBilletageUSD.length > 0 && (
-                        <table className="table table-bordered table-striped">
+                        <table
+                            className="table table-bordered table-striped"
+                            style={{ fontSize: "13px" }}
+                        >
                             <thead>
                                 <tr>
                                     <th>Réference</th>
                                     <th>Montant</th>
-                                    <th>Déposant</th>
+                                    <th>Bénéficiare</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>

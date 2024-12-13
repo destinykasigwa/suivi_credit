@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comptes;
+use App\Models\Mandataires;
 use Illuminate\Http\Request;
 use App\Models\AdhesionMembre;
 use App\Models\CompteurCompte;
-use App\Models\Mandataires;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AdhesionController extends Controller
@@ -268,6 +269,46 @@ class AdhesionController extends Controller
             }
         } else {
             return response()->json(["status" => 0, "msg" => "Aucun compte renseigné"]);
+        }
+    }
+
+    public function ajoutMandataire(Request $request)
+    {
+        if (isset($request->compteAbrege)) {
+            if ($request->mandataireName) {
+                if ($request->mandatairePhone) {
+                    Mandataires::create([
+                        'refCompte' => $request->compteAbrege,
+                        'mendataireName' => $request->mandataireName,
+                        'telephoneM' => $request->mandatairePhone,
+                    ]);
+                    return response()->json(["status" => 1, "msg" => "Mandataire ajouté avec succès"]);
+                } else {
+                    return response()->json(["status" => 0, "msg" => "Vous devez renseigné le numéro de télephone du mandataire"]);
+                }
+            } else {
+                return response()->json(["status" => 0, "msg" => "Le champ nom ne dois pas être vide"]);
+            }
+        } else {
+            return response()->json(["status" => 0, "msg" => "Aucun compte renseigné"]);
+        }
+    }
+
+    public function getMandataire(Request $request)
+    {
+        if (isset($request->compte_to_search)) {
+            $data =  Mandataires::where("refCompte", $request->compte_to_search)->get();
+            return response()->json(["status" => 1, "data" => $data]);
+        }
+    }
+
+    public function deleteMandataire($id)
+    {
+        if (Auth::user()->admin == 1) {
+            Mandataires::where("id", "=", $id)->delete();
+            return response()->json(["status" => 1, "msg" => "Mandataire bien supprimé"]);
+        } else {
+            return response()->json(["status" => 0, "msg" => "Vous n'êtes autorisé à supprimer un mandataire"]);
         }
     }
 }

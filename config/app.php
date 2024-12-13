@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Facade;
+use App\Services\AfricaTalkingService;
 
 return [
 
@@ -212,6 +213,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'Pdf' => Barryvdh\DomPDF\Facade\Pdf::class,
+        'AfricaTalking' => AfricaTalkingService::class,
 
     ])->toArray(),
 

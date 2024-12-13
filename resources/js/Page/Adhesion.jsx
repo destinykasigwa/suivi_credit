@@ -71,6 +71,9 @@ const Adhesion = () => {
 
     //ACTIVATION COMPTE ATTRIBUTE
     const [devise_compte, setdevise_compte] = useState("CDF");
+    const [mandataireName, setmandataireName] = useState();
+    const [mandatairePhone, setmandatairePhone] = useState();
+    const [fetchMandataire, setFetchMandataire] = useState();
 
     //ENREGISTRE LES DONNEES POUR LE NOUVEAU MEMBRE CREE
     const handleSubmitAdhesion = async (e) => {
@@ -100,15 +103,31 @@ const Adhesion = () => {
             console.log(res.data.validate_error);
         }
     };
+    //PERMET DE RECUPERER LE MANDATAIRE ASSOCIE A UN COMPTE
+
+    const getMandataires = async () => {
+        // e.preventDefault();
+        const res = await axios.post("/eco/pages/adhesion/get-mandaitre", {
+            compte_to_search: compte_to_search,
+        });
+        if (res.data.status == 1) {
+            setFetchMandataire(res.data.data);
+            console.log(fetchMandataire);
+        } else {
+            console.log("something went rwong");
+        }
+    };
 
     //GET DATA TO UPDATE
     const getSeachedData = async (e) => {
         e.preventDefault();
+
         //console.log(compte_to_search);
         const res = await axios.post("/eco/page/adhesion/get-searched-item", {
             compte_to_search,
         });
         if (res.data.status == 1) {
+            getMandataires(); //AFFICHE LES MANDATAIRES ASSOCIE A UN COMPTE
             setagence(res.data.data.agence);
             setcode_monnaie(res.data.data.code_monnaie);
             settype_epargne(res.data.data.type_epargne);
@@ -137,7 +156,6 @@ const Adhesion = () => {
             setcritere(res.data.data.critere);
             // setFetchDataToUpdate(res.data.data);
             setsignature_file(res.data.data.signature_image_file);
-            console.log(signature_file);
         } else if (res.data.status == 0) {
             setIsloading2(false);
             Swal.fire({
@@ -266,6 +284,80 @@ const Adhesion = () => {
                 button: "OK!",
             });
         }
+    };
+
+    const AjouterMandataire = async (e) => {
+        e.preventDefault();
+        const res = await axios.post("/eco/pages/adhesion/ajout-mandataire", {
+            compteAbrege: compte_to_search,
+            mandataireName,
+            mandatairePhone,
+        });
+        if (res.data.status == 1) {
+            getMandataires(); //AFFICHE LES MANDATAIRES ASSOCIE A UN COMPTE
+            setmandataireName("");
+            setmandatairePhone("");
+            Swal.fire({
+                title: "Succès",
+                text: res.data.msg,
+                icon: "success",
+                button: "OK!",
+            });
+        } else if (res.data.status == 0) {
+            Swal.fire({
+                title: "Erreur",
+                text: res.data.msg,
+                icon: "error",
+                button: "OK!",
+            });
+        }
+    };
+    //PERMET DE SUPPRIMER UN MANDATAIRE
+    const DeleteMandataire = async (id) => {
+        Swal.fire({
+            title: "Confirmation !",
+            text: "Etes vous sûr de supprimer ce mandataire ?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Oui supprimer!",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await axios.get(
+                        "/eco/pages/adhesion/suppression-mandataire/" + id
+                    );
+                    if (res.data.status === 1) {
+                        getMandataires(); //MET AJOUR LE TABLEAU APRES SUPPRESSION
+                        Swal.fire({
+                            title: "Succès",
+                            text: res.data.msg,
+                            icon: "success",
+                            timer: 8000,
+                            confirmButtonText: "Okay",
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Erreur",
+                            text: res.data.msg,
+                            icon: "error",
+                            timer: 8000,
+                            confirmButtonText: "Okay",
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: "Erreur",
+                        text: "Une erreur est survenue .",
+                        icon: "error",
+                        timer: 8000,
+                        confirmButtonText: "Okay",
+                    });
+                    console.error(error);
+                }
+            }
+        });
     };
     return (
         <div className="container-fluid" style={{ marginTop: "10px" }}>
@@ -3126,9 +3218,9 @@ const Adhesion = () => {
                                                     className="float-none w-auto p-0"
                                                     style={{ fontSize: "15px" }}
                                                 >
-                                                    <h4 className="text-bold">
-                                                        Mandataire
-                                                    </h4>
+                                                    <h6 className="text-bold">
+                                                        Nouveau mandataire
+                                                    </h6>
                                                 </legend>
                                                 <table>
                                                     <tr>
@@ -3222,11 +3314,7 @@ const Adhesion = () => {
                                                                 style={{
                                                                     padding:
                                                                         "1px ",
-                                                                    border: `${
-                                                                        error.mandataireName
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
+                                                                    border: `${"1px solid #dcdcdc"}`,
                                                                     marginBottom:
                                                                         "5px",
                                                                     // width: "100px",
@@ -3236,6 +3324,9 @@ const Adhesion = () => {
                                                                         e.target
                                                                             .value
                                                                     )
+                                                                }
+                                                                value={
+                                                                    mandataireName
                                                                 }
                                                             />
                                                         </td>
@@ -3257,17 +3348,13 @@ const Adhesion = () => {
                                                         <td>
                                                             {" "}
                                                             <input
-                                                                id="mandatairemandatairePhone"
+                                                                id="mandatairePhone"
                                                                 type="text"
                                                                 name="mandatairePhone"
                                                                 style={{
                                                                     padding:
                                                                         "1px ",
-                                                                    border: `${
-                                                                        error.mandatairePhone
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
+                                                                    border: `${"1px solid #dcdcdc"}`,
                                                                     marginBottom:
                                                                         "5px",
                                                                     // width: "100px",
@@ -3278,7 +3365,34 @@ const Adhesion = () => {
                                                                             .value
                                                                     )
                                                                 }
+                                                                value={
+                                                                    mandatairePhone
+                                                                }
                                                             />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td>
+                                                            <button
+                                                                onClick={
+                                                                    AjouterMandataire
+                                                                }
+                                                                className="btn btn-primary rounded-10 mr-2"
+                                                            >
+                                                                Ajouter
+                                                            </button>
+                                                            {/* {compte_to_search && (
+                                                                <button
+                                                                    onClick={
+                                                                        getMandataires
+                                                                    }
+                                                                    className="btn btn-success rounded-10"
+                                                                >
+                                                                    Afficher
+                                                                    <i className="fa fa-spinner"></i>
+                                                                </button>
+                                                            )} */}
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -3286,31 +3400,65 @@ const Adhesion = () => {
                                         </form>
                                     </div>
                                 </div>
-                                <div className="row">
-                                    <h4>Liste des mandataire</h4>
-                                    <div className="col-md-6">
-                                        <table className="table table-bordered table-striped">
-                                            <thead>
-                                                <th>Nom mandataire</th>
-                                                <th>Téléphone</th>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Destin kasigwa</td>
-                                                    <td>243976518324</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Destin kasigwa</td>
-                                                    <td>243976518324</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Destin kasigwa</td>
-                                                    <td>243976518324</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                {fetchMandataire &&
+                                    fetchMandataire.length > 0 && (
+                                        <div className="row">
+                                            <h4>Liste des mandataire</h4>
+                                            <div className="col-md-6">
+                                                <table className="table table-bordered table-striped">
+                                                    <thead>
+                                                        <th>Nom mandataire</th>
+                                                        <th>Téléphone</th>
+                                                        <th>Action</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        {fetchMandataire.length !=
+                                                            0 &&
+                                                            fetchMandataire.map(
+                                                                (
+                                                                    res,
+                                                                    index
+                                                                ) => {
+                                                                    return (
+                                                                        <tr
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                        >
+                                                                            <td>
+                                                                                {
+                                                                                    res.mendataireName
+                                                                                }
+                                                                            </td>
+                                                                            <td>
+                                                                                {
+                                                                                    res.telephoneM
+                                                                                }
+                                                                            </td>
+                                                                            <td>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        DeleteMandataire(
+                                                                                            res.id
+                                                                                        );
+                                                                                    }}
+                                                                                    className="btn btn-danger"
+                                                                                >
+                                                                                    <i class="fas fa-trash-alt">
+                                                                                        {" "}
+                                                                                        Supprimer
+                                                                                    </i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    );
+                                                                }
+                                                            )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
                             </div>
                             <div
                                 className="tab-pane fade"
@@ -3331,9 +3479,9 @@ const Adhesion = () => {
                                                     className="float-none w-auto p-0"
                                                     style={{ fontSize: "15px" }}
                                                 >
-                                                    <h4 className="text-bold">
+                                                    <h6 className="text-bold">
                                                         Création compte
-                                                    </h4>
+                                                    </h6>
                                                 </legend>
                                                 <table>
                                                     <tbody>

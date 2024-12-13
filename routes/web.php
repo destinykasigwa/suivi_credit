@@ -21,6 +21,7 @@ use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\ComptesParamController;
 use App\Http\Controllers\TransactionsController;
 use App\Http\Middleware\Authenticate;
+use App\Models\AdhesionMembre;
 
 /*
 |--------------------------------------------------------------------------
@@ -430,6 +431,13 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
         [ComptesParamController::class, 'getCreatedAccount']
     );
 
+    //PERMET DE RECUPERER TOUS LES COMPTES EPARGNE
+    Route::get(
+        " eco/pages/comptes-cree/data/compte-epargne",
+        [ComptesParamController::class, 'getEpargneAccount']
+    );
+
+
 
     //CLOTURE DE LA JOURNEE EN COURS
     // Route::get(
@@ -563,9 +571,22 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     //PERMET DE REECHELONNER UN CREDIT
     Route::post('eco/page/montage-credit/reechelonner-credit', [SuiviCreditController::class, 'ReechelonnementCredit']);
 
+    //PERMET D'EXPORTE LE RAPPORT SOMMAIRE DES COMPTES
+    Route::post('/download-report/sommaire-compte', [ReportsController::class, 'downloadReportSommaireCompte'])->name('download.report');
 
-    Route::post('/download-report', [ReportsController::class, 'downloadReport'])->name('download.report');
+    //PERMET D'EXPORTER LE RAPPORT LISTE DES COMPTES EPARGNE
+    Route::post('/download-report/liste-compte/epargne', [ReportsController::class, 'downloadReportCompteEpargne'])->name('download.report');
 
     //PERMET DE CLOTURER L'EXERCICE EN COURS 
     Route::get('eco/comptes/cloture/annuelle', [PostageController::class, 'clotureAnnuelle']);
+
+    //PERMET D'AJOUTER UN MANDATAIRE A UN COMPTE
+    Route::post('eco/pages/adhesion/ajout-mandataire', [AdhesionController::class, 'ajoutMandataire']);
+
+    //PERMET DE RECUPERER LES MANDATAIRES ASSOCIES A UN COMPTE
+
+    Route::post('eco/pages/adhesion/get-mandaitre', [AdhesionController::class, 'getMandataire']);
+
+    //PERMET DE SUPPRIMER UN MANDATAIRE
+    Route::get('eco/pages/adhesion/suppression-mandataire/{id}', [AdhesionController::class, 'deleteMandataire']);
 });

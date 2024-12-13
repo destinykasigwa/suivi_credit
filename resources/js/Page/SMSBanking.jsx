@@ -16,7 +16,7 @@ export default class SMSbanking extends React.Component {
             NomCompte: "",
             Civilite: "",
             Email: "",
-            Telephone: "+243",
+            Telephone: "",
             searchData: false,
             // DateActivation: "",
             // DateDesActivation: "",
@@ -606,7 +606,7 @@ export default class SMSbanking extends React.Component {
                                                                         .textInput
                                                                 }
                                                                 className="form-control font-weight-bold"
-                                                                placeholder="Rechercher..."
+                                                                placeholder="Numero Abrégé..."
                                                                 name="searchedItem"
                                                                 value={
                                                                     this.state
