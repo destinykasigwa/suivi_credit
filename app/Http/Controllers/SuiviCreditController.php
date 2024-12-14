@@ -371,7 +371,6 @@ class SuiviCreditController extends Controller
     public function saveEcheancierCredit(Request $request)
     {
         // dd($request->all());
-
         $validator = validator::make($request->all(), [
             'desicion' => 'required',
             'ModeCalcul' => 'required',
@@ -434,6 +433,7 @@ class SuiviCreditController extends Controller
                         ]);
                     }
                 }
+                //SI L'ECHEANCIER ETAIT DEJA GENERER POUR CE CREDIT EST QUE C PAS UN REECHELONNEMENT
                 if ($checkRow and !$request->reechelonne) {
                     //VERIFIE S'IL N'EXISTE PAS UN REMBOURSEMENT DEJA EFFECTUE
                     $chechRembours = Remboursementcredit::where("NumDossie", $request->NumDossier)
@@ -469,6 +469,25 @@ class SuiviCreditController extends Controller
                             'msg' => "Cette action est interdite pour un crédit comportant déjà des remboursements."
                         ]);
                     }
+                }
+                if (!$checkRow) {
+                    $this->genereEcheancier(
+                        $request->desicion,
+                        $request->ModeCalcul,
+                        $request->DateOctroi,
+                        $request->DateTombeEcheance,
+                        $request->MontantAccorde,
+                        $request->TauxInteret,
+                        $request->DateTranche,
+                        $request->dateEcheance,
+                        $request->NumDossier,
+
+                    );
+                    return response()->json([
+                        "status" => 1,
+                        "msg" => "Géneration de l'écheancier bien effectuée",
+                        'validate_error' => $validator->messages()
+                    ]);
                 }
             } else {
                 return response()->json([
@@ -1359,85 +1378,4 @@ class SuiviCreditController extends Controller
             return response()->json(["status" => 0, "msg" => "Aucun numéro de dossier trouvé."]);
         }
     }
-
-    //PERME DE FAIRE UN REMBOURESEMENT MANUEL EN CAPITAL
-    // function RemboursementManuel(Request $request)
-    // {
-    //     if (isset($request->numDossier)) {
-    //         if (isset($request->MontantCapRembourser)) {
-    //             $getEcheancierData = Echeancier::where("NumDossier", $request->numDossier)->where("statutPayement", 0)->where("posted", 0)->get();
-    //             for ($i = 0; $i < sizeof($getEcheancierData); $i++) {
-    //                 //RECUPERE LE CODE MONNAIE CREDIT
-    //                 $getPorteFeuilleInfo = Portefeuille::where("NumDossier", $request->numDossier)->first();
-
-    //                 if ($getPorteFeuilleInfo->CodeMonnaie == "CDF") {
-    //                     //RECUPERE LE SOLDE DU CLIENT
-    //                     $soldeMembreCDF = Transactions::select(
-    //                         DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
-    //                     )->where("NumCompte", '=', $getPorteFeuilleInfo->NumCompteEpargne)
-    //                         ->groupBy("NumCompte")
-    //                         ->first();
-    //                     $soldeMembre = $soldeMembreCDF->soldeMembreCDF;
-    //                     if ($request->MontantCapRembourser >= $soldeMembre) {
-    //                         # code...
-    //                         //VERIFIE ICI S'IL Y'A PAS UNE TRANCHE INCOMPLET
-    //                         $checkTrancheIncomplete = Remboursementcredit::where("RefEcheance", $getEcheancierData[$i]->ReferenceEch)->first();
-    //                         if ($checkTrancheIncomplete) {
-    //                             //SI CECI RETOURNE TRUE CA SIGNIFIE QU'IL YA DE TRANCHE INCOMPLETE
-    //                             $montantRembourser = $checkTrancheIncomplete->CapitalPaye;
-    //                             $capitalRestant = $getEcheancierData[$i]->CapAmmorti - $checkTrancheIncomplete->CapitalPaye;
-    //                             Remboursementcredit::where("RefEcheance", $getEcheancierData[$i]->ReferenceEch)->update([
-    //                                 "CapitalPaye" => $montantRembourser + $capitalRestant,
-    //                             ]);
-    //                             //ON PASSE ICI LES OPERATION POUR ENREGISTRER  LA TRANSACTION
-    //                             //GENERE LE NUMERO AUTOMATIQUE DE L'OPERATION
-    //                             CompteurTransaction::create([
-    //                                 'fakevalue' => "0000",
-    //                             ]);
-    //                             $numOperation = [];
-    //                             $numOperation = CompteurTransaction::latest()->first();
-    //                             $NumTransaction = "AT00" . $numOperation->id;
-    //                             //DEBITE LE COMPTE DU CLIENT
-
-    //                             //CREDITE LE COMPTE CREDIT COMPTABLE
-
-    //                             //CREDITE LE COMPTE COMPTABLE DU CLIENT
-
-    //                             //FAIT LA REPRISE SUR PROVISION
-    //                             $CodeMonnaie = 2;
-    //                             $dataSystem = TauxEtDateSystem::latest()->first();
-    //                             $tauxDuJour = $dataSystem->TauxEnFc;
-    //                             $dateSystem = $dataSystem->DateSystem;
-
-    //                             $checkJourRetard = JourRetard::where("NumDossier", $getEcheancierData[$i]->NumDossier)->where("DateRetard", "=", $dataSystem->DateSystem)->first();
-
-    //                             $this->RepriseSurProvision(
-    //                                 $getPorteFeuilleInfo->CodeAgence,
-    //                                 $getPorteFeuilleInfo->compteCreditClient,
-    //                                 $CodeMonnaie,
-    //                                 $getPorteFeuilleInfo->compteCreditClientNumDossier,
-    //                                 $dateSystem,
-    //                                 $tauxDuJour,
-    //                                 $getPorteFeuilleInfo->numAdherant,
-    //                                 $checkJourRetard->montantImpute,
-    //                                 $montantRembourser,
-    //                             );
-    //                             //$this->ClotureTranche($getEcheancierData[$i]->ReferenceEch, $getEcheancierData[$i]->NumDossier);
-    //                         }
-    //                     } else {
-    //                         return response()->json(["status" => 0, "msg" => "Le solde du compte est inferieur au montant que vous avez saisi."]);
-    //                     }
-    //                 }
-    //             }
-    //         } else {
-    //             return response()->json(["status" => 0, "msg" => "Veuillez renseigner le montant à rembourser."]);
-    //         }
-    //     } else {
-    //         return response()->json(["status" => 0, "msg" => "Aucun numéro de dossier trouvé."]);
-    //     }
-    // }
-
-
-
-
 }

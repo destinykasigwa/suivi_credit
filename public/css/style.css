@@ -222,6 +222,7 @@ html, body {
   position: relative !important; /* Position normale pour éviter des chevauchements */
   width: 100% !important;        /* Le footer prend toute la largeur */
   text-align: center !important;
+
 }
 
 

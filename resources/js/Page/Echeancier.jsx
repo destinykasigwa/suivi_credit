@@ -106,7 +106,7 @@ const Echeancier = () => {
     const handleRadioChange = (event) => {
         setRadioValue(event.target.value);
     };
-    let compteur = 1;
+    let compteur = 0;
     const dateParser = (num) => {
         const options = {
             // weekday: "long",

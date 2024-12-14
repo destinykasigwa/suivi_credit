@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Services\SendNotification;
 use App\CustomTasks\ClotureJournee;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -18,6 +19,13 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('password:expiration')->everyMinute()->runInBackground();
         $schedule->command('cloture:journee')->everyMinute()->runInBackground();
+
+        // Planifier la fonction RappelRemboursementCredit tous les jours à 8h00
+        $schedule->call(function () {
+            // Laravel va automatiquement résoudre la dépendance AfricaTalkingService ici
+            $sendNotification = app(SendNotification::class);  // Utilisation de app() pour résoudre la dépendance
+            $sendNotification->RappelRemboursementCredit();
+        })->everyMinute();  // Vous pouvez changer l'heure ici selon vos besoins
     }
     /**
      * Register the commands for the application.
