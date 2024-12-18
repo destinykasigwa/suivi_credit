@@ -43,6 +43,7 @@ const DepotEspece = () => {
     const [loadingData, setloadingData] = useState(false);
     const [getNumCompte, setGetNumCompte] = useState();
     const [isLoadingBar, setIsLoadingBar] = useState();
+    const [fetchSolde, setFetchSolde] = useState();
     //GET SEACHED DATA
     const getSeachedData = async (e) => {
         e.preventDefault();
@@ -190,6 +191,7 @@ const DepotEspece = () => {
                 setfetchData2(res.data.data);
                 setGetNumCompte(event.target.innerHTML);
                 fetchData2 && setDeposantName(fetchData2.NomCompte);
+                setFetchSolde(res.data.soldeCompte);
                 console.log(DeposantName);
             } else {
                 setloadingData(false);
@@ -473,6 +475,42 @@ const DepotEspece = () => {
                                 </table>
                             </form>
                         </div>
+                        {fetchSolde && (
+                            <div className="col-md-3 card rounded-0 p-3">
+                                <p
+                                    className="text-bold"
+                                    style={{ color: "steelblue" }}
+                                >
+                                    Solde compte
+                                </p>
+                                <form
+                                    action=""
+                                    style={{
+                                        overflowX: "scroll",
+                                        height: "150px",
+                                    }}
+                                >
+                                    <table className="table">
+                                        <tr>
+                                            <td>
+                                                <h4>
+                                                    <strong>
+                                                        {fetchData2 &&
+                                                        fetchData2.CodeMonnaie ==
+                                                            1
+                                                            ? "USD "
+                                                            : "CDF "}
+                                                        {fetchSolde.soldeMembre.toFixed(
+                                                            2
+                                                        )}{" "}
+                                                    </strong>
+                                                </h4>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            </div>
+                        )}
                     </div>
                     <p
                         className="border border-10"

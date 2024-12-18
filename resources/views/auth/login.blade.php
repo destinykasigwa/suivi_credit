@@ -1,9 +1,8 @@
 @include('partials.subheader')
 
 <body
-    style="background: #fff; background-image: url('{{ asset('images/bg3.jpeg') }}');background-repeat: no-repeat;
-background-repeat: no-repeat;
-background-size: 300% 300%;">
+    style="background: #fff; background-image: url('{{ asset('images/FINAPLUS.png') }}');background-repeat: no-repeat;
+background-size: 100% 100%;">
     <div class="container" id="login">
         <div class="h-100 d-flex align-items-center justify-content-center">
 

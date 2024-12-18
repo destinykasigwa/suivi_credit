@@ -2401,7 +2401,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
             return response()->json(["status" => 1, "data" => $getSoldeCompte]);
         }
         if (isset($request->radioValue) and $request->radioValue == "balance_convertie_usd") {
-            $getSoldeCompte =  DB::table('transactions as t')
+            $getSoldeCompte = DB::table('transactions as t')
                 ->join('comptes as c', 'c.NumAdherant', '=', 't.refCompteMembre')
                 ->select(
                     'c.RefSousGroupe',
@@ -2413,38 +2413,27 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                         WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
                         THEN (t.Creditfc - t.Debitfc) 
                         ELSE 0 
-                    END) AS solde_consolide_cdf
-                "),
-                    DB::raw("
-                    SUM(DISTINCT CASE 
-                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
-                        THEN (t.Creditfc - t.Debitfc) 
-                        ELSE 0 
-                    END) AS solde_consolide_usd
-                "),
-                    DB::raw("
-                    SUM(DISTINCT CASE 
-                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
-                        THEN (t.Creditfc - t.Debitfc) 
-                        ELSE 0 
                     END) 
-                    + SUM(DISTINCT CASE 
+                    + 
+                    SUM(DISTINCT CASE 
                         WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
                         THEN (t.Creditfc - t.Debitfc) 
                         ELSE 0 
                     END) AS solde_consolide_usd_to_cdf
                 "),
                     DB::raw("
-                    (SUM(DISTINCT CASE 
-                        WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
-                        THEN (t.Creditfc - t.Debitfc) 
-                        ELSE 0 
-                    END) 
-                    + SUM(DISTINCT CASE 
-                        WHEN t.CodeMonnaie = 1 AND t.DateTransaction <= ? 
-                        THEN (t.Creditfc - t.Debitfc) 
-                        ELSE 0 
-                    END)) / MAX(t.Taux) AS solde_consolide_cdf_to_usd
+                    CASE
+                        WHEN SUM(DISTINCT CASE 
+                            WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                            THEN (t.Creditusd - t.Debitusd) 
+                            ELSE 0 
+                        END) < 0 THEN 0
+                        ELSE SUM(DISTINCT CASE 
+                            WHEN t.CodeMonnaie = 2 AND t.DateTransaction <= ? 
+                            THEN (t.Creditusd - t.Debitusd) 
+                            ELSE 0 
+                        END)
+                    END AS solde_consolide_cdf_to_usd
                 ")
                 )
                 ->where('t.DateTransaction', '<=', $date2)
@@ -2477,10 +2466,15 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     }
                 )
                 ->setBindings(
-                    array_fill(0, 6, $date2), // Date répétée pour chaque `?`
+                    array_fill(0, 4, $date2), // Date répétée pour chaque `?`
                     'select'
                 )
                 ->get();
+
+
+
+
+
 
             // dd($getSoldeCompte);
 

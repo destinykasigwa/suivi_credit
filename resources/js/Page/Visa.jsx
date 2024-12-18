@@ -21,6 +21,7 @@ const Visa = () => {
     const [fetchMandataire, setFetchMandataire] = useState();
     const [loadingData, setloadingData] = useState(false);
     const [isLoadingBar, setIsLoadingBar] = useState();
+    const [fetchSolde, setFetchSolde] = useState();
     const getSeachedData = async (e) => {
         e.preventDefault();
         setloadingData(true);
@@ -107,6 +108,7 @@ const Visa = () => {
             if (res.data.status == 1) {
                 setloadingData(false);
                 setfetchData2(res.data.data);
+                setFetchSolde(res.data.soldeCompte);
                 console.log(fetchData2);
             } else {
                 Swal.fire({
@@ -383,6 +385,43 @@ const Visa = () => {
                                 </table>
                             </form>
                         </div>
+                        {fetchSolde && (
+                            <div className="col-md-3 card rounded-0 p-3">
+                                <p
+                                    className="text-bold"
+                                    style={{ color: "steelblue" }}
+                                >
+                                    Solde compte
+                                </p>
+                                <form
+                                    action=""
+                                    style={{
+                                        overflowX: "scroll",
+                                        height: "150px",
+                                    }}
+                                >
+                                    <table className="table">
+                                        <tr>
+                                            <td>
+                                                <h4>
+                                                    <strong>
+                                                        {" "}
+                                                        {fetchData2 &&
+                                                        fetchData2.CodeMonnaie ==
+                                                            1
+                                                            ? "USD "
+                                                            : "CDF "}
+                                                        {fetchSolde.soldeMembre.toFixed(
+                                                            2
+                                                        )}{" "}
+                                                    </strong>
+                                                </h4>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            </div>
+                        )}
                     </div>
                     <p
                         className="border border-10"

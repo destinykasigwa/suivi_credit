@@ -55,9 +55,18 @@ const ResetPassWord = () => {
                 <div>
                     <div className={styles.register_section_warp}>
                         <div className={styles.register_section_right}>
-                            {/* <div className={styles.headersection}>
-                                <h4>Récuperation de mot de passe étape 3/3!</h4>
-                            </div> */}
+                            <div className={styles.headersection}>
+                                <h5
+                                    style={{
+                                        color: "steelblue",
+                                        fontWeight: "bold",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    Votre mot de passe a été réinitialisé vous
+                                    devez le changer
+                                </h5>
+                            </div>
 
                             <form
                                 className={styles.form}

@@ -6,6 +6,7 @@ $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"'
 
 </main>
 <!-- Footer -->
+
 <div class="container-fluid footer bg-teal text-white">
     <div class="row">
         <div class="col-12 text-center py-3">

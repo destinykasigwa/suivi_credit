@@ -648,7 +648,7 @@ export default class SMSbanking extends React.Component {
                                                     this.state.fetchData
                                                         .length != 0 && (
                                                         <table
-                                                            className="table table-bordered"
+                                                            className="table table-bordered mt-2"
                                                             style={{
                                                                 lineHeight: "1",
                                                                 fontSize:

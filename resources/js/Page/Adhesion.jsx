@@ -471,275 +471,299 @@ const Adhesion = () => {
                                 <div className="row">
                                     <div className="col-md-5 card rounded-0 p-3">
                                         <form action="">
-                                            <table>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="agence"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Agence
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="agence"
-                                                                name="agence"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.agence
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setAdhesion(
-                                                                        (
-                                                                            p
-                                                                        ) => ({
-                                                                            ...p,
-                                                                            agence: e
-                                                                                .target
-                                                                                .value,
-                                                                        })
-                                                                    )
-                                                                }
-                                                            >
-                                                                <option value="">
-                                                                    Sélectionnez
-                                                                </option>
-                                                                <option value="SIEGE">
-                                                                    SIEGE
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="code_monnaie"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Code monaie
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="code_monnaie"
-                                                                type="text"
-                                                                name="code_monnaie"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setAdhesion(
-                                                                        (
-                                                                            p
-                                                                        ) => ({
-                                                                            ...p,
-                                                                            code_monnaie:
-                                                                                e
+                                            <fieldset className="border p-2">
+                                                <legend
+                                                    className="float-none w-auto p-0"
+                                                    style={{ fontSize: "15px" }}
+                                                >
+                                                    <h6
+                                                        className="text-bold"
+                                                        style={{
+                                                            color: "green",
+                                                        }}
+                                                    >
+                                                        Nouveau compte
+                                                    </h6>
+                                                </legend>
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="agence"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Agence
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="agence"
+                                                                    name="agence"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.agence
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setAdhesion(
+                                                                            (
+                                                                                p
+                                                                            ) => ({
+                                                                                ...p,
+                                                                                agence: e
                                                                                     .target
                                                                                     .value,
-                                                                        })
-                                                                    )
-                                                                }
-                                                                disabled
-                                                            >
-                                                                {/* <option value="">
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option value="">
+                                                                        Sélectionnez
+                                                                    </option>
+                                                                    <option value="SIEGE">
+                                                                        SIEGE
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="code_monnaie"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Code monaie
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="code_monnaie"
+                                                                    type="text"
+                                                                    name="code_monnaie"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `1px solid #dcdcdc"
+                                                                    }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setAdhesion(
+                                                                            (
+                                                                                p
+                                                                            ) => ({
+                                                                                ...p,
+                                                                                code_monnaie:
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                    disabled
+                                                                >
+                                                                    {/* <option value="">
                                                                     Sélectionnez
                                                                 </option> */}
-                                                                <option value="CDF">
-                                                                    CDF
-                                                                </option>
-                                                                <option value="USD">
-                                                                    USD
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="type_epargne"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Type epargne
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="type_epargne"
-                                                                type="text"
-                                                                name="type_epargne"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.type_epargne
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                    // width: "100px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setAdhesion(
-                                                                        (
-                                                                            p
-                                                                        ) => ({
-                                                                            ...p,
-                                                                            type_epargne:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        })
-                                                                    )
-                                                                }
-                                                            >
-                                                                <option value="">
-                                                                    Sélectionnez
-                                                                </option>
-                                                                <option value="Epargne à vie">
-                                                                    Epargne à
-                                                                    vie
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="type_client"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Type client
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="type_client"
-                                                                type="text"
-                                                                name="type_client"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.type_client
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setAdhesion(
-                                                                        (
-                                                                            p
-                                                                        ) => ({
-                                                                            ...p,
-                                                                            type_client:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        })
-                                                                    )
-                                                                }
-                                                            >
-                                                                <option value="">
-                                                                    Sélectionnez
-                                                                </option>
-                                                                <option value="Personne pysique">
-                                                                    Personne
-                                                                    pysique
-                                                                </option>
-                                                                <option value="Personne morale">
-                                                                    Personne
-                                                                    morale
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
+                                                                    <option value="CDF">
+                                                                        CDF
+                                                                    </option>
+                                                                    <option value="USD">
+                                                                        USD
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="type_epargne"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Type epargne
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="type_epargne"
+                                                                    type="text"
+                                                                    name="type_epargne"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.type_epargne
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                        // width: "100px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setAdhesion(
+                                                                            (
+                                                                                p
+                                                                            ) => ({
+                                                                                ...p,
+                                                                                type_epargne:
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option value="">
+                                                                        Sélectionnez
+                                                                    </option>
+                                                                    <option value="Epargne à vie">
+                                                                        Epargne
+                                                                        à vie
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="type_client"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Type client
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="type_client"
+                                                                    type="text"
+                                                                    name="type_client"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.type_client
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setAdhesion(
+                                                                            (
+                                                                                p
+                                                                            ) => ({
+                                                                                ...p,
+                                                                                type_client:
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option value="">
+                                                                        Sélectionnez
+                                                                    </option>
+                                                                    <option value="Personne pysique">
+                                                                        Personne
+                                                                        pysique
+                                                                    </option>
+                                                                    <option value="Personne morale">
+                                                                        Personne
+                                                                        morale
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
 
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="intitule_compte"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Intitulé de
-                                                                compte
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                id="intitule_compte"
-                                                                type="text"
-                                                                name="intitule_compte"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.intitule_compte
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                    // width: "100px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setAdhesion(
-                                                                        (
-                                                                            p
-                                                                        ) => ({
-                                                                            ...p,
-                                                                            intitule_compte:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        })
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    adhesion.intitule_compte
-                                                                }
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="intitule_compte"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Nom compte
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    id="intitule_compte"
+                                                                    type="text"
+                                                                    name="intitule_compte"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.intitule_compte
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                        // width: "100px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setAdhesion(
+                                                                            (
+                                                                                p
+                                                                            ) => ({
+                                                                                ...p,
+                                                                                intitule_compte:
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                    value={
+                                                                        adhesion.intitule_compte
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
                                         </form>
                                     </div>
                                 </div>
@@ -1819,259 +1843,287 @@ const Adhesion = () => {
                                 <div className="row">
                                     <div className="col-md-5 card rounded-0 p-3">
                                         <form action="">
-                                            <table>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="agence"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Compte abregé
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                id="compte_to_search"
-                                                                name="compte_to_search"
-                                                                type="text"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.agence
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
+                                            <fieldset className="border p-2">
+                                                <legend
+                                                    className="float-none w-auto p-0"
+                                                    style={{ fontSize: "15px" }}
+                                                >
+                                                    <h6
+                                                        className="text-bold"
+                                                        style={{
+                                                            color: "green",
+                                                        }}
+                                                    >
+                                                        Modification compte
+                                                    </h6>
+                                                </legend>
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="agence"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Compte
+                                                                    abregé
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    id="compte_to_search"
+                                                                    name="compte_to_search"
+                                                                    type="text"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.agence
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                        width: "80px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setcompte_to_search(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <button
+                                                                    className="btn btn-primary rounded-0"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        marginTop:
+                                                                            "-5px",
+                                                                    }}
+                                                                    onClick={
+                                                                        getSeachedData
+                                                                    }
+                                                                >
+                                                                    Rechercher
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="code_monnaie"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Code monaie
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="code_monnaie"
+                                                                    type="text"
+                                                                    name="code_monnaie"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `1px solid #dcdcdc"
                                                                     }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                    width: "80px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setcompte_to_search(
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            />
-                                                            <button
-                                                                className="btn btn-primary rounded-0"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    marginTop:
-                                                                        "-5px",
-                                                                }}
-                                                                onClick={
-                                                                    getSeachedData
-                                                                }
-                                                            >
-                                                                Rechercher
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="code_monnaie"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Code monaie
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="code_monnaie"
-                                                                type="text"
-                                                                name="code_monnaie"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                }}
-                                                                value={
-                                                                    code_monnaie
-                                                                }
-                                                                disabled
-                                                            >
-                                                                {/* <option value="">
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                    value={
+                                                                        code_monnaie
+                                                                    }
+                                                                    disabled
+                                                                >
+                                                                    {/* <option value="">
                                                                     Sélectionnez
                                                                 </option> */}
-                                                                <option value="CDF">
-                                                                    CDF
-                                                                </option>
-                                                                <option value="USD">
-                                                                    USD
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="type_epargne"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Type epargne
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="type_epargne"
-                                                                type="text"
-                                                                name="type_epargne"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.type_epargne
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                    // width: "100px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    settype_epargne(
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            >
-                                                                <option
-                                                                    value={
-                                                                        type_epargne
+                                                                    <option value="CDF">
+                                                                        CDF
+                                                                    </option>
+                                                                    <option value="USD">
+                                                                        USD
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="type_epargne"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Type epargne
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="type_epargne"
+                                                                    type="text"
+                                                                    name="type_epargne"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.type_epargne
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                        // width: "100px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        settype_epargne(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
                                                                     }
                                                                 >
-                                                                    {
-                                                                        type_epargne
-                                                                    }
-                                                                </option>
-                                                                <option value="Epargne à vie">
-                                                                    Epargne à
-                                                                    vie
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="type_client"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Type client
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <select
-                                                                id="type_client"
-                                                                type="text"
-                                                                name="type_client"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.type_client
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    settype_client(
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            >
-                                                                <option
-                                                                    value={
-                                                                        type_client
+                                                                    <option
+                                                                        value={
+                                                                            type_epargne
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            type_epargne
+                                                                        }
+                                                                    </option>
+                                                                    <option value="Epargne à vie">
+                                                                        Epargne
+                                                                        à vie
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="type_client"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Type client
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    id="type_client"
+                                                                    type="text"
+                                                                    name="type_client"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.type_client
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        settype_client(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
                                                                     }
                                                                 >
-                                                                    {
-                                                                        type_client
-                                                                    }
-                                                                </option>
-                                                                <option value="Personne pysique">
-                                                                    Personne
-                                                                    pysique
-                                                                </option>
-                                                                <option value="Personne morale">
-                                                                    Personne
-                                                                    morale
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                    </tr>
+                                                                    <option
+                                                                        value={
+                                                                            type_client
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            type_client
+                                                                        }
+                                                                    </option>
+                                                                    <option value="Personne pysique">
+                                                                        Personne
+                                                                        pysique
+                                                                    </option>
+                                                                    <option value="Personne morale">
+                                                                        Personne
+                                                                        morale
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
 
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                htmlFor="intitule_compte"
-                                                                style={{
-                                                                    padding:
-                                                                        "2px",
-                                                                    color: "steelblue",
-                                                                }}
-                                                            >
-                                                                Intitulé de
-                                                                compte
-                                                            </label>
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                id="intitule_compte"
-                                                                type="text"
-                                                                name="intitule_compte"
-                                                                style={{
-                                                                    padding:
-                                                                        "1px ",
-                                                                    border: `${
-                                                                        error.intitule_compte
-                                                                            ? "1px solid red"
-                                                                            : "1px solid #dcdcdc"
-                                                                    }`,
-                                                                    marginBottom:
-                                                                        "5px",
-                                                                    // width: "100px",
-                                                                }}
-                                                                onChange={(e) =>
-                                                                    setintitule_compte(
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    intitule_compte
-                                                                }
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                        <tr>
+                                                            <td>
+                                                                <label
+                                                                    htmlFor="intitule_compte"
+                                                                    style={{
+                                                                        padding:
+                                                                            "2px",
+                                                                        color: "steelblue",
+                                                                    }}
+                                                                >
+                                                                    Intitulé de
+                                                                    compte
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    id="intitule_compte"
+                                                                    type="text"
+                                                                    name="intitule_compte"
+                                                                    style={{
+                                                                        padding:
+                                                                            "1px ",
+                                                                        border: `${
+                                                                            error.intitule_compte
+                                                                                ? "1px solid red"
+                                                                                : "1px solid #dcdcdc"
+                                                                        }`,
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                        // width: "100px",
+                                                                    }}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setintitule_compte(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                    value={
+                                                                        intitule_compte
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
                                         </form>
                                     </div>
                                 </div>

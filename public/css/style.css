@@ -216,12 +216,16 @@ html, body {
 
 .bg-teal {
   background-color: teal !important;
+  margin-top: 50px !important;
+  height: auto !important;
+  
 }
 
 .footer {
   position: relative !important; /* Position normale pour éviter des chevauchements */
   width: 100% !important;        /* Le footer prend toute la largeur */
   text-align: center !important;
+
 
 }
 

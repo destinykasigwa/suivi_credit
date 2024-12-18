@@ -67,6 +67,7 @@ div > .input_form {
     border: 1.6px solid #1f1e1e;
     color: #666565;
     text-align: center;
+    
 }
 div > .input_form::placeholder {
     color: #b2b0b0;

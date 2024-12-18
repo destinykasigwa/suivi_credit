@@ -40,11 +40,19 @@ class TransactionsController extends Controller
     //protected $africaTalking;
 
     protected $sendNotification;
+    protected $numCompteCaissePrUSD;
+    protected $numCompteCaissePrCDF;
+    protected $compteVirementInterGuichetUSD;
+    protected $compteVirementInterGuichetCDF;
 
     public function __construct()
     {
         $this->middleware("auth");
         $this->sendNotification = app(SendNotification::class);
+        $this->numCompteCaissePrUSD = "5700000000201";
+        $this->numCompteCaissePrCDF = "5700000000202";
+        $this->compteVirementInterGuichetUSD = "5900000000201";
+        $this->compteVirementInterGuichetCDF = "5900000000202";
     }
 
 
@@ -119,11 +127,30 @@ class TransactionsController extends Controller
             //RECUPERE LES DATES PAR DEFAUT   
             $NewDate1  = date('Y') . '-01-01';
             $NewDate2 = date("Y-m-d");
+
+            if ($data->CodeMonnaie == 2) {
+                //RECUPERE LE SOLDE DU COMPTE CDF
+                $soldeMembre = Transactions::select(
+                    DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembre"),
+                )->where("NumCompte", '=',  $request->NumCompte)
+                    ->where("CodeMonnaie", '=',  2)
+                    ->groupBy("NumCompte")
+                    ->first();
+            } else {
+                //RECUPERE LE SOLDE DU COMPTE CDF
+                $soldeMembre = Transactions::select(
+                    DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembre"),
+                )->where("NumCompte", '=',  $request->NumCompte)
+                    ->where("CodeMonnaie", '=',  1)
+                    ->groupBy("NumCompte")
+                    ->first();
+            }
             return response()->json([
                 "status" => 1,
                 "data" => $data,
                 "defaultDateDebut" => $NewDate1,
-                "defaultDateFin" => $NewDate2
+                "defaultDateFin" => $NewDate2,
+                "soldeCompte" => $soldeMembre,
             ]);
         } else {
             return response()->json(["status" => 0, "msg" => "Une erreur est survenue."]);
@@ -311,7 +338,7 @@ class TransactionsController extends Controller
                         ]);
 
                         //SEND NOTIFICATION
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C", $request->DeposantName);
                         return response()->json(["status" => 1, "msg" => "Opération bien enregistrée"]);
                     } else {
                         return response()->json([
@@ -478,7 +505,7 @@ class TransactionsController extends Controller
 
                         //SEND NOTIFICATION
 
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C", $request->DeposantName);
                         return response()->json(["status" => 1, "msg" => "Opération bien enregistrée"]);
                     } else {
                         return response()->json([
@@ -532,7 +559,14 @@ class TransactionsController extends Controller
             if ($request->devise == "CDF") {
                 $dataSystem = TauxEtDateSystem::latest()->first();
                 //RECUPERE LE NUMERO DE COMPTE DU CLIENT
-                $getCompte = Comptes::where("NumAdherant", $request->refCompte)->where("CodeMonnaie", 2)->first();
+                // $getCompte = Comptes::where("NumAdherant", $request->refCompte)->where("CodeMonnaie", 2)->first();
+                $getCompte = Comptes::where(function ($query) use ($request) {
+                    $query->where("NumAdherant", $request->refCompte)
+                        ->orWhere("NumCompte", $request->refCompte);
+                })
+                    ->where("CodeMonnaie", 2)
+                    ->first();
+
                 if ($getCompte) {
                     //RECUPERE LE SOLDE 
                     $soldeMembreCDF = Transactions::select(
@@ -578,7 +612,13 @@ class TransactionsController extends Controller
             } else if ($request->devise == "USD") {
                 $dataSystem = TauxEtDateSystem::latest()->first();
                 //RECUPERE LE NUMERO DE COMPTE DU CLIENT
-                $getCompte = Comptes::where("NumAdherant", $request->refCompte)->where("CodeMonnaie", 1)->first();
+                $getCompte = Comptes::where(function ($query) use ($request) {
+                    $query->where("NumAdherant", $request->refCompte)
+                        ->orWhere("NumCompte", $request->refCompte);
+                })
+                    ->where("CodeMonnaie", 1)
+                    ->first();
+                // $getCompte = Comptes::where("NumAdherant", $request->refCompte)->where("CodeMonnaie", 1)->first();
                 if ($getCompte) {
                     //RECUPERE LE SOLDE 
                     $soldeMembreUSD = Transactions::select(
@@ -866,7 +906,7 @@ class TransactionsController extends Controller
                             "Servie" => 1,
                         ]);
                         //SEND NOTIFICATION TO CUSTUMER
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D", $dataVisa->Retirant);
                         return response()->json(['status' => 1, 'msg' => "Opération bien enregistrée."]);
                     } else {
                         return response()->json(['status' => 0, 'msg' => "Oooops! une erreur est survenue lors de l'éxécution de cette requête verifier bien que votre caisse est approvissionnée si l'erreur persiste veuillez contactez votre Administrateur système."]);
@@ -1064,7 +1104,7 @@ class TransactionsController extends Controller
 
                         //SEND NOTIFICATION TO CUSTOMER 
 
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D");
+                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D", $dataVisa->Retirant);
                         return response()->json(['status' => 1, 'msg' => "Opération bien enregistrée."]);
                     }
                 } else {
@@ -1289,57 +1329,77 @@ class TransactionsController extends Controller
             $dataCaissier = User::where("id", "=", $request->CaissierId)->first();
 
             if ($request->devise == "CDF") {
-                $caissierEccount = Comptes::where("caissierId", $request->CaissierId)->where("CodeMonnaie", 2)->first();
-                //RECUPERE SUR LA TABLE USERS LE NOM QUI CORRESPOND A CE ID CDF
-                $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
-                CompteurTransaction::create([
-                    'fakevalue' => "0000",
-                ]);
-                $numOperation = [];
-                $numOperation = CompteurTransaction::latest()->first();
-                $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "D00" . $numOperation->id;
-                //RECUPERE LA DATE DU SYSTEME
-                BilletageAppro_cdf::create([
-                    "Reference" => $NumTransaction,
-                    "NumCompteCaissier" => $caissierEccount->NumCompte,
-                    "vightMilleFranc" => $request->vightMille,
-                    "dixMilleFranc" => $request->dixMille,
-                    "cinqMilleFranc" => $request->cinqMille,
-                    "milleFranc" => $request->milleFranc,
-                    "cinqCentFranc" => $request->cinqCentFr,
-                    "deuxCentFranc" => $request->deuxCentFranc,
-                    "centFranc" => $request->centFranc,
-                    "cinquanteFanc" => $request->cinquanteFanc,
-                    "NomUtilisateur" => Auth::user()->name,
-                    "NomDemandeur" => $dataCaissier->name,
-                    "DateTransaction" =>   $dateSystem,
-                    "montant" => $request->Montant
-                ]);
+                $numCompteCaissePrCDF = $this->numCompteCaissePrCDF;
+                $soldeComptePrincip = Transactions::select(
+                    DB::raw("SUM(Debitfc)-SUM(Creditfc) as soldeCompte"),
+                )->where("NumCompte", '=', $numCompteCaissePrCDF)
+                    ->groupBy("NumCompte")
+                    ->first();
+                if ($soldeComptePrincip->soldeCompte >= $request->Montant) {
+                    $caissierEccount = Comptes::where("caissierId", $request->CaissierId)->where("CodeMonnaie", 2)->first();
+                    //RECUPERE SUR LA TABLE USERS LE NOM QUI CORRESPOND A CE ID CDF
+                    $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
+                    CompteurTransaction::create([
+                        'fakevalue' => "0000",
+                    ]);
+                    $numOperation = [];
+                    $numOperation = CompteurTransaction::latest()->first();
+                    $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "D00" . $numOperation->id;
+                    //RECUPERE LA DATE DU SYSTEME
+                    BilletageAppro_cdf::create([
+                        "Reference" => $NumTransaction,
+                        "NumCompteCaissier" => $caissierEccount->NumCompte,
+                        "vightMilleFranc" => $request->vightMille,
+                        "dixMilleFranc" => $request->dixMille,
+                        "cinqMilleFranc" => $request->cinqMille,
+                        "milleFranc" => $request->milleFranc,
+                        "cinqCentFranc" => $request->cinqCentFr,
+                        "deuxCentFranc" => $request->deuxCentFranc,
+                        "centFranc" => $request->centFranc,
+                        "cinquanteFanc" => $request->cinquanteFanc,
+                        "NomUtilisateur" => Auth::user()->name,
+                        "NomDemandeur" => $dataCaissier->name,
+                        "DateTransaction" =>   $dateSystem,
+                        "montant" => $request->Montant
+                    ]);
 
-                return response()->json(["status" => 1, "msg" => "Appro en attente de Validation"]);
+                    return response()->json(["status" => 1, "msg" => "Appro en attente de Validation"]);
+                } else {
+                    return response()->json(["status" => 0, "msg" => "Le montant saisi est superieur au solde de la caisse principale son solde est: " . $soldeComptePrincip->soldeCompte]);
+                }
             } else if ($request->devise == "USD") {
-                $caissierEccount = Comptes::where("caissierId", $request->CaissierId)->where("CodeMonnaie", 1)->first();
-                $numOperation = [];
-                $numOperation = CompteurTransaction::latest()->first();
-                $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "D00" . $numOperation->id;
-                $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
+                $numCompteCaissePrUSD = $this->numCompteCaissePrUSD;
+                $soldeComptePrincip = Transactions::select(
+                    DB::raw("SUM(Debitusd)-SUM(Creditusd) as soldeCompte"),
+                )->where("NumCompte", '=', $numCompteCaissePrUSD)
+                    ->groupBy("NumCompte")
+                    ->first();
+                if ($soldeComptePrincip->soldeCompte >= $request->Montant) {
+                    $caissierEccount = Comptes::where("caissierId", $request->CaissierId)->where("CodeMonnaie", 1)->first();
+                    $numOperation = [];
+                    $numOperation = CompteurTransaction::latest()->first();
+                    $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "D00" . $numOperation->id;
+                    $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
 
 
-                BilletageAppro_usd::create([
-                    "Reference" => $NumTransaction,
-                    "NumCompteCaissier" => $caissierEccount->NumCompte,
-                    "centDollars" => $request->hundred,
-                    "cinquanteDollars" => $request->fitfty,
-                    "vightDollars" => $request->twenty,
-                    "dixDollars" => $request->ten,
-                    "cinqDollars" => $request->five,
-                    "unDollars" => $request->oneDollar,
-                    "NomUtilisateur" => Auth::user()->name,
-                    "NomDemandeur" => $dataCaissier->name,
-                    "DateTransaction" =>  $dateSystem,
-                    "montant" => $request->Montant
-                ]);
-                return response()->json(["status" => 1, "msg" => "Appro en attente de Validation"]);
+                    BilletageAppro_usd::create([
+                        "Reference" => $NumTransaction,
+                        "NumCompteCaissier" => $caissierEccount->NumCompte,
+                        "centDollars" => $request->hundred,
+                        "cinquanteDollars" => $request->fitfty,
+                        "vightDollars" => $request->twenty,
+                        "dixDollars" => $request->ten,
+                        "cinqDollars" => $request->five,
+                        "unDollars" => $request->oneDollar,
+                        "NomUtilisateur" => Auth::user()->name,
+                        "NomDemandeur" => $dataCaissier->name,
+                        "DateTransaction" =>  $dateSystem,
+                        "montant" => $request->Montant
+                    ]);
+                    return response()->json(["status" => 1, "msg" => "Appro en attente de Validation"]);
+                } else {
+                    return response()->json(["status" => 0, "msg" => "Le montant saisi est superieur au solde de la caisse principale son solde est: " . $soldeComptePrincip->soldeCompte]);
+                }
             }
         } else {
             return response()->json(["status" => 0, "msg" => "Vous devez renseigner la devise, le caisier et le montant"]);
@@ -1377,8 +1437,8 @@ class TransactionsController extends Controller
                 $dataCaissier = Comptes::where("caissierId", "=", Auth::user()->id)->where("CodeMonnaie", "=", 2)->first();
                 $numCompteCaissierCDF = $dataCaissier->NumCompte;
                 $tauxDuJour = TauxEtDateSystem::latest()->first()->TauxEnFc;
-                $numCompteCaissePrCDF = "5700000000202";
-                $compteVirementInterGuichetCDF = "5900000000202";
+                $numCompteCaissePrCDF = $this->numCompteCaissePrCDF;
+                $compteVirementInterGuichetCDF = $this->compteVirementInterGuichetCDF;
 
                 //COMPTEUR DES OPERATIONS
                 $numOperation = [];
@@ -1501,8 +1561,8 @@ class TransactionsController extends Controller
                 $dataCaissier = Comptes::where("caissierId", "=", Auth::user()->id)->where("CodeMonnaie", "=", 1)->first();
                 $numCompteCaissierUSD = $dataCaissier->NumCompte;
                 $tauxDuJour = TauxEtDateSystem::latest()->first()->TauxEnFc;
-                $numCompteCaissePrUSD = "5700000000201";
-                $compteVirementInterGuichetUSD = "5900000000201";
+                $numCompteCaissePrUSD = $this->numCompteCaissePrUSD;
+                $compteVirementInterGuichetUSD = $this->compteVirementInterGuichetUSD;
 
                 //COMPTEUR DES OPERATIONS
                 $numOperation = [];
@@ -1583,7 +1643,7 @@ class TransactionsController extends Controller
                     "NumDossier" => "DOS00" . $numOperation->id,
                     "NumDemande" => "V00" . $numOperation->id,
                     "NumCompte" => $numCompteCaissierUSD,
-                    "NumComptecp" => $numCompteCaissierUSD,
+                    "NumComptecp" => $numCompteCaissePrUSD,
                     "Debit" => $getApproRow->montant,
                     "Operant" => $getApproRow->NomDemandeur,
                     "Debitusd" => $getApproRow->montant,
@@ -1650,8 +1710,8 @@ class TransactionsController extends Controller
         if (!$checkIfRowNotConfirmed) {
             $data = Delestages::where("id", $request->refDelestage)->first();
             $tauxDuJour = TauxEtDateSystem::latest()->first()->TauxEnFc;
-            $numCompteCaissePrUSD = "5700000000201";
-            $compteVirementInterGuichetUSD = "5900000000201";
+            $numCompteCaissePrUSD = $this->numCompteCaissePrUSD;
+            $compteVirementInterGuichetUSD = $this->compteVirementInterGuichetUSD;
             $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
             //COMPTEUR DES OPERATIONS
             $numOperation = [];
@@ -1765,8 +1825,8 @@ class TransactionsController extends Controller
         if (!$checkIfRowNotConfirmed) {
             $data = Delestages::where("id", $request->refDelestage)->first();
             $tauxDuJour = TauxEtDateSystem::latest()->first()->TauxEnFc;
-            $numCompteCaissePrCDF = "5700000000202";
-            $compteVirementInterGuichetCDF = "5900000000202";
+            $numCompteCaissePrCDF = $this->numCompteCaissePrCDF;
+            $compteVirementInterGuichetCDF = $this->compteVirementInterGuichetCDF;
             $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
             //COMPTEUR DES OPERATIONS
             $numOperation = [];

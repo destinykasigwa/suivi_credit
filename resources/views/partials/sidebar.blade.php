@@ -11,7 +11,7 @@
              </div> --}}
              <div class="info">
                  <a href="eco/home" class="d-block text-light"
-                     style="font-size: 18px;margin-top:-10px"><strong>IHDEMUNIS</strong></a>
+                     style="font-size: 30px;margin-top:-10px"><strong>FinaPlus</strong></a>
              </div>
          </div>
          <nav class="mt-2">
@@ -169,7 +169,8 @@
                                          </a>
                                      </li>
                                      <li class="nav-item">
-                                         <a href="{{ route('eco.pages.crediter') }}" class="nav-link">
+                                         <a style="pointer-events: none" href="{{ route('eco.pages.crediter') }}"
+                                             class="nav-link">
                                              <i class="far fa-circle nav-icon"></i>
                                              <p>Créditer</p>
                                          </a>

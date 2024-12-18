@@ -26,7 +26,7 @@ class SendNotification
 
 
     //PERMET D'ENVOYER DES NOTIFICATION
-    public function sendNotification($NumCompte, $devise, $montant, $typeTransaction)
+    public function sendNotification($NumCompte, $devise, $montant, $typeTransaction, $operant)
     {
         // if ($codeMonnaie == 1) {
         //     $devise = "USD"; //USD
@@ -95,15 +95,16 @@ class SendNotification
                             ->groupBy("NumCompte")
                             ->first();
 
-                        $message = ($getMembreInfo2->sexe == "Homme")
-                            ? "Bonjour Monsieur "
-                            : (($getMembreInfo2->sexe == "Femme")
-                                ? "Bonjour Madame "
-                                : "Bonjour ");
+                        // $message = ($getMembreInfo2->sexe == "Homme")
+                        //     ? "Bonjour Monsieur "
+                        //     : (($getMembreInfo2->sexe == "Femme")
+                        //         ? "Bonjour Madame "
+                        //         : "Bonjour ");
 
-                        $message .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompteCDF .
+                        $message = $getMembreInfo2->NomCompte . ", Votre compte CDF " . $NumCompteCDF .
                             ($typeTransaction == "C" ? " est credite " : " est debite ") .
-                            "de " . $montant . " . Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
+                            "de " . $montant .
+                            ($typeTransaction == "C" ? " depot de " : " retrait de ") . $operant . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
 
                         $receiver_number = $getMembreInfo->Telephone;
                         $response = $this->africaTalking->sendSms($receiver_number, $message);
@@ -140,15 +141,15 @@ class SendNotification
                             ->first();
 
                         $receiver_number = $getMembreInfo->Telephone;
-                        $message = ($getMembreInfo2->sexe == "Homme")
-                            ? "Bonjour Monsieur "
-                            : (($getMembreInfo2->sexe == "Femme")
-                                ? "Bonjour Madame "
-                                : "Bonjour ");
+                        // $message = ($getMembreInfo2->sexe == "Homme")
+                        //     ? "Bonjour Monsieur "
+                        //     : (($getMembreInfo2->sexe == "Femme")
+                        //         ? "Bonjour Madame "
+                        //         : "Bonjour ");
 
-                        $message .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
+                        $message = $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
                             ($typeTransaction == "C" ? " est credite " : " est debite ") .
-                            "de " . $montant . ". Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
+                            "de " . $montant . ($typeTransaction == "C" ? " depot de " : " retrait de ") . $operant . ". Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
 
                         $receiver_number = $getMembreInfo->Telephone;
                         $response = $this->africaTalking->sendSms($receiver_number, $message);
@@ -388,13 +389,7 @@ class SendNotification
                                 ->groupBy("NumCompte")
                                 ->first();
 
-                            $message = ($getMembreInfo2->sexe == "Homme")
-                                ? "Bonjour Monsieur "
-                                : (($getMembreInfo2->sexe == "Femme")
-                                    ? "Bonjour Madame "
-                                    : "Bonjour ");
-
-                            $message .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompteCDF .
+                            $message = $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompteCDF .
                                 " est debite de " . $montant . " capital ordinaire du credit" . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
 
                             $receiver_number = $getMembreInfo->Telephone;

@@ -103,7 +103,15 @@ const Recuperation = () => {
                         <div className={styles.register_section_warp}>
                             <div className={styles.register_section_right}>
                                 <div className={styles.headersection}>
-                                    <h3>Récuperation du mot de passe 1/3!</h3>
+                                    <h5
+                                        style={{
+                                            color: "steelblue",
+                                            fontWeight: "bold",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Récuperation du mot de passe 1/3!
+                                    </h5>
                                 </div>
                                 <form
                                     className={styles.form}
@@ -156,10 +164,16 @@ const Recuperation = () => {
                         <div className={styles.register_section_warp}>
                             <div className={styles.register_section_right}>
                                 <div className={styles.headersection}>
-                                    <h4>
+                                    <h5
+                                        style={{
+                                            color: "steelblue",
+                                            fontWeight: "bold",
+                                            textAlign: "center",
+                                        }}
+                                    >
                                         Veuillez renseigner le code vous envoyé
                                         par email étape 2/3!
-                                    </h4>
+                                    </h5>
                                 </div>
                                 <form
                                     className={styles.form}
@@ -213,9 +227,15 @@ const Recuperation = () => {
                         <div className={styles.register_section_warp}>
                             <div className={styles.register_section_right}>
                                 <div className={styles.headersection}>
-                                    <h4>
+                                    <h5
+                                        style={{
+                                            color: "steelblue",
+                                            fontWeight: "bold",
+                                            textAlign: "center",
+                                        }}
+                                    >
                                         Récuperation de mot de passe étape 3/3!
-                                    </h4>
+                                    </h5>
                                 </div>
 
                                 <form

@@ -861,9 +861,18 @@ const RecuApproUSD = ({ data }) => {
                                                         <div>
                                                             Fait à goma le{" "}
                                                             {dateParser(
-                                                                new Date()
+                                                                data.DateTransaction
                                                             )}{" "}
+                                                            {" à " +
+                                                                data.created_at
+                                                                    .split(
+                                                                        "T"
+                                                                    )[1]
+                                                                    .split(
+                                                                        "."
+                                                                    )[0]}
                                                         </div>
+
                                                         <table className="table table-striped">
                                                             <thead>
                                                                 <tr>

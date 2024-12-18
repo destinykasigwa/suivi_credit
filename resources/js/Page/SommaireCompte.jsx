@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import * as FileSaver from "file-saver";
 import html2canvas from "html2canvas";
+import { Bars } from "react-loader-spinner";
 
 const SommaireCompte = () => {
     const [loading, setloading] = useState(false);
@@ -13,6 +14,7 @@ const SommaireCompte = () => {
     const [date_fin_balance, setdate_fin_balance] = useState("");
     const [radioValue, setRadioValue] = useState("rapport_non_converti");
     const [radioValue2, setRadioValue2] = useState("");
+    const [chargement, setchargement] = useState(false);
     const handleRadioChange = (event) => {
         setRadioValue(event.target.value);
     };
@@ -67,6 +69,7 @@ const SommaireCompte = () => {
     };
 
     const downloadReport = (type) => {
+        setchargement(true);
         // Générer le nom du fichier avec la date du jour
         const filename = `Sommaire_Compte_${
             new Date().toISOString().split("T")[0]
@@ -91,6 +94,7 @@ const SommaireCompte = () => {
                 }
             )
             .then((response) => {
+                setchargement(false);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -144,6 +148,7 @@ const SommaireCompte = () => {
     const AfficherSommaire = async (e) => {
         e.preventDefault();
         setloading(true);
+        setchargement(true);
         const res = await axios.post(
             "/eco/pages/rapport/sommaire-compte/affichage",
             {
@@ -157,6 +162,7 @@ const SommaireCompte = () => {
             }
         );
         if (res.data.status == 1) {
+            setchargement(false);
             setloading(false);
             setFetchData(res.data.data);
             //setFetchData2(res.data.data);
@@ -487,6 +493,38 @@ const SommaireCompte = () => {
                     className="row mb-2"
                     style={{ background: "#fff", padding: "1px" }}
                 >
+                    {chargement && (
+                        <div
+                            style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                zIndex: 1000,
+                            }}
+                        >
+                            <div>
+                                <Bars
+                                    height="80"
+                                    width="80"
+                                    color="#4fa94d"
+                                    ariaLabel="loading"
+                                />
+                                <h5
+                                    style={{
+                                        color: "#fff",
+                                    }}
+                                >
+                                    Patientez...
+                                </h5>
+                            </div>
+                        </div>
+                    )}
                     <div className="col-md-2">
                         <form action="">
                             <table>
@@ -1187,7 +1225,8 @@ const SommaireCompte = () => {
                                                                         {" "}
                                                                         {numberWithSpaces(
                                                                             parseFloat(
-                                                                                res.solde_consolide_usd_to_cdf
+                                                                                res.solde_consolide_usd_to_cdf ||
+                                                                                    0 // Remplace null ou undefined par 0
                                                                             ).toFixed(
                                                                                 2
                                                                             )
@@ -1252,7 +1291,8 @@ const SommaireCompte = () => {
                                                                         {" "}
                                                                         {numberWithSpaces(
                                                                             parseFloat(
-                                                                                res.solde_consolide_cdf_to_usd
+                                                                                res.solde_consolide_cdf_to_usd ||
+                                                                                    0 // Remplace null ou undefined par 0
                                                                             ).toFixed(
                                                                                 2
                                                                             )

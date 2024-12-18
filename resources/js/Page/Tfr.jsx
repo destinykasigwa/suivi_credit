@@ -244,8 +244,28 @@ const Tfr = () => {
         };
 
         const table = document.getElementById(tableId);
-        const wb = XLSX.utils.table_to_book(table);
+
+        if (!table) {
+            console.error(`Table with id ${tableId} not found`);
+            return;
+        }
+
+        // Convert table to workbook
+        const wb = XLSX.utils.table_to_book(table, { raw: true });
+
+        // Optionally set column widths
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const cols = Array.from(
+            table.querySelectorAll("tr:first-child th")
+        ).map(
+            () => ({ wpx: 100 }) // Set default width in pixels
+        );
+        ws["!cols"] = cols;
+
+        // Write workbook
         const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+        // Save file
         const fileName = `table_${tableId}.xlsx`;
         saveAs(
             new Blob([s2ab(wbout)], { type: "application/octet-stream" }),

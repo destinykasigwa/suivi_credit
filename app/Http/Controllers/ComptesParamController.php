@@ -310,6 +310,11 @@ class ComptesParamController extends Controller
             ->orWhere("RefTypeCompte", "=", 7)
             ->orWhere("RefTypeCompte", "=", 4)
             ->orWhere("RefTypeCompte", "=", 1)
+            ->orderByRaw("CASE 
+             WHEN RefTypeCompte = 7 THEN 1 
+             WHEN RefTypeCompte = 6 THEN 2 
+             ELSE 3 
+             END")
             ->get();
 
         return response()->json([

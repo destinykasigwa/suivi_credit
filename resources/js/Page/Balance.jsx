@@ -441,6 +441,7 @@ const Balance = () => {
                                                     id="balance_convertie_cdf"
                                                     name="balance_convertie_cdf"
                                                     value="balance_convertie_cdf"
+                                                    disabled
                                                     checked={
                                                         radioValue ===
                                                         "balance_convertie_cdf"
@@ -470,6 +471,7 @@ const Balance = () => {
                                                     id="balance_convertie_usd"
                                                     name="balance_convertie_usd"
                                                     value="balance_convertie_usd"
+                                                    disabled
                                                     checked={
                                                         radioValue ===
                                                         "balance_convertie_usd"
