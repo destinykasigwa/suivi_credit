@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { Bars } from "react-loader-spinner";
 
 const Debiter = () => {
     const [loading, setloading] = useState(false);
@@ -15,6 +16,9 @@ const Debiter = () => {
     const [fetchDayOperation, setfetchDayOperation] = useState();
     const [searchRefOperation, setsearchRefOperation] = useState();
     const [fetchSearchedOperation, setfetchSearchedOperation] = useState();
+    const [chargement, setchargement] = useState(false);
+    const [searched_account_by_name, setsearched_account_by_name] = useState();
+    const [fetchDataByName, setFetchDataByName] = useState();
     const [checkboxValues, setCheckboxValues] = useState({
         RemboursementAnticipative: false,
     });
@@ -28,6 +32,7 @@ const Debiter = () => {
     const saveOperation = async (e) => {
         e.preventDefault();
         setloading(true);
+        setchargement(true);
 
         let confirmation;
         // Afficher une boîte de dialogue de confirmation
@@ -67,9 +72,9 @@ const Debiter = () => {
                     }
                 );
 
-                setloading(false);
-
                 if (res.data.status === 1) {
+                    setchargement(false);
+                    setloading(false);
                     Swal.fire({
                         title: "Succès",
                         text: res.data.msg,
@@ -80,6 +85,8 @@ const Debiter = () => {
                     setMontant("");
                     setLibelle("");
                 } else if (res.data.status === 0) {
+                    setchargement(false);
+                    setloading(false);
                     Swal.fire({
                         title: "Erreur",
                         text: res.data.msg,
@@ -91,6 +98,7 @@ const Debiter = () => {
                     setError(res.data.validate_error);
                 }
             } catch (error) {
+                setchargement(false);
                 setloading(false);
                 Swal.fire({
                     title: "Erreur",
@@ -101,6 +109,7 @@ const Debiter = () => {
             }
         } else {
             setloading(false);
+            setchargement(false);
         }
     };
 
@@ -152,6 +161,7 @@ const Debiter = () => {
     }
 
     const extourneOperation = async (reference) => {
+        setchargement(true);
         const confirmation = await Swal.fire({
             title: "Êtes-vous sûr?",
             text: "Voulez-vous vraiment extourner cette opération ?",
@@ -165,9 +175,7 @@ const Debiter = () => {
                 "/eco/page/debiteur/extourne-operation/" + reference
             );
             if (res.data.status == 1) {
-                // this.setState({
-                //     fetchSearchedOperation: res.data.data,
-                // });
+                setchargement(false);
                 Swal.fire({
                     title: "Créditeur",
                     text: res.data.msg,
@@ -175,6 +183,7 @@ const Debiter = () => {
                     button: "OK!",
                 });
             } else if (res.data.status == 0) {
+                setchargement(false);
                 Swal.fire({
                     title: "Erreur",
                     text: res.data.msg,
@@ -183,6 +192,7 @@ const Debiter = () => {
                 });
             }
         } else {
+            setchargement(false);
             Swal.fire({
                 title: "Annulation",
                 text: "L'extourne n'a pas eu lieu",
@@ -230,6 +240,28 @@ const Debiter = () => {
             event.target.value
         );
     }
+    const getSeachedDataByName = async (e) => {
+        e.preventDefault();
+        setchargement(true);
+        const res = await axios.post("/eco/page/releve/get-account-by-name", {
+            searched_account_by_name: searched_account_by_name,
+        });
+        if (res.data.status == 1) {
+            setFetchDataByName(res.data.data);
+            console.log(fetchDataByName);
+            setchargement(false);
+        } else {
+            setchargement(false);
+            Swal.fire({
+                title: "Erreur",
+                text: res.data.msg,
+                icon: "error",
+                timer: 8000,
+                confirmButtonText: "Okay",
+            });
+        }
+    };
+
     let compteur = 1;
     return (
         <div className="container-fluid" style={{ marginTop: "10px" }}>
@@ -249,6 +281,38 @@ const Debiter = () => {
                 </div>
             </div>
             <div className="row mt-3">
+                {chargement && (
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            zIndex: 1000,
+                        }}
+                    >
+                        <div>
+                            <Bars
+                                height="80"
+                                width="80"
+                                color="#4fa94d"
+                                ariaLabel="loading"
+                            />
+                            <h5
+                                style={{
+                                    color: "#fff",
+                                }}
+                            >
+                                Patientez...
+                            </h5>
+                        </div>
+                    </div>
+                )}
                 <div
                     className="col-md-3 card rounded-0 p-3"
                     style={{ marginRight: "3px" }}
@@ -482,34 +546,123 @@ const Debiter = () => {
                         </table>
                     </div>
                 )}
-                <div className="col-md-2 card">
-                    <table>
-                        <tr>
+
+                {FetchDataDebit && (
+                    <div className="col-md-2 card">
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input
+                                            type="checkbox"
+                                            class="form-check-input mt-2"
+                                            id="isVirement"
+                                            name="isVirement"
+                                            checked={checkboxValues.isVirement}
+                                            onChange={handleCheckboxChange}
+                                        />
+                                        <label
+                                            class="form-check-label"
+                                            for="isVirement"
+                                            style={{
+                                                color: "steelblue",
+                                                fontSize: "20px",
+                                            }}
+                                        >
+                                            Virement ?
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                )}
+                <div className="col-md-2">
+                    <form action="">
+                        <table>
                             <td>
-                                <div class="form-check">
-                                    <input
-                                        type="checkbox"
-                                        class="form-check-input mt-2"
-                                        id="isVirement"
-                                        name="isVirement"
-                                        checked={checkboxValues.isVirement}
-                                        onChange={handleCheckboxChange}
-                                    />
-                                    <label
-                                        class="form-check-label"
-                                        for="isVirement"
-                                        style={{
-                                            color: "steelblue",
-                                            fontSize: "20px",
-                                        }}
-                                    >
-                                        Virement ?
-                                    </label>
-                                </div>
+                                <input
+                                    id="compte_to_search_by_name"
+                                    name="compte_to_search_by_name"
+                                    type="text"
+                                    style={{
+                                        padding: "1px ",
+                                        border: `${"1px solid #dcdcdc"}`,
+                                        marginBottom: "5px",
+                                        width: "145px",
+                                    }}
+                                    onChange={(e) => {
+                                        setsearched_account_by_name(
+                                            e.target.value
+                                        );
+                                    }}
+                                />
+                                <button
+                                    className="btn btn-primary rounded-0"
+                                    style={{
+                                        padding: "2px",
+                                        marginTop: "-5px",
+                                    }}
+                                    onClick={getSeachedDataByName}
+                                >
+                                    Rechercher par nom
+                                </button>
                             </td>
-                        </tr>
-                    </table>
+                        </table>
+                    </form>
                 </div>
+                {fetchDataByName && (
+                    <div
+                        className="col-md-4"
+                        style={{ height: "150px", overflowY: "scroll" }}
+                    >
+                        <table className="table table-bordered table-striped">
+                            {fetchDataByName &&
+                                fetchDataByName.map((res, index) => {
+                                    return (
+                                        <tr key={index}>
+                                            <td
+                                                style={
+                                                    {
+                                                        // border: "1px solid #000",
+                                                        // cursor: "pointer",
+                                                    }
+                                                }
+                                                // onClick={(event) =>
+                                                //     getAccountInfo(event)
+                                                // }
+                                            >
+                                                {res.NumCompte}
+                                            </td>
+                                            <td
+                                            // style={{
+                                            //     border: "1px solid #fff",
+                                            // }}
+                                            >
+                                                {res.NomCompte}
+                                            </td>
+                                            <td
+                                            // style={{
+                                            //     border: "1px solid #fff",
+                                            // }}
+                                            >
+                                                {res.CodeMonnaie == 1
+                                                    ? "USD"
+                                                    : "CDF"}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            <tr>
+                                {/* <td>
+                                        <button className="btn btn-primary rounded-0">
+                                            Afficher le solde
+                                        </button>
+                                    </td> */}
+                            </tr>
+                        </table>
+                    </div>
+                )}
             </div>
 
             <p

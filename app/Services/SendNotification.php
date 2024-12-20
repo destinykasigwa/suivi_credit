@@ -49,7 +49,7 @@ class SendNotification
                         ->first();
 
                     $data = ($getMembreInfo2->sexe == "Homme" ? " Bonjour Monsieur " : ($getMembreInfo2->sexe == "Femme" ? " Bonjour Madame " : " Bonjour ")) .
-                        $getMembreInfo2->NomCompte . " Votre compte CDF " . $compteCDF . ($typeTransaction == "C" ? " est crédité " : "debité ") . " de " . $montant . " CDF  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
+                        $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte . ($typeTransaction == "C" ? " est crédité " : "debité ") . " de " . $montant . " CDF  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
                     Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
                     // return view('emails.test');
                 } else if ($devise == "USD") {
@@ -101,7 +101,7 @@ class SendNotification
                         //         ? "Bonjour Madame "
                         //         : "Bonjour ");
 
-                        $message = $getMembreInfo2->NomCompte . ", Votre compte CDF " . $NumCompteCDF .
+                        $message = $getMembreInfo2->NomCompte . ", Votre compte CDF " . $NumCompte .
                             ($typeTransaction == "C" ? " est credite " : " est debite ") .
                             "de " . $montant .
                             ($typeTransaction == "C" ? " depot de " : " retrait de ") . $operant . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
@@ -147,7 +147,7 @@ class SendNotification
                         //         ? "Bonjour Madame "
                         //         : "Bonjour ");
 
-                        $message = $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
+                        $message = $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompte .
                             ($typeTransaction == "C" ? " est credite " : " est debite ") .
                             "de " . $montant . ($typeTransaction == "C" ? " depot de " : " retrait de ") . $operant . ". Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
 
@@ -180,6 +180,287 @@ class SendNotification
     }
 
 
+    //PERMET D'ENVOYER UNE NOTIFICATION LORS DE L'ANNULATION D'UNE OPERATION
+
+    public function sendNotificationExtourneOp($NumCompte, $devise, $montant, $typeTransaction)
+    {
+        // if ($codeMonnaie == 1) {
+        //     $devise = "USD"; //USD
+        // } else if ($codeMonnaie == 2) {
+        //     $devise = "CDF"; //CDF
+        // }
+        //RECUPERE LES INFORMATIONS DE LA PERSONNE QUI VENAIT D'EFFECTUER UN MOUVEMENT
+        $getMembreInfo = SMSBanking::where("NumAbrege", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+        if ($getMembreInfo) {
+            if ($getMembreInfo->Email != null and $getMembreInfo->ActivatedEmail == 1) {
+                if ($devise == "CDF") {
+                    $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 2)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+                    //RECUPERE LE SOLDE DU MEMBRE EN FC 
+                    $compteCDF = $getMembreInfo2->NumCompte;
+                    $soldeMembreCDF = Transactions::select(
+                        DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
+                    )->where("NumCompte", '=', $compteCDF)
+                        ->groupBy("NumCompte")
+                        ->first();
+
+                    $data = ($getMembreInfo2->sexe == "Homme" ? " Bonjour Monsieur " : ($getMembreInfo2->sexe == "Femme" ? " Bonjour Madame " : " Bonjour ")) .
+                        $getMembreInfo2->NomCompte . " Annulation " . ($typeTransaction == "C" ? " de votre retrait " : " dépot ") . " de " . $montant . " sur votre compte CDF " . $NumCompte . "  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
+                    Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
+                    // return view('emails.test');
+                } else if ($devise == "USD") {
+                    $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 1)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+
+                    $NumCompteUSD = $getMembreInfo2->NumCompte;
+
+                    //RECUPERE LE SOLDE DU MEMBRE EN USD
+                    $soldeMembreUSD = Transactions::select(
+                        DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembreUSD"),
+                    )->where("NumCompte", '=', $NumCompteUSD)
+                        ->groupBy("NumCompte")
+                        ->first();
+
+                    // $data = $getMembreInfo2->sexe == "Homme" ? "Bonjour Monsieur" : ($getMembreInfo2->sexe == "Femme"  ? "Bonjour Madame" : "Bonjour") .
+                    //     $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD . " est crédité de " . $montantDepot . " USD Votre nouveau solde est de  " . $soldeMembreUSD->soldeMembreUSD . "USD";
+
+
+                    $data = ($getMembreInfo2->sexe == "Homme"
+                        ? "Bonjour Monsieur"
+                        : ($getMembreInfo2->sexe == "Femme"
+                            ? "Bonjour Madame"
+                            : "Bonjour"))
+                        . " " .  $getMembreInfo2->NomCompte . ", Annulation " . ($typeTransaction == "C" ? " de votre retrait " : " dépot ") . " de " . $montant . " sur votre compte USD " . $NumCompte . "  Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreCDF . " USD";
+
+                    Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
+                }
+            }
+            if ($getMembreInfo->Telephone != null and $getMembreInfo->ActivatedSMS == 1) {
+
+                if ($devise == "CDF") {
+                    try {
+                        $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 2)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+                        //RECUPERE LE SOLDE DU MEMBRE EN USD
+                        $NumCompteCDF = $getMembreInfo2->NumCompte;
+                        $soldeMembreCDF = Transactions::select(
+                            DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
+                        )->where("NumCompte", '=', $NumCompteCDF)
+                            ->groupBy("NumCompte")
+                            ->first();
+
+                        // $message = ($getMembreInfo2->sexe == "Homme")
+                        //     ? "Bonjour Monsieur "
+                        //     : (($getMembreInfo2->sexe == "Femme")
+                        //         ? "Bonjour Madame "
+                        //         : "Bonjour ");
+
+                        $message =  $getMembreInfo2->NomCompte . ", Annulation " . ($typeTransaction == "C" ? " de votre retrait " : " dépot ") . " de " . $montant . " sur votre compte CDF " . $NumCompte . "  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
+
+                        $receiver_number = $getMembreInfo->Telephone;
+                        $response = $this->africaTalking->sendSms($receiver_number, $message);
+                        //Log::info(json_encode($response));
+                        if ($response['status'] == 'success') {
+                            // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 1,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        } else {
+                            // Traiter l'échec, par exemple, loguer l'erreur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 0,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        }
+                    } catch (\Throwable $th) {
+                        throw $th;
+                    }
+                } else if ($devise == "USD") {
+                    try {
+                        $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 1)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+                        //RECUPERE LE SOLDE DU MEMBRE EN USD
+                        $NumCompteUSD = $getMembreInfo2->NumCompte;
+                        $soldeMembreUSD = Transactions::select(
+                            DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembreUSD"),
+                        )->where("NumCompte", '=', $NumCompteUSD)
+                            ->groupBy("NumCompte")
+                            ->first();
+
+                        $receiver_number = $getMembreInfo->Telephone;
+                        // $message = ($getMembreInfo2->sexe == "Homme")
+                        //     ? "Bonjour Monsieur "
+                        //     : (($getMembreInfo2->sexe == "Femme")
+                        //         ? "Bonjour Madame "
+                        //         : "Bonjour ");
+
+                        $message =  $getMembreInfo2->NomCompte . ", Annulation " . ($typeTransaction == "C" ? " de votre retrait " : " dépot ") . " de " . $montant . " sur votre compte USD " . $NumCompte . "  Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
+                        $receiver_number = $getMembreInfo->Telephone;
+                        $response = $this->africaTalking->sendSms($receiver_number, $message);
+
+                        if ($response['status'] == 'success') {
+                            // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 1,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        } else {
+                            // Traiter l'échec, par exemple, loguer l'erreur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 0,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        }
+                    } catch (\Throwable $th) {
+                        throw $th;
+                    }
+                }
+            }
+        }
+    }
+
+    //CETTE FONCTION ENVOIE DE MESSAGE A UN CREDIT POUR UN MOUVEMENT DANS LE MENU Comptabilite
+    public function sendNotificationComptabilite($NumCompte, $devise, $montant, $typeTransaction, $libelle)
+    {
+        // if ($codeMonnaie == 1) {
+        //     $devise = "USD"; //USD
+        // } else if ($codeMonnaie == 2) {
+        //     $devise = "CDF"; //CDF
+        // }
+        //RECUPERE LES INFORMATIONS DE LA PERSONNE QUI VENAIT D'EFFECTUER UN MOUVEMENT
+        $getMembreInfo = SMSBanking::where("NumAbrege", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+        if ($getMembreInfo) {
+            if ($getMembreInfo->Email != null and $getMembreInfo->ActivatedEmail == 1) {
+                if ($devise == "CDF") {
+                    $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 2)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+                    //RECUPERE LE SOLDE DU MEMBRE EN FC 
+                    $compteCDF = $getMembreInfo2->NumCompte;
+                    $soldeMembreCDF = Transactions::select(
+                        DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
+                    )->where("NumCompte", '=', $compteCDF)
+                        ->groupBy("NumCompte")
+                        ->first();
+
+                    $data = ($getMembreInfo2->sexe == "Homme" ? " Bonjour Monsieur " : ($getMembreInfo2->sexe == "Femme" ? " Bonjour Madame " : " Bonjour ")) .
+                        $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte . ($typeTransaction == "C" ? " est crédité " : "debité ") . " de " . $montant . " " . $libelle . "  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
+                    Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
+                    // return view('emails.test');
+                } else if ($devise == "USD") {
+                    $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 1)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+
+                    $NumCompteUSD = $getMembreInfo2->NumCompte;
+
+                    //RECUPERE LE SOLDE DU MEMBRE EN USD
+                    $soldeMembreUSD = Transactions::select(
+                        DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembreUSD"),
+                    )->where("NumCompte", '=', $NumCompteUSD)
+                        ->groupBy("NumCompte")
+                        ->first();
+
+                    // $data = $getMembreInfo2->sexe == "Homme" ? "Bonjour Monsieur" : ($getMembreInfo2->sexe == "Femme"  ? "Bonjour Madame" : "Bonjour") .
+                    //     $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD . " est crédité de " . $montantDepot . " USD Votre nouveau solde est de  " . $soldeMembreUSD->soldeMembreUSD . "USD";
+
+
+                    $data = ($getMembreInfo2->sexe == "Homme" ? " Bonjour Monsieur " : ($getMembreInfo2->sexe == "Femme" ? " Bonjour Madame " : " Bonjour ")) .
+                        $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompte . ($typeTransaction == "C" ? " est crédité " : "debité ") . " de " . $montant . " " . $libelle . "  Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
+
+                    Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
+                }
+            }
+            if ($getMembreInfo->Telephone != null and $getMembreInfo->ActivatedSMS == 1) {
+
+                if ($devise == "CDF") {
+                    try {
+                        $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 2)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+                        //RECUPERE LE SOLDE DU MEMBRE EN USD
+                        $NumCompteCDF = $getMembreInfo2->NumCompte;
+                        $soldeMembreCDF = Transactions::select(
+                            DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeMembreCDF"),
+                        )->where("NumCompte", '=', $NumCompteCDF)
+                            ->groupBy("NumCompte")
+                            ->first();
+
+                        // $message = ($getMembreInfo2->sexe == "Homme")
+                        //     ? "Bonjour Monsieur "
+                        //     : (($getMembreInfo2->sexe == "Femme")
+                        //         ? "Bonjour Madame "
+                        //         : "Bonjour ");
+                        $message =   $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte . ($typeTransaction == "C" ? " est credite " : "debite ") . " de " . $montant . " " . $libelle . "  Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
+                        $receiver_number = $getMembreInfo->Telephone;
+                        $response = $this->africaTalking->sendSms($receiver_number, $message);
+                        //Log::info(json_encode($response));
+                        if ($response['status'] == 'success') {
+                            // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 1,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        } else {
+                            // Traiter l'échec, par exemple, loguer l'erreur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 0,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        }
+                    } catch (\Throwable $th) {
+                        throw $th;
+                    }
+                } else if ($devise == "USD") {
+                    try {
+                        $getMembreInfo2 = Comptes::where("CodeMonnaie", "=", 1)->where("NumAdherant", "=", $NumCompte)->orWhere("NumCompte", $NumCompte)->first();
+                        //RECUPERE LE SOLDE DU MEMBRE EN USD
+                        $NumCompteUSD = $getMembreInfo2->NumCompte;
+                        $soldeMembreUSD = Transactions::select(
+                            DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeMembreUSD"),
+                        )->where("NumCompte", '=', $NumCompteUSD)
+                            ->groupBy("NumCompte")
+                            ->first();
+
+                        $receiver_number = $getMembreInfo->Telephone;
+                        // $message = ($getMembreInfo2->sexe == "Homme")
+                        //     ? "Bonjour Monsieur "
+                        //     : (($getMembreInfo2->sexe == "Femme")
+                        //         ? "Bonjour Madame "
+                        //         : "Bonjour ");
+
+                        $message =   $getMembreInfo2->NomCompte . ", Votre compte USD " . $NumCompte . ($typeTransaction == "C" ? " est credite" : "debite ") . " de " . $montant . " " . $libelle . "  Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
+                        $receiver_number = $getMembreInfo->Telephone;
+                        $response = $this->africaTalking->sendSms($receiver_number, $message);
+
+                        if ($response['status'] == 'success') {
+                            // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 1,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        } else {
+                            // Traiter l'échec, par exemple, loguer l'erreur
+                            SendedSMS::create([
+                                "numPhone" => $receiver_number,
+                                "messageStatus" => 0,
+                                "paidStatus" => 0,
+                                "dateEnvoie" => date("Y-m-d"),
+                            ]);
+                        }
+                    } catch (\Throwable $th) {
+                        throw $th;
+                    }
+                }
+            }
+        }
+    }
+
     //PERMET D'ENVOYER DES NOTIFICATION
     public function sendNotificationRemboursementCredit($NumCompte, $devise, $montant, $typeTransaction, $isPartielOrComplete)
     {
@@ -204,7 +485,7 @@ class SendNotification
                                 ? "Bonjour Madame "
                                 : "Bonjour ");
 
-                        $data .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $compteCDF .
+                        $data .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte .
                             " est debité de " . $montant . " capital ordinaire du credit " . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
                         Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
                         // return view('emails.test');
@@ -230,7 +511,7 @@ class SendNotification
                                 ? "Bonjour Madame "
                                 : "Bonjour ");
 
-                        $data .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
+                        $data .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompte .
                             " est debite de " . $montant . " capital ordinaire du credit " . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
 
                         Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
@@ -255,7 +536,7 @@ class SendNotification
                                     ? "Bonjour Madame "
                                     : "Bonjour ");
 
-                            $message .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompteCDF .
+                            $message .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte .
                                 " est debite de " . $montant . " interet ordinaire du credit " . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
 
                             $receiver_number = $getMembreInfo->Telephone;
@@ -299,7 +580,7 @@ class SendNotification
                                     ? "Bonjour Madame "
                                     : "Bonjour ");
 
-                            $message .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
+                            $message .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompte .
                                 " est debite de " . $montant . " interet ordinaire du credit " . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
 
                             $receiver_number = $getMembreInfo->Telephone;
@@ -349,7 +630,7 @@ class SendNotification
                                 ? "Bonjour Madame "
                                 : "Bonjour ");
 
-                        $data .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $compteCDF .
+                        $data .= $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte .
                             " est debité de " . $montant . " capital ordinaire du credit " . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
                         Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
                         // return view('emails.test');
@@ -370,7 +651,7 @@ class SendNotification
                                 ? "Bonjour Madame "
                                 : "Bonjour ");
 
-                        $data .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
+                        $data .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompte .
                             " est debité de " . $montant . " capital ordinaire du credit" . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
 
                         Mail::to($getMembreInfo->Email)->send(new TransactionsEmail($data));
@@ -389,7 +670,7 @@ class SendNotification
                                 ->groupBy("NumCompte")
                                 ->first();
 
-                            $message = $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompteCDF .
+                            $message = $getMembreInfo2->NomCompte . " Votre compte CDF " . $NumCompte .
                                 " est debite de " . $montant . " capital ordinaire du credit" . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreCDF->soldeMembreCDF . " CDF";
 
                             $receiver_number = $getMembreInfo->Telephone;
@@ -433,7 +714,7 @@ class SendNotification
                                     ? "Bonjour Madame "
                                     : "Bonjour ");
 
-                            $message .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompteUSD .
+                            $message .= $getMembreInfo2->NomCompte . " Votre compte USD " . $NumCompte .
                                 " est debite de " . $montant . " capital ordinaire du credit " . $isPartielOrComplete . " Votre nouveau solde est de " . $soldeMembreUSD->soldeMembreUSD . " USD";
 
                             $receiver_number = $getMembreInfo->Telephone;

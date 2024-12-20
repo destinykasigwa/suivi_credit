@@ -574,6 +574,9 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     //PERMET D'EXPORTE LE RAPPORT SOMMAIRE DES COMPTES
     Route::post('/download-report/sommaire-compte', [ReportsController::class, 'downloadReportSommaireCompte'])->name('download.report');
 
+    //PERMET D'EXPORTE LE RAPPORT SOMMAIRE DES CONVERTI
+    Route::post('/download-report/sommaire-compte/convertie', [ReportsController::class, 'downloadReportSommaireCompteConvertie'])->name('download.report');
+
     //PERMET D'EXPORTER LE RAPPORT LISTE DES COMPTES EPARGNE
     Route::post('/download-report/liste-compte/epargne', [ReportsController::class, 'downloadReportCompteEpargne'])->name('download.report');
 

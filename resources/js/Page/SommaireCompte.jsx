@@ -108,6 +108,46 @@ const SommaireCompte = () => {
             .catch((error) => console.error("Error:", error));
     };
 
+    const downloadReportConvertie = (type) => {
+        setchargement(true);
+        // Générer le nom du fichier avec la date du jour
+        const filename = `Sommaire_Compte_convertie${
+            new Date().toISOString().split("T")[0]
+        }`; // "YYYY-MM-DD"
+        axios
+            .post(
+                "download-report/sommaire-compte/convertie",
+                {
+                    fetchData: fetchData, // Assurez-vous que fetchData contient vos données
+                    date_debut_balance: date_debut_balance,
+                    date_fin_balance: date_fin_balance,
+                    type: type, // Ajouter le paramètre type à la requête
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"), // Ajouter le token CSRF
+                    },
+                    responseType: "blob", // Définir le type de réponse comme un blob (pour le fichier)
+                }
+            )
+            .then((response) => {
+                setchargement(false);
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${filename}.${type === "pdf" ? "pdf" : "xlsx"}`; // Utiliser le nom dynamique du fichier
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch((error) => console.error("Error:", error));
+    };
+
     // const downloadReport = async (
     //     type,
     //     date_debut_balance,
@@ -178,6 +218,16 @@ const SommaireCompte = () => {
             );
             setTotal1(totalAmount1 && totalAmount1);
             setTotal2(totalAmount2 && totalAmount2);
+        } else {
+            setchargement(false);
+            setloading(false);
+            Swal.fire({
+                title: "Erreur",
+                text: res.data.msg,
+                icon: "error",
+                timer: 8000,
+                confirmButtonText: "Okay",
+            });
         }
     };
 
@@ -1417,7 +1467,7 @@ const SommaireCompte = () => {
                             onClick={() =>
                                 radioValue == "balance_convertie_cdf" ||
                                 radioValue == "balance_convertie_usd"
-                                    ? exportToPDF
+                                    ? downloadReportConvertie("pdf")
                                     : downloadReport("pdf")
                             }
                         >

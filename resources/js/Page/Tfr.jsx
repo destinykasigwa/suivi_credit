@@ -955,27 +955,27 @@ const Tfr = () => {
                                                                 <tr
                                                                     style={{
                                                                         background: `${
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "851" ||
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "850"
                                                                                 ? "#dcdcdc"
-                                                                                : res.Ncompte ==
+                                                                                : res.NumCompte ==
                                                                                       "871" ||
-                                                                                  res.Ncompte ==
+                                                                                  res.NumCompte ==
                                                                                       "870"
                                                                                 ? "teal"
                                                                                 : ""
                                                                         }`,
                                                                         fontSize: `${
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "851" ||
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "850"
                                                                                 ? "20px"
-                                                                                : res.Ncompte ==
+                                                                                : res.NumCompte ==
                                                                                       "871" ||
-                                                                                  res.Ncompte ==
+                                                                                  res.NumCompte ==
                                                                                       "870"
                                                                                 ? "20px"
                                                                                 : ""
@@ -1013,8 +1013,7 @@ const Tfr = () => {
                                                                             "87"
                                                                             ? numberWithSpaces(
                                                                                   parseFloat(
-                                                                                      res.soldeFinUSD +
-                                                                                          res.soldeFinCDF
+                                                                                      res.solde_consolide_cdf_to_usd_date_2
                                                                                   ).toFixed(
                                                                                       2
                                                                                   )
@@ -1022,14 +1021,14 @@ const Tfr = () => {
                                                                             : numberWithSpaces(
                                                                                   Math.abs(
                                                                                       parseFloat(
-                                                                                          res.soldeFinUSD +
-                                                                                              res.soldeFinCDF
+                                                                                          res.solde_consolide_cdf_to_usd_date_2
                                                                                       )
                                                                                   ).toFixed(
                                                                                       2
                                                                                   )
                                                                               )}
                                                                     </td>
+
                                                                     <td
                                                                         style={{
                                                                             textAlign:
@@ -1042,16 +1041,14 @@ const Tfr = () => {
                                                                             "87"
                                                                             ? numberWithSpaces(
                                                                                   parseFloat(
-                                                                                      res.soldeDebutUSD +
-                                                                                          res.soldeDebutCDF
+                                                                                      res.solde_consolide_cdf_to_usd_date_1
                                                                                   ).toFixed(
                                                                                       2
                                                                                   )
                                                                               )
                                                                             : Math.abs(
                                                                                   parseFloat(
-                                                                                      res.soldeDebutUSD +
-                                                                                          res.soldeDebutCDF
+                                                                                      res.solde_consolide_cdf_to_usd_date_1
                                                                                   )
                                                                               ).toFixed(
                                                                                   2
@@ -1063,27 +1060,27 @@ const Tfr = () => {
                                                                 <tr
                                                                     style={{
                                                                         background: `${
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "851" ||
                                                                             res.Ncompte ==
                                                                                 "850"
                                                                                 ? "#dcdcdc"
-                                                                                : res.Ncompte ==
+                                                                                : res.NumCompte ==
                                                                                       "871" ||
-                                                                                  res.Ncompte ==
+                                                                                  res.NumCompte ==
                                                                                       "870"
                                                                                 ? "teal"
                                                                                 : ""
                                                                         }`,
                                                                         fontSize: `${
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "851" ||
-                                                                            res.Ncompte ==
+                                                                            res.NumCompte ==
                                                                                 "850"
                                                                                 ? "20px"
-                                                                                : res.Ncompte ==
+                                                                                : res.NumCompte ==
                                                                                       "871" ||
-                                                                                  res.Ncompte ==
+                                                                                  res.NumCompte ==
                                                                                       "870"
                                                                                 ? "20px"
                                                                                 : ""
@@ -1121,8 +1118,7 @@ const Tfr = () => {
                                                                             "87"
                                                                             ? numberWithSpaces(
                                                                                   parseFloat(
-                                                                                      res.soldeFinUSD +
-                                                                                          res.soldeFinCDF
+                                                                                      res.solde_consolide_usd_to_cdf_date_2
                                                                                   ).toFixed(
                                                                                       2
                                                                                   )
@@ -1130,8 +1126,7 @@ const Tfr = () => {
                                                                             : numberWithSpaces(
                                                                                   Math.abs(
                                                                                       parseFloat(
-                                                                                          res.soldeFinUSD +
-                                                                                              res.soldeFinCDF
+                                                                                          res.solde_consolide_usd_to_cdf_date_2
                                                                                       )
                                                                                   ).toFixed(
                                                                                       2
@@ -1150,8 +1145,7 @@ const Tfr = () => {
                                                                             "87"
                                                                             ? numberWithSpaces(
                                                                                   parseFloat(
-                                                                                      res.soldeDebutUSD +
-                                                                                          res.soldeDebutCDF
+                                                                                      res.solde_consolide_cdf_to_usd_date_2
                                                                                   ).toFixed(
                                                                                       2
                                                                                   )
@@ -1159,8 +1153,7 @@ const Tfr = () => {
                                                                             : numberWithSpaces(
                                                                                   Math.abs(
                                                                                       parseFloat(
-                                                                                          res.soldeDebutUSD +
-                                                                                              res.soldeDebutCDF
+                                                                                          res.solde_consolide_cdf_to_usd_date_1
                                                                                       )
                                                                                   ).toFixed(
                                                                                       2

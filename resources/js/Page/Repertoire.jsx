@@ -477,7 +477,12 @@ const Repertoire = () => {
                             <div className="h-130 d-flex align-items-center justify-content-center">
                                 <div className="table-responsive">
                                     <h5>
-                                        Caissier(ère): {UserName && UserName}
+                                        Caissier(ère):{" "}
+                                        {/* {UserName
+                                            ? UserName
+                                            : getDataCDF &&
+                                              getDataCDF[0].NomUtilisateur} */}
+                                        {UserName && UserName}
                                     </h5>
                                     <table
                                         class="table table-bordered"

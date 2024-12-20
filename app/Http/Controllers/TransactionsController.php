@@ -49,10 +49,10 @@ class TransactionsController extends Controller
     {
         $this->middleware("auth");
         $this->sendNotification = app(SendNotification::class);
-        $this->numCompteCaissePrUSD = "5700000000201";
-        $this->numCompteCaissePrCDF = "5700000000202";
-        $this->compteVirementInterGuichetUSD = "5900000000201";
-        $this->compteVirementInterGuichetCDF = "5900000000202";
+        $this->numCompteCaissePrUSD = "570201";
+        $this->numCompteCaissePrCDF = "570202";
+        $this->compteVirementInterGuichetUSD = "590201";
+        $this->compteVirementInterGuichetCDF = "590202";
     }
 
 
@@ -338,7 +338,7 @@ class TransactionsController extends Controller
                         ]);
 
                         //SEND NOTIFICATION
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C", $request->DeposantName);
+                        $this->sendNotification->sendNotification($dataCompte->NumAdherant, $request->devise, $request->Montant, "C", $request->DeposantName);
                         return response()->json(["status" => 1, "msg" => "Opération bien enregistrée"]);
                     } else {
                         return response()->json([
@@ -505,7 +505,7 @@ class TransactionsController extends Controller
 
                         //SEND NOTIFICATION
 
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "C", $request->DeposantName);
+                        $this->sendNotification->sendNotification($dataCompte->NumAdherant, $request->devise, $request->Montant, "C", $request->DeposantName);
                         return response()->json(["status" => 1, "msg" => "Opération bien enregistrée"]);
                     } else {
                         return response()->json([
@@ -906,7 +906,7 @@ class TransactionsController extends Controller
                             "Servie" => 1,
                         ]);
                         //SEND NOTIFICATION TO CUSTUMER
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D", $dataVisa->Retirant);
+                        $this->sendNotification->sendNotification($dataCompte->NumAdherant, $request->devise, $request->Montant, "D", $dataVisa->Retirant);
                         return response()->json(['status' => 1, 'msg' => "Opération bien enregistrée."]);
                     } else {
                         return response()->json(['status' => 0, 'msg' => "Oooops! une erreur est survenue lors de l'éxécution de cette requête verifier bien que votre caisse est approvissionnée si l'erreur persiste veuillez contactez votre Administrateur système."]);
@@ -1104,7 +1104,7 @@ class TransactionsController extends Controller
 
                         //SEND NOTIFICATION TO CUSTOMER 
 
-                        $this->sendNotification->sendNotification($request->NumAbrege, $request->devise, $request->Montant, "D", $dataVisa->Retirant);
+                        $this->sendNotification->sendNotification($dataCompte->NumAdherant, $request->devise, $request->Montant, "D", $dataVisa->Retirant);
                         return response()->json(['status' => 1, 'msg' => "Opération bien enregistrée."]);
                     }
                 } else {
@@ -2540,11 +2540,11 @@ class TransactionsController extends Controller
 
                 if ($dataDebit->CodeMonnaie == 2 and $dataCredit->CodeMonnaie == 2) {
                     //VERIFIE LE SOLDE 
-                    $soldeCompteDebit = Transactions::select(
-                        DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeCompte"),
-                    )->where("NumCompte", '=', $dataDebit->NumCompte)
-                        ->groupBy("NumCompte")
-                        ->first();
+                    // $soldeCompteDebit = Transactions::select(
+                    //     DB::raw("SUM(Creditfc)-SUM(Debitfc) as soldeCompte"),
+                    // )->where("NumCompte", '=', $dataDebit->NumCompte)
+                    //     ->groupBy("NumCompte")
+                    //     ->first();
 
                     // if ($soldeCompteDebit->soldeCompte >= $request->Montant and $dataDebit->RefGroupe == 330) {
                     // if ($soldeCompteDebit->soldeCompte >= $request->Montant) {
@@ -2602,6 +2602,31 @@ class TransactionsController extends Controller
                     ]);
                     $this->CheckTransactionStatus(871);
                     // $this->CheckTransactionStatus2(851);
+
+                    //CETTE LOGIQUE PERMET D'ENVOYER UN MESSAGE AU CLIENT LORSQUE LE COMPTE MOUVEMENTER SONT DES COMPTES EPARGNE
+                    $dataRefCompteClientDebit = Transactions::where("NumCompte", $request->compte_a_debiter)->orWhere("refCompteMembre", $request->compte_a_debiter)
+                        ->where("NumCompte", "like", "33%")->first();
+                    $dataRefCompteClientCredit = Transactions::where("NumCompte", $request->compte_a_crediter)->orWhere("refCompteMembre", $request->compte_a_crediter)
+                        ->where("NumCompte", "like", "33%")
+                        ->first();
+                    if ($dataRefCompteClientDebit) {
+                        if ($dataRefCompteClientDebit->CodeMonnaie == 1) {
+                            $devise = "USD"; //USD
+                            $this->sendNotification->sendNotificationComptabilite($dataRefCompteClientDebit->refCompteMembre, $devise, $request->Montant, $dataRefCompteClientDebit->TypeTransaction, $request->Libelle);
+                        } else if ($dataRefCompteClientDebit->CodeMonnaie == 2) {
+                            $devise = "CDF"; //CDF
+                            $this->sendNotification->sendNotificationComptabilite($dataRefCompteClientDebit->refCompteMembre, $devise, $request->Montant, $dataRefCompteClientDebit->TypeTransaction, $request->Libelle);
+                        }
+                    }
+                    if ($dataRefCompteClientCredit) {
+                        if ($dataRefCompteClientCredit->CodeMonnaie == 1) {
+                            $devise = "USD"; //USD
+                            $this->sendNotification->sendNotificationComptabilite($dataRefCompteClientCredit->refCompteMembre, $devise, $request->Montant, $dataRefCompteClientCredit->TypeTransaction, $request->Libelle);
+                        } else if ($dataRefCompteClientCredit->CodeMonnaie == 2) {
+                            $devise = "CDF"; //CDF
+                            $this->sendNotification->sendNotificationComptabilite($dataRefCompteClientCredit->refCompteMembre, $devise, $request->Montant, $dataRefCompteClientCredit->TypeTransaction, $request->Libelle);
+                        }
+                    }
 
                     return response()->json([
                         "status" => 1,
@@ -2945,11 +2970,11 @@ class TransactionsController extends Controller
                 $dataCredit = Comptes::where("NumCompte", $request->compte_a_crediter)->orWhere("NumAdherant", $request->compte_a_crediter)->where("CodeMonnaie", 2)->first();
                 if ($dataDebit->CodeMonnaie == 1 and $dataCredit->CodeMonnaie == 1) {
                     //VERIFIE LE SOLDE 
-                    $soldeCompteDebit = Transactions::select(
-                        DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeCompte"),
-                    )->where("NumCompte", '=', $dataDebit->NumCompte)
-                        ->groupBy("NumCompte")
-                        ->first();
+                    // $soldeCompteDebit = Transactions::select(
+                    //     DB::raw("SUM(Creditusd)-SUM(Debitusd) as soldeCompte"),
+                    // )->where("NumCompte", '=', $dataDebit->NumCompte)
+                    //     ->groupBy("NumCompte")
+                    //     ->first();
                     // if ($soldeCompteDebit->soldeCompte >= $request->Montant and $dataDebit->RefGroupe == 330) {
                     // if ($soldeCompteDebit->soldeCompte >= $request->Montant) {
                     //DEBITE LE COMPTE 
@@ -3031,6 +3056,10 @@ class TransactionsController extends Controller
     public function extourneOperation($reference)
     {
         $data = Transactions::where("NumTransaction", "=", $reference)->first();
+        $dataRefCompteClient = Transactions::where("NumTransaction", $reference)
+            ->where("NumCompte", "like", "33%")
+            ->first();
+
         if ($data) {
             if ($data->extourner != 1) {
                 if ($data->NomUtilisateur == "AUTO") {
@@ -3107,11 +3136,17 @@ class TransactionsController extends Controller
                         ]);
                     }
                 }
+                //SEND NOTIFICATION
+
+                if ($dataRefCompteClient->CodeMonnaie == 1) {
+                    $devise = "USD"; //USD
+                } else if ($dataRefCompteClient->CodeMonnaie == 2) {
+                    $devise = "CDF"; //CDF
+                }
+                $this->sendNotification->sendNotificationExtourneOp($dataRefCompteClient->refCompteMembre, $devise, ($dataRefCompteClient->TypeTransaction == "D" ? $dataRefCompteClient->Debit : $dataRefCompteClient->Credit), $dataRefCompteClient->TypeTransaction);
+                // END SEND NOTIFICATION
                 return response()->json(["status" => 1, "msg" => "Extourne bien effectuée"]);
-
-
-
-                return response()->json(["status" => 1, "data" => $data]);
+                // return response()->json(["status" => 1, "data" => $data]);
             } else {
                 return response()->json(["status" => 0, "msg" => "Cette opération est déjà extournée."]);
             }
