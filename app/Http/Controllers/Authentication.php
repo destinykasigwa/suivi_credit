@@ -87,7 +87,7 @@ class Authentication extends Controller
         if ($data and $data->admin == 0) {
             $checkIfDateClosed = ClosedDay::latest()->first();
             if ($checkIfDateClosed and $checkIfDateClosed->closed == 1) {
-                return response()->json(["status" => 0, "msg" => "Accès interdit."]);
+                return response()->json(["status" => 0, "msg" => "Accès interdit la journée doit être ouverte par l'admin du système."]);
             }
         }
         if ($data and $data->locked_state == 1) {

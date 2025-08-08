@@ -28,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
         //
         View::composer('partials.header', ProfileComposer::class);
         View::composer('partials.sidebar', ProfileComposer::class);
+        //GESTION CREDIT AKIBA  
+        View::composer('partials-gc.header', ProfileComposer::class);
+        View::composer('partials-gc.sidebar', ProfileComposer::class);
     }
 }

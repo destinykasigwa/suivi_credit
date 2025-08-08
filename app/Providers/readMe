@@ -1,0 +1,4 @@
+//CONTROL LES DROIT DES UTILISATEURS
+1. Middleware/CheckUserRole
+2. Controllers/AccessConfigController
+3. Providers/AppServiceProvider

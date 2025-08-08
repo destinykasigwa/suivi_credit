@@ -1199,10 +1199,24 @@ const Echeancier = () => {
                                             }}
                                         >
                                             <div className="col-md-3">
-                                                <table>
+                                                <table
+                                                    style={{ fontSize: "14px" }}
+                                                >
                                                     <tr>
-                                                        <td>Type crédit :</td>
-                                                        <td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
+                                                            TypeCrédit :
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
                                                             {
                                                                 fetchTableauAmortiss[0]
                                                                     .RefProduitCredit
@@ -1210,8 +1224,20 @@ const Echeancier = () => {
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td>N° COMPTE :</td>
-                                                        <td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
+                                                            N°COMPTE :
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
                                                             {
                                                                 fetchTableauAmortiss[0]
                                                                     .NumCompteEpargne
@@ -1219,13 +1245,25 @@ const Echeancier = () => {
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td>Intutilé :</td>
-                                                        <td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
+                                                            Intutilé :
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
                                                             {accountName &&
                                                                 accountName.NomCompte}
                                                         </td>
                                                     </tr>
-                                                    <tr>
+                                                    {/* <tr>
                                                         <td>Mode remb. : </td>
                                                         <td>
                                                             {
@@ -1233,11 +1271,23 @@ const Echeancier = () => {
                                                                     .ModeRemboursement
                                                             }
                                                         </td>
-                                                    </tr>
+                                                    </tr> */}
 
                                                     <tr>
-                                                        <td>Mode remb. : </td>
-                                                        <td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
+                                                            ModeRemb. :{" "}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
                                                             {
                                                                 fetchTableauAmortiss[0]
                                                                     .ModeRemboursement
@@ -1245,8 +1295,20 @@ const Echeancier = () => {
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td>Gestionnaire :</td>
-                                                        <td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
+                                                            Gestionn. :
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                fontSize:
+                                                                    "12px",
+                                                            }}
+                                                        >
                                                             {accountName &&
                                                                 accountName.Gestionnaire}
                                                         </td>

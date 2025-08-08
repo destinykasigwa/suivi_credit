@@ -1,5 +1,5 @@
-@include('partials.header')
-@include('partials.sidebar')
+@include('partials-gc.header')
+@include('partials-gc.sidebar')
 <div class="content-wrapper content"
     style="background: #fff; background-image: url('{{ asset('images/bg3.jpeg') }}');background-repeat: no-repeat;
 background-size: 100% 100%;">
@@ -22,4 +22,4 @@ background-size: 100% 100%;">
         </div>
     </section>
 </div>
-@include('partials.footer')
+@include('partials-gc.footer')

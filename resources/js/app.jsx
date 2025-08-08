@@ -50,6 +50,8 @@ import SommaireCompte from "./Page/SommaireCompte";
 import Cloture from "./Page/Cloture";
 import SMSbanking from "./Page/SMSBanking";
 import ResetPassWord from "./Page/ResetPassWord";
+import MontageCreditA from "./Page/GC/MontageCreditA";
+import ValidationC from "./Page/GC/ValidationC";
 
 if (document.getElementById("app")) {
     ReactDOM.createRoot(document.getElementById("app")).render(
@@ -292,6 +294,22 @@ if (document.getElementById("smsBanking")) {
     ReactDOM.createRoot(document.getElementById("smsBanking")).render(
         <BrowserRouter>
             <SMSbanking />
+        </BrowserRouter>
+    );
+}
+//GESTION CREDIT AKIBA
+if (document.getElementById("montageCreditA")) {
+    ReactDOM.createRoot(document.getElementById("montageCreditA")).render(
+        <BrowserRouter>
+            <MontageCreditA />
+        </BrowserRouter>
+    );
+}
+
+if (document.getElementById("validationC")) {
+    ReactDOM.createRoot(document.getElementById("validationC")).render(
+        <BrowserRouter>
+            <ValidationC />
         </BrowserRouter>
     );
 }

@@ -242,11 +242,11 @@ class AdhesionController extends Controller
                     if ($request->compteAbrege     < 10) {
                         $compteEnDollars = "330000000" . $request->compteAbrege     . "201";
                     } else if ($request->compteAbrege >= 10 && $request->compteAbrege < 100) {
-                        $compteEnDollars = "33010000" . $request->compteAbrege . "201";
+                        $compteEnDollars = "33000000" . $request->compteAbrege . "201";
                     } else if ($request->compteAbrege >= 100 && $request->compteAbrege < 1000) {
-                        $compteEnDollars = "3301000" . $request->compteAbrege . "201";
+                        $compteEnDollars = "3300000" . $request->compteAbrege . "201";
                     } else if ($request->compteAbrege >= 1000 && $request->compteAbrege < 10000) {
-                        $compteEnDollars = "330100" . $request->compteAbrege . "201";
+                        $compteEnDollars = "330000" . $request->compteAbrege . "201";
                     }
                     $data = AdhesionMembre::where("compte_abrege", $request->compteAbrege)->first();
                     Comptes::create([

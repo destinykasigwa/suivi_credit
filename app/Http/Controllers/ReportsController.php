@@ -1828,6 +1828,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     ->where('t.extourner', "!=", 1)
                     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
                     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
+                    ->whereNotIn('c.NumCompte', [851, 850]) // Utiliser whereNotIn pour exclure plusieurs valeurs
                     ->where(function ($query) {
                         $query->where('c.isResultAccount', 1);
                     })
@@ -1880,6 +1881,7 @@ AND (COALESCE("' . $compteFin . '", "") = "" OR c.RefCadre <= "' . $compteFin . 
                     ->where('t.extourner', "!=", 1)
                     ->whereNotNull('c.NumCompte') // Exclure les lignes où NumCompte est null
                     ->whereNotNull('c.NomCompte') // Exclure les lignes où NomCompte est null
+                    ->whereNotIn('c.NumCompte', [851, 850]) // Utiliser whereNotIn pour exclure plusieurs valeurs
                     ->where(function ($query) {
                         $query->where('c.isResultAccount', 1);
                     })

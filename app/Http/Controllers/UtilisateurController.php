@@ -183,7 +183,7 @@ class UtilisateurController extends Controller
             Comptes::create([
                 'CodeAgence' => 20,
                 'NumCompte' => "5700" . $request->userId . "201",
-                'NomCompte' => $userData->name,
+                'NomCompte' => "CAISSE " . $userData->name . " USD",
                 'RefTypeCompte' => "5",
                 'RefCadre' => "57",
                 'RefGroupe' => "570",
@@ -191,20 +191,22 @@ class UtilisateurController extends Controller
                 'CodeMonnaie' => 1,
                 'NumAdherant' => "5700" . $request->userId . "201",
                 'isCaissier' => 1,
+                'isChefCaisse' => 0,
                 'caissierId' => $request->userId
             ]);
             //CREATE CDF ACCOUNT
             Comptes::create([
                 'CodeAgence' => 20,
                 'NumCompte' => "5700" . $request->userId . "202",
-                'NomCompte' => $userData->name,
+                'NomCompte' => "CAISSE " . $userData->name . " CDF",
                 'RefTypeCompte' => "5",
                 'RefCadre' => "57",
                 'RefGroupe' => "570",
-                'RefSousGroupe' => "5700",
+                'RefSousGroupe' => "5701",
                 'CodeMonnaie' => 2,
                 'NumAdherant' => "5700" . $request->userId . "202",
                 'isCaissier' => 1,
+                'isChefCaisse' => 0,
                 'caissierId' => $request->userId
 
             ]);

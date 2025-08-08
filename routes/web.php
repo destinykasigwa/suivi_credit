@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\AdhesionMembre;
 use App\CustomTasks\ClotureJournee;
-use App\CustomTasks\ClotureJourneeCopy;
 use App\Http\Controllers\EcoHomePage;
+use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
+use App\CustomTasks\ClotureJourneeCopy;
 use App\Http\Controllers\Authentication;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BulkSMSController;
@@ -12,16 +14,16 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SendSMSController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\AdhesionController;
-use App\Http\Controllers\ClotureJourneeController;
+use App\Http\Controllers\AGestionCreditController;
 use App\Http\Controllers\PDFExportController;
 use App\Http\Controllers\RemboursementManuel;
 use App\Http\Controllers\SMSBankingController;
+use App\Http\Controllers\GestionCreditHomePage;
 use App\Http\Controllers\SuiviCreditController;
 use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\ComptesParamController;
 use App\Http\Controllers\TransactionsController;
-use App\Http\Middleware\Authenticate;
-use App\Models\AdhesionMembre;
+use App\Http\Controllers\ClotureJourneeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -592,4 +594,26 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
 
     //PERMET DE SUPPRIMER UN MANDATAIRE
     Route::get('eco/pages/adhesion/suppression-mandataire/{id}', [AdhesionController::class, 'deleteMandataire']);
+
+
+
+
+
+    //GESTION CREDIT ROUTE 
+    //MAIN  
+    Route::get('/gestion_credit/home', [GestionCreditHomePage::class, 'GestionCreditHomePage'])->name('gestion_credit.home');
+    Route::get('/gestion_credit/pages/montage-credit', [AGestionCreditController::class, 'AMontangeCreditHomePage'])->name('gestion_credit.pages.montage-credit');
+    Route::post('eco/pages/montage-credit/addnew', [AGestionCreditController::class, 'store']);
+    Route::get('/gestion_credit/pages/validation-credit', [AGestionCreditController::class, 'ValidatioCreditHomePage'])->name('gestion_credit.pages.validation-credit');
+    Route::get('montage-credit/validation/rapport', [AGestionCreditController::class, 'getCreditValidation']);
+    Route::get(
+        "montage_credit/page/validation/credit/reference/{ref}",
+        [AGestionCreditController::class, 'getSearchedCredit']
+    );
+
+
+    Route::post(
+        "gestion_credit/pages/dossier-credit/delete/{id}",
+        [AGestionCreditController::class, 'getCreditToDelete']
+    );
 });

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 class AccessConfigController extends Controller
 {
     //
-
     public function CaissierProfile($idUser)
     {
         $getUserRole = DB::select('SELECT * FROM profiles JOIN profils_users ON profils_users.profil_id = profiles.id WHERE profils_users.user_id = ? AND profiles.nom_profile = ?', [$idUser, 'Caissier']);

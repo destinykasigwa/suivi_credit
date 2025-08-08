@@ -269,7 +269,7 @@ const Appro = () => {
                                                         padding: "1px ",
                                                         border: `${"1px solid #dcdcdc"}`,
                                                         marginBottom: "5px",
-                                                        width: "80px",
+                                                        width: "150px",
                                                     }}
                                                     onChange={(e) => {
                                                         setCaissierId(

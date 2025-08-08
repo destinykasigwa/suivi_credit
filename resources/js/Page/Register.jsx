@@ -104,7 +104,6 @@ const RegisterForm = () => {
                                         Nom d'utilisateur
                                     </label>
                                 </div>
-
                                 <div className="email">
                                     <input
                                         className={styles.input_form}
@@ -128,7 +127,6 @@ const RegisterForm = () => {
                                         Email
                                     </label>
                                 </div>
-
                                 <div className="password">
                                     <input
                                         className={styles.input_form}
@@ -152,7 +150,6 @@ const RegisterForm = () => {
                                         Mot de passe
                                     </label>
                                 </div>
-
                                 <div className="confirmpassword">
                                     <input
                                         className={styles.input_form}
@@ -176,10 +173,9 @@ const RegisterForm = () => {
                                         Confirmez mot de passe
                                     </label>
                                 </div>
-
                                 {/* <div className="error">
                   addUserResults.isError? addUserResults.error.data: ''
-                </div> */}
+                </div> */}{" "}
                                 <button
                                     type="submit"
                                     className={styles.button_effect}
@@ -190,6 +186,8 @@ const RegisterForm = () => {
                   Have An Account Please Log In
                 </p> */}
                             </form>
+                            <br />
+                            <br />
                         </div>
                     </div>
                 </div>

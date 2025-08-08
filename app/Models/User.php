@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'locked_state',
         'start_date',
         'expirate_date',
         'attempt_times',

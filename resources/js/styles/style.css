@@ -1,0 +1,22 @@
+.custom-date {
+  width: 100px !important;
+  padding: 5px 8px;
+  font-size: 14px;
+  font-size: 15px;
+}
+
+.input-style{
+    padding: 3px;
+    border: 1px solid #dcdcdc;
+    margin-bottom: "5px";
+                                                        
+}
+.label-style{
+    padding: 2px;
+    color: steelblue;
+}
+
+.unclear-text{
+    color: green;
+
+}

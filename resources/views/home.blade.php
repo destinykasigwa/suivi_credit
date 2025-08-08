@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
-<body style="background-image: url({{ asset('images/bacground.jpg') }})">
+<body style="background-image: url({{ asset('images/FinaPlusLogo.png') }})">
 
 
     <div id="app" class="h-100 d-flex align-items-center justify-content-center">

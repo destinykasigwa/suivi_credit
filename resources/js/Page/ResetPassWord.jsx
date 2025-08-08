@@ -71,7 +71,7 @@ const ResetPassWord = () => {
                             <form
                                 className={styles.form}
                                 onSubmit={handleSubmit}
-                                style={{ padding: "40px" }}
+                                style={{ padding: "5px" }}
                             >
                                 <div className={styles.password}>
                                     <input

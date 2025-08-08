@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('mandataires', function (Blueprint $table) {
+        Schema::create('credits_images', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('credit_id')->constrained()->onDelete('cascade');
+            $table->string('path'); // chemin vers le fichier
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mandataires');
+        Schema::dropIfExists('credits_images');
     }
 };

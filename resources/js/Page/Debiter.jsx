@@ -19,6 +19,7 @@ const Debiter = () => {
     const [chargement, setchargement] = useState(false);
     const [searched_account_by_name, setsearched_account_by_name] = useState();
     const [fetchDataByName, setFetchDataByName] = useState();
+    const [copiedText, setCopiedText] = useState("");
     const [checkboxValues, setCheckboxValues] = useState({
         RemboursementAnticipative: false,
     });
@@ -260,6 +261,18 @@ const Debiter = () => {
                 confirmButtonText: "Okay",
             });
         }
+    };
+
+    const handleCopy = (text) => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                setCopiedText(text);
+                alert(
+                    `Le texte "${text}" a été copié dans le presse-papiers coller simplement à l'endroit souhaiter CTRL+V`
+                );
+            })
+            .catch((err) => console.error("Erreur lors de la copie : ", err));
     };
 
     let compteur = 1;
@@ -613,53 +626,66 @@ const Debiter = () => {
                 </div>
                 {fetchDataByName && (
                     <div
-                        className="col-md-4"
+                        className="col-md-5"
                         style={{ height: "150px", overflowY: "scroll" }}
                     >
                         <table className="table table-bordered table-striped">
-                            {fetchDataByName &&
-                                fetchDataByName.map((res, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td
-                                                style={
-                                                    {
-                                                        // border: "1px solid #000",
-                                                        // cursor: "pointer",
+                            <thead>
+                                <tr>
+                                    <th>NumCompte</th>
+                                    <th>NomCompte</th>
+                                    <th>Dévise</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {fetchDataByName &&
+                                    fetchDataByName.map((res, index) => {
+                                        return (
+                                            <tr key={index}>
+                                                <td
+                                                    style={
+                                                        {
+                                                            // border: "1px solid #000",
+                                                            // cursor: "pointer",
+                                                        }
                                                     }
-                                                }
-                                                // onClick={(event) =>
-                                                //     getAccountInfo(event)
-                                                // }
-                                            >
-                                                {res.NumCompte}
-                                            </td>
-                                            <td
-                                            // style={{
-                                            //     border: "1px solid #fff",
-                                            // }}
-                                            >
-                                                {res.NomCompte}
-                                            </td>
-                                            <td
-                                            // style={{
-                                            //     border: "1px solid #fff",
-                                            // }}
-                                            >
-                                                {res.CodeMonnaie == 1
-                                                    ? "USD"
-                                                    : "CDF"}
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            <tr>
-                                {/* <td>
-                                        <button className="btn btn-primary rounded-0">
-                                            Afficher le solde
-                                        </button>
-                                    </td> */}
-                            </tr>
+                                                    // onClick={(event) =>
+                                                    //     getAccountInfo(event)
+                                                    // }
+                                                >
+                                                    <button
+                                                        onClick={() =>
+                                                            handleCopy(
+                                                                res.NumCompte
+                                                            )
+                                                        }
+                                                    >
+                                                        <i class="fas fa-clone">
+                                                            copier
+                                                        </i>
+                                                    </button>{" "}
+                                                    {res.NumCompte}{" "}
+                                                </td>
+                                                <td
+                                                // style={{
+                                                //     border: "1px solid #fff",
+                                                // }}
+                                                >
+                                                    {res.NomCompte}
+                                                </td>
+                                                <td
+                                                // style={{
+                                                //     border: "1px solid #fff",
+                                                // }}
+                                                >
+                                                    {res.CodeMonnaie == 1
+                                                        ? "USD"
+                                                        : "CDF"}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                            </tbody>
                         </table>
                     </div>
                 )}

@@ -703,6 +703,7 @@ class TransactionsController extends Controller
     {
 
         if (isset($request->NumAbrege)) {
+
             //VERTIFIE SI LE BILLETATGE ENTREE PAR LE CAISSIER CORRESPOND AU BILLETAGE QU'IL POSSEDE DANS SA CAISSE
             if ($request->devise == "CDF") {
 
@@ -720,7 +721,13 @@ class TransactionsController extends Controller
                 )->where("NomUtilisateur", "=", Auth::user()->name)->where("DateTransaction", "=", $date)
                     ->groupBy("NomUtilisateur")
                     ->get();
-                if (isset($billetageCDF[0])) {
+
+
+
+                if ($billetageCDF->isEmpty()) {
+
+                    return response()->json(['status' => 0, "msg" => "Vous devez d'abord effectuer un appro votre caisse en CDF semble n'est pas contenir de fonds !"]);
+                } else {
 
                     if ($request->vightMille > $billetageCDF[0]->vightMilleFran) {
                         return response()->json(['status' => 0, 'msg' => "Oooops! Nombre de billet pour 20.000f non disponible vous avez " . $billetageCDF[0]->vightMilleFran . " billets dans votre caisse"]);
@@ -748,8 +755,15 @@ class TransactionsController extends Controller
                     $numOperation = CompteurTransaction::latest()->first();
                     $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "00" . $numOperation->id;
                     //RECUPERE LE COMPTE DU CAISSIER CONCERNE CDF
-                    $dataCompte = Comptes::where("NumAdherant", $request->NumAbrege)
-                        ->where("CodeMonnaie", 2)->first();
+                    //$dataCompte = Comptes::where("NumAdherant", $request//->NumAbrege)
+                    // ->where("CodeMonnaie", 2)->first();
+                    $dataCompte = Comptes::where(function ($query) use ($request) {
+                        $query->where('NumAdherant', $request->NumAbrege)
+                            ->orWhere('NumCompte', $request->NumAbrege);
+                    })
+                        ->where('CodeMonnaie', 2)
+                        ->first();
+
                     if ($dataCompte) {
                         $numCompteCaissierCDF = Comptes::where("caissierId", "=", Auth::user()->id)->where("CodeMonnaie", "=", "2")->first();
                         $CompteCaissierCDF = $numCompteCaissierCDF->NumCompte;
@@ -913,10 +927,12 @@ class TransactionsController extends Controller
                     }
                 }
             }
+
             if ($request->devise == "USD") {
                 CompteurTransaction::create([
                     'fakevalue' => "0000",
                 ]);
+
                 //RECUPERE LA SOMME DE BILLETAGE USD
                 $date = TauxEtDateSystem::orderBy('id', 'desc')->first()->DateSystem;
                 $billetageUSD = BilletageUSD::select(
@@ -949,8 +965,12 @@ class TransactionsController extends Controller
                     $numOperation = CompteurTransaction::latest()->first();
                     $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "00" . $numOperation->id;
                     //RECUPERE LE COMPTE DU CAISSIER CONCERNE CDF
-                    $dataCompte = Comptes::where("NumAdherant", $request->NumAbrege)
-                        ->where("CodeMonnaie", 1)->first();
+                    $dataCompte = Comptes::where(function ($query) use ($request) {
+                        $query->where('NumAdherant', $request->NumAbrege)
+                            ->orWhere('NumCompte', $request->NumAbrege);
+                    })
+                        ->where('CodeMonnaie', 1)
+                        ->first();
                     if ($dataCompte) {
                         $numCompteCaissierUSD = Comptes::where("caissierId", "=", Auth::user()->id)->where("CodeMonnaie", "=", "1")->first();
                         $CompteCaissierUSD = $numCompteCaissierUSD->NumCompte;
@@ -1335,7 +1355,10 @@ class TransactionsController extends Controller
                 )->where("NumCompte", '=', $numCompteCaissePrCDF)
                     ->groupBy("NumCompte")
                     ->first();
-                if ($soldeComptePrincip->soldeCompte >= $request->Montant) {
+
+                $montant = (int) $request->Montant;
+                $solde = abs($soldeComptePrincip->soldeCompte);
+                if ($solde >= $montant) {
                     $caissierEccount = Comptes::where("caissierId", $request->CaissierId)->where("CodeMonnaie", 2)->first();
                     //RECUPERE SUR LA TABLE USERS LE NOM QUI CORRESPOND A CE ID CDF
                     $dateSystem = TauxEtDateSystem::latest()->first()->DateSystem;
@@ -1368,13 +1391,16 @@ class TransactionsController extends Controller
                     return response()->json(["status" => 0, "msg" => "Le montant saisi est superieur au solde de la caisse principale son solde est: " . $soldeComptePrincip->soldeCompte]);
                 }
             } else if ($request->devise == "USD") {
+
                 $numCompteCaissePrUSD = $this->numCompteCaissePrUSD;
                 $soldeComptePrincip = Transactions::select(
                     DB::raw("SUM(Debitusd)-SUM(Creditusd) as soldeCompte"),
                 )->where("NumCompte", '=', $numCompteCaissePrUSD)
                     ->groupBy("NumCompte")
                     ->first();
-                if ($soldeComptePrincip->soldeCompte >= $request->Montant) {
+                $montant = (int) $request->Montant;
+                $solde = abs($soldeComptePrincip->soldeCompte);
+                if ($solde >= $montant) {
                     $caissierEccount = Comptes::where("caissierId", $request->CaissierId)->where("CodeMonnaie", 1)->first();
                     $numOperation = [];
                     $numOperation = CompteurTransaction::latest()->first();
@@ -1778,7 +1804,7 @@ class TransactionsController extends Controller
                 "Debitusd" => $data->montantUSD,
                 "Debitfc" => $data->montantUSD * $tauxDuJour,
                 "NomUtilisateur" => Auth::user()->name,
-                "Libelle" => "Delestage caisse secondaire de " . $data->NomDemandeur,
+                "Libelle" => "Entrée Tresor par " . $data->NomDemandeur,
             ]);
 
             //ON CREDITE LE COMPTE DU CAISSIER CONCERNE 
@@ -1893,7 +1919,7 @@ class TransactionsController extends Controller
                 "Debitusd" => $data->montantCDF / $tauxDuJour,
                 "Debitfc" => $data->montantCDF,
                 "NomUtilisateur" => Auth::user()->name,
-                "Libelle" => "Delestage caisse secondaire de " . $data->NomDemandeur,
+                "Libelle" => "Entrée Tresor par " . $data->NomDemandeur,
             ]);
 
             //ON CREDITE LE COMPTE DU CAISSIER CONCERNE 
@@ -3137,13 +3163,15 @@ class TransactionsController extends Controller
                     }
                 }
                 //SEND NOTIFICATION
-
-                if ($dataRefCompteClient->CodeMonnaie == 1) {
-                    $devise = "USD"; //USD
-                } else if ($dataRefCompteClient->CodeMonnaie == 2) {
-                    $devise = "CDF"; //CDF
+                if ($dataRefCompteClient) {
+                    if ($dataRefCompteClient->CodeMonnaie == 1) {
+                        $devise = "USD"; //USD
+                    } else if ($dataRefCompteClient->CodeMonnaie == 2) {
+                        $devise = "CDF"; //CDF
+                    }
+                    $this->sendNotification->sendNotificationExtourneOp($dataRefCompteClient->refCompteMembre, $devise, ($dataRefCompteClient->TypeTransaction == "D" ? $dataRefCompteClient->Debit : $dataRefCompteClient->Credit), $dataRefCompteClient->TypeTransaction);
                 }
-                $this->sendNotification->sendNotificationExtourneOp($dataRefCompteClient->refCompteMembre, $devise, ($dataRefCompteClient->TypeTransaction == "D" ? $dataRefCompteClient->Debit : $dataRefCompteClient->Credit), $dataRefCompteClient->TypeTransaction);
+
                 // END SEND NOTIFICATION
                 return response()->json(["status" => 1, "msg" => "Extourne bien effectuée"]);
                 // return response()->json(["status" => 1, "data" => $data]);

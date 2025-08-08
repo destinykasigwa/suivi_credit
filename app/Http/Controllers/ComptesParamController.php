@@ -335,23 +335,31 @@ class ComptesParamController extends Controller
             'comptes.CodeMonnaie',
             'comptes.RefCompte',
             DB::raw("
-                    CASE 
-                        WHEN comptes.CodeMonnaie = 2 THEN 
-                            SUM(transactions.Creditfc - transactions.Debitfc)
-                        ELSE 
-                            SUM(transactions.Creditusd - transactions.Debitusd)
-                    END as solde
-                "),
+                CASE 
+                    WHEN comptes.CodeMonnaie = 2 THEN 
+                        SUM(transactions.Creditfc - transactions.Debitfc)
+                    ELSE 
+                        SUM(transactions.Creditusd - transactions.Debitusd)
+                END as solde
+            "),
             DB::raw("MAX(transactions.DateTransaction) as derniere_date_transaction")
         )
             ->join("adhesion_membres", "comptes.NumAdherant", "=", "adhesion_membres.compte_abrege")
             ->leftJoin("transactions", "comptes.NumCompte", "=", "transactions.NumCompte")
             ->where("comptes.RefCadre", 33)
-            ->where("comptes.NumCompte", "!=", 3300)
-            ->where("comptes.NumCompte", "!=", 3301)
-            ->groupBy('comptes.NumCompte', 'comptes.NomCompte', 'comptes.NumAdherant', 'adhesion_membres.sexe', 'comptes.CodeMonnaie', 'comptes.RefCompte') // Ajoutez les colonnes ici
+            ->whereNotIn("comptes.NumCompte", [3300, 3301]) // Simplification des exclusions
+            ->groupBy(
+                'comptes.NumCompte',
+                'comptes.NomCompte',
+                'adhesion_membres.sexe',
+                'comptes.NumAdherant',
+                'comptes.CodeMonnaie',
+                'comptes.RefCompte'
+            )
+            ->distinct() // Évite les doublons si des jointures produisent des duplications
             ->orderBy("comptes.RefCompte", "desc")
             ->get();
+
         $compteEpargne = $compteEpargne->toArray();
 
 

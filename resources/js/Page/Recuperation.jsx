@@ -98,7 +98,7 @@ const Recuperation = () => {
             style={{ marginTop: "100px" }}
         >
             {isValide == 0 ? (
-                <div className="col-md-6 card">
+                <div className="col-md-6">
                     <div>
                         <div className={styles.register_section_warp}>
                             <div className={styles.register_section_right}>

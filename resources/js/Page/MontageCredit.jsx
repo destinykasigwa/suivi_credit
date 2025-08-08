@@ -569,15 +569,43 @@ const MontageCredit = () => {
                         style={{
                             background: "teal",
                             borderRadius: "10px",
-                            height: "10",
-                            padding: "2px",
+                            padding: "10px", // Ajusté pour un meilleur espacement
                             color: "white",
+                            display: "flex", // Utilisation de Flexbox
+                            justifyContent: "space-between", // Distribution des éléments aux extrémités
+                            alignItems: "center", // Alignement vertical des éléments
                         }}
                     >
-                        <h5 className="text-bold p-1">
+                        <h5 className="text-bold p-1" style={{ margin: 0 }}>
                             Porte Feuille de Crédit
                         </h5>
-                    </div>{" "}
+                        <h5 className="text-bold p-1" style={{ margin: 0 }}>
+                            <a
+                                href="eco/pages/credit/rapport-credit"
+                                style={{
+                                    color: "white",
+                                    textDecoration: "none",
+                                    backgroundColor: "#007BFF", // Couleur de fond (bleu)
+                                    padding: "8px 15px", // Espacement interne
+                                    borderRadius: "5px", // Coins arrondis
+                                    fontWeight: "bold", // Texte en gras
+                                    fontSize: "14px", // Taille du texte
+                                    display: "inline-block", // Pour ressembler à un bouton
+                                    border: "1px solid #0056b3", // Bordure
+                                    transition:
+                                        "background-color 0.3s, transform 0.2s", // Animation hover
+                                }}
+                                onMouseEnter={(e) =>
+                                    (e.target.style.backgroundColor = "#0056b3")
+                                } // Hover couleur
+                                onMouseLeave={(e) =>
+                                    (e.target.style.backgroundColor = "#007BFF")
+                                } // Couleur normale
+                            >
+                                Rapport crédit
+                            </a>
+                        </h5>
+                    </div>
                 </div>
             </div>
             {/* // */}
@@ -2723,7 +2751,7 @@ const MontageCredit = () => {
                         >
                             {/* <h4 className="fw-bold">ECHEANCIER</h4> */}
                             <div className="row">
-                                <div className="col-md-8 card rounded-0 p-3">
+                                <div className="col-md-10 card rounded-0 p-3">
                                     <div className="row">
                                         <div className="col-md-4">
                                             <form action="">
@@ -2838,7 +2866,7 @@ const MontageCredit = () => {
                                                                     color: "steelblue",
                                                                 }}
                                                             >
-                                                                Date octroie
+                                                                DateOctroie
                                                             </label>
                                                         </td>
                                                         <td>
@@ -2962,8 +2990,7 @@ const MontageCredit = () => {
                                                                     color: "steelblue",
                                                                 }}
                                                             >
-                                                                Tombée
-                                                                d'Echéance
+                                                                TombéeEchéance
                                                             </label>
                                                         </td>
                                                         <td>
@@ -3004,8 +3031,7 @@ const MontageCredit = () => {
                                                                     color: "steelblue",
                                                                 }}
                                                             >
-                                                                Date Dernière
-                                                                Echnce
+                                                                DateDernièreEchnce
                                                             </label>
                                                         </td>
                                                         <td>
@@ -3047,7 +3073,9 @@ const MontageCredit = () => {
                                                                             "2px",
                                                                         color: "steelblue",
                                                                     }}
-                                                                ></label>
+                                                                >
+                                                                    MontantAccordé
+                                                                </label>
                                                             </td>
                                                             <td>
                                                                 <input

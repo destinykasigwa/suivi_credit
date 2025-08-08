@@ -19,8 +19,8 @@ const Balance = () => {
     const handleRadioChange2 = (event) => {
         setRadioValue2(event.target.value);
     };
-    const [compte_balance_debut, setcompte_balance_debut] = useState();
-    const [compte_balance_fin, setcompte_balance_fin] = useState();
+    const [compte_balance_debut, setcompte_balance_debut] = useState("3301");
+    const [compte_balance_fin, setcompte_balance_fin] = useState("3301");
     const [devise, setdevise] = useState();
     const [fetchData, setFetchData] = useState();
     const [fetchDataConverti, setFetchDataConverti] = useState();
@@ -598,6 +598,7 @@ const Balance = () => {
                                                         e.target.value
                                                     )
                                                 }
+                                                value={compte_balance_debut}
                                             />{" "}
                                             <label
                                                 class="form-check-label"
@@ -625,6 +626,7 @@ const Balance = () => {
                                                         e.target.value
                                                     )
                                                 }
+                                                value={compte_balance_fin}
                                                 type="text"
                                             />
                                         </td>

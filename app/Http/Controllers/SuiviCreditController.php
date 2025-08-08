@@ -13,6 +13,7 @@ use App\Models\Transactions;
 use Illuminate\Http\Request;
 use App\Models\LockedGarantie;
 use App\Models\TauxEtDateSystem;
+use App\Services\SendNotification;
 use Illuminate\Support\Facades\DB;
 use App\Models\CompteurTransaction;
 use App\Models\Remboursementcredit;
@@ -25,6 +26,7 @@ class SuiviCreditController extends Controller
 {
     public $compteCreditAuxMembreCDF;
     public $compteCreditAuxMembreUSD;
+    protected $sendNotification;
 
     //
     public function __construct()
@@ -32,6 +34,7 @@ class SuiviCreditController extends Controller
         $this->middleware("auth");
         $this->compteCreditAuxMembreCDF = "3210000000202";
         $this->compteCreditAuxMembreUSD = "3210000000201";
+        $this->sendNotification = app(SendNotification::class);
     }
 
     //GET MONTAGE CREDIT HOME PAGE 
@@ -82,6 +85,7 @@ class SuiviCreditController extends Controller
     //PERMET D'ENREGISTRER UN TYPE CREDIT 
     public function saveNewTypeCredit(Request $request)
     {
+
         if (isset($request->type_credit)) {
             $ref = TypeCredit::latest()->first()->id;
             TypeCredit::create([
@@ -187,7 +191,8 @@ class SuiviCreditController extends Controller
 
     public function saveNewCreditInDb(Request $request)
     {
-        // dd($request->all());
+
+
         $validator = validator::make($request->all(), [
             'type_credit' => 'required',
             'recouvreur' => 'required',
@@ -1022,6 +1027,7 @@ class SuiviCreditController extends Controller
 
                             //UPADATE TABLE
                             Portefeuille::where("NumDossier", $request->NumDossier)->update([
+                                "CompteInteret" => $CompteInteret,
                                 "InteretDu" => $soldeInteret->sommeInteret
                             ]);
 
@@ -1368,8 +1374,9 @@ class SuiviCreditController extends Controller
                         "refCompteMembre" => $dataCredit->NumCompteEpargne,
                     ]);
                 }
-
-
+                //ENVOIE UNE NOTIFICATION
+                $Libelle = "Votre crédit à court terme octroyé en date du " . $creditExist->DateOctroi;
+                $this->sendNotification->sendNotificationComptabilite($dataCredit->numAdherant, $dataCredit->CodeMonnaie, $dataCredit->MontantAccorde, "C", $Libelle);
                 return response()->json(["status" => 1, "msg" => "Ce crédit a bien été décaissé merci."]);
             } else {
                 return response()->json(["status" => 0, "msg" => "Le crédit ne pas encore accordé merci."]);

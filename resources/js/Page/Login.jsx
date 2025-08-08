@@ -73,7 +73,7 @@ const LoginForm = () => {
                 navigate(lastVisitedPage);
             } else {
                 // S'il n'y a pas de dernière page visitée, rediriger vers la page d'accueil
-                navigate("/eco/home");
+                navigate("/gestion_credit/home");
             }
             window.location.reload();
         } else if (res.data.status == 0) {
@@ -157,87 +157,136 @@ const LoginForm = () => {
     //     }
     // };
 
+    // Bouton désactivé si l'un des deux champs est vide
+    const isDisabled = user.name.trim() === "" || user.password.trim() === "";
+
     return (
-        <div
-            className="h-100 d-flex align-items-center justify-content-center"
-            style={{ marginTop: "100px" }}
-        >
+        <div className="container-fluid">
             {expiredPassword == false ? (
-                <div className="col-md-6 card">
-                    <div>
-                        <div className={styles.register_section_warp}>
-                            <div className={styles.register_section_right}>
-                                <h2>Login !</h2>
-
-                                <form
-                                    className={styles.form}
-                                    onSubmit={handleSubmit}
-                                >
-                                    <div className={styles.name}>
-                                        <input
-                                            className={styles.input_form}
-                                            type="text"
-                                            name="name"
-                                            value={user.name}
-                                            onChange={(e) =>
-                                                setUser((p) => ({
-                                                    ...p,
-                                                    name: e.target.value,
-                                                }))
-                                            }
-                                        />
-                                        <input
-                                            type="hidden"
-                                            value={user.SkipNow}
-                                        />
-                                        <span className="text-danger">
-                                            {error.name}
-                                        </span>
-                                        <label className={styles.label_form}>
-                                            Nom d'utilisateur
-                                        </label>
-                                    </div>
-
-                                    <div className="password">
-                                        <input
-                                            className={styles.input_form}
-                                            type="password"
-                                            name="password"
-                                            value={user.password}
-                                            onChange={(e) =>
-                                                setUser((p) => ({
-                                                    ...p,
-                                                    password: e.target.value,
-                                                }))
-                                            }
-                                            // required
-                                            // autoComplete="off"
-                                            // placeholder="Xbshsd$##@31!"
-                                        />
-                                        <span className="text-danger">
-                                            {error.password}
-                                        </span>
-                                        <label className={styles.label_form}>
-                                            Mot de passe
-                                        </label>
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        className={styles.button_effect}
+                <div className="row">
+                    <div
+                        className="col-md-6  rounded-0"
+                        style={{
+                            height: "100vh",
+                            background: "#dcdcdc",
+                            border: "25px solid #fff",
+                            margin: "0px",
+                        }}
+                    >
+                        <div style={{ marginTop: "120px" }}>
+                            <div className={styles.register_section_warp}>
+                                <div className={styles.register_section_right}>
+                                    <form
+                                        className={styles.form}
+                                        onSubmit={handleSubmit}
                                     >
-                                        Connexion
-                                    </button>
-                                    <a
-                                        style={{ textDecoration: "none" }}
-                                        href="/auth/forget-password"
-                                    >
-                                        J'ai oublié mon mot de passe
-                                    </a>
-                                </form>
+                                        <p style={{ textAlign: "center" }}>
+                                            <h5>
+                                                {" "}
+                                                <strong>
+                                                    {" "}
+                                                    Bienvenue sur la plate forme
+                                                </strong>{" "}
+                                                <br />
+                                                de traitement de dossier de
+                                                crédit
+                                            </h5>
+                                        </p>
+                                        <div className={styles.name}>
+                                            <input
+                                                className={styles.input_form}
+                                                type="text"
+                                                name="name"
+                                                value={user.name}
+                                                onChange={(e) =>
+                                                    setUser((p) => ({
+                                                        ...p,
+                                                        name: e.target.value,
+                                                    }))
+                                                }
+                                            />
+                                            <input
+                                                type="hidden"
+                                                value={user.SkipNow}
+                                            />
+                                            <span className="text-danger">
+                                                {error.name}
+                                            </span>
+                                            <label
+                                                className={styles.label_form}
+                                            >
+                                                Nom d'utilisateur
+                                            </label>
+                                        </div>
+
+                                        <div className="password">
+                                            <input
+                                                className={styles.input_form}
+                                                type="password"
+                                                name="password"
+                                                value={user.password}
+                                                onChange={(e) =>
+                                                    setUser((p) => ({
+                                                        ...p,
+                                                        password:
+                                                            e.target.value,
+                                                    }))
+                                                }
+                                                // required
+                                                // autoComplete="off"
+                                                // placeholder="Xbshsd$##@31!"
+                                            />
+                                            <span className="text-danger">
+                                                {error.password}
+                                            </span>
+                                            <label
+                                                className={styles.label_form}
+                                            >
+                                                Mot de passe
+                                            </label>
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            disabled={isDisabled}
+                                            className={`w-full py-2 rounded text-white ${
+                                                isDisabled
+                                                    ? "bg-gray-400 cursor-not-allowed"
+                                                    : "bg-blue-600"
+                                            }`}
+                                        >
+                                            Connexion
+                                        </button>
+                                        <a
+                                            style={{
+                                                textDecoration: "none",
+                                                textAlign: "center",
+                                            }}
+                                            href="/auth/forget-password"
+                                        >
+                                            J'ai oublié mon mot de passe
+                                        </a>
+                                    </form>
+                                </div>
                             </div>
                         </div>
+                        <br />
                     </div>
-                    <br />
+                    <div
+                        className="col-md-6 card rounded-0"
+                        style={{
+                            height: "100vh",
+                            margin: "0px",
+                        }}
+                    >
+                        <div className="container text-center my-4">
+                            <img
+                                src="/images/credit-image.jpg"
+                                alt="Crédit"
+                                className="img-fluid"
+                                style={{ maxWidth: "570px", width: "100%" }}
+                            />
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <div className="col-md-6 card">

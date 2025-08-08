@@ -482,7 +482,7 @@ const Adhesion = () => {
                                                             color: "green",
                                                         }}
                                                     >
-                                                        Nouveau compte
+                                                        Nouveau membre
                                                     </h6>
                                                 </legend>
                                                 <table>
@@ -1553,8 +1553,84 @@ const Adhesion = () => {
                                                                 <option value="">
                                                                     Sélectionnez
                                                                 </option>
-                                                                <option value="Nord kivu">
-                                                                    Nord kivu
+                                                                <option value="Bas-Uele">
+                                                                    Bas-Uele
+                                                                </option>
+
+                                                                <option value="Equateur">
+                                                                    Equateur
+                                                                </option>
+                                                                <option value="Haut-katanga">
+                                                                    Haut-katanga
+                                                                </option>
+                                                                <option value="Haut-Lomani">
+                                                                    Haut-Lomani
+                                                                </option>
+                                                                <option value="Haut-Uele">
+                                                                    Haut-Uele
+                                                                </option>
+                                                                <option value="Ituri">
+                                                                    Ituri
+                                                                </option>
+                                                                <option value="Kasai">
+                                                                    Kasai
+                                                                </option>
+                                                                <option value="Kasai-Central">
+                                                                    Kasai-Central
+                                                                </option>
+                                                                <option value="Kasai-Oiental">
+                                                                    Kasai-Oriental
+                                                                </option>
+                                                                <option value="Kinshasa">
+                                                                    Kinshasa
+                                                                </option>
+                                                                <option value="Congo-Central">
+                                                                    Congo-Cental
+                                                                </option>
+                                                                <option value="Kwango">
+                                                                    Kwango
+                                                                </option>
+                                                                <option value="Kwilu">
+                                                                    Kwilu
+                                                                </option>
+                                                                <option value="Lomami">
+                                                                    Lomami
+                                                                </option>
+                                                                <option value="Lualaba">
+                                                                    Lualaba
+                                                                </option>
+                                                                <option value="Mai-Ndombe">
+                                                                    Mai-Ndombe
+                                                                </option>
+                                                                <option value="Maniema">
+                                                                    Maniema
+                                                                </option>
+                                                                <option value="Mongala">
+                                                                    Mongala
+                                                                </option>
+                                                                <option value="Nord-Kivu">
+                                                                    Nord-Kivu
+                                                                </option>
+                                                                <option value="Nord-Ubangi">
+                                                                    Nord-Ubangi
+                                                                </option>
+                                                                <option value="Sankuru">
+                                                                    Sankuru
+                                                                </option>
+                                                                <option value="Sud-Kivu">
+                                                                    Sud-Kivu
+                                                                </option>
+                                                                <option value="Sud-Ubangi">
+                                                                    Sud-Ubangi
+                                                                </option>
+                                                                <option value="Tanganyika">
+                                                                    Tanganyika
+                                                                </option>
+                                                                <option value="Tshopo">
+                                                                    Tshopo
+                                                                </option>
+                                                                <option value="Tshapa">
+                                                                    Tshapa
                                                                 </option>
                                                             </select>
                                                         </td>
