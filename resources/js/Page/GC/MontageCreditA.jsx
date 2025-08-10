@@ -57,8 +57,16 @@ const MontageCreditA = () => {
         );
         setImages((prev) => [...prev, ...validFiles]);
     };
+    // const handleInputChange = (e) => {
+    //     handleFiles(e.target.files);
+    // };
     const handleInputChange = (e) => {
-        handleFiles(e.target.files);
+        const selectedFiles = Array.from(e.target.files).filter(
+            (file) =>
+                file.type.startsWith("image/") ||
+                file.type === "application/pdf"
+        );
+        setImages((prev) => [...prev, ...selectedFiles]);
     };
     const handleClick = () => {
         fileInputRef.current.click();
@@ -1070,7 +1078,7 @@ const MontageCreditA = () => {
                                         <input
                                             type="file"
                                             multiple
-                                            accept="image/*"
+                                            accept="image/*,application/pdf"
                                             ref={fileInputRef}
                                             onChange={handleInputChange}
                                             style={{
@@ -1093,25 +1101,77 @@ const MontageCreditA = () => {
                                             gap: "10px",
                                         }}
                                     >
-                                        {images.map((img, index) => (
+                                        {images.map((file, index) => (
                                             <div
                                                 key={index}
                                                 style={{
                                                     position: "relative",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "center",
+                                                    width: "100px",
                                                 }}
                                             >
-                                                <img
-                                                    src={URL.createObjectURL(
-                                                        img
-                                                    )}
-                                                    alt={`preview-${index}`}
-                                                    width="100"
-                                                    height="100"
+                                                {file.type.startsWith(
+                                                    "image/"
+                                                ) ? (
+                                                    <img
+                                                        src={URL.createObjectURL(
+                                                            file
+                                                        )}
+                                                        alt={`preview-${index}`}
+                                                        width="100"
+                                                        height="100"
+                                                        style={{
+                                                            objectFit: "cover",
+                                                            borderRadius: "5px",
+                                                        }}
+                                                    />
+                                                ) : file.type ===
+                                                  "application/pdf" ? (
+                                                    <div
+                                                        style={{
+                                                            width: "100px",
+                                                            height: "100px",
+                                                            backgroundColor:
+                                                                "#f44336",
+                                                            color: "white",
+                                                            display: "flex",
+                                                            flexDirection:
+                                                                "column",
+                                                            alignItems:
+                                                                "center",
+                                                            justifyContent:
+                                                                "center",
+                                                            borderRadius: "5px",
+                                                            cursor: "pointer",
+                                                            fontSize: "12px",
+                                                            textAlign: "center",
+                                                        }}
+                                                        onClick={() =>
+                                                            window.open(
+                                                                URL.createObjectURL(
+                                                                    file
+                                                                ),
+                                                                "_blank"
+                                                            )
+                                                        }
+                                                    >
+                                                        📄 PDF
+                                                    </div>
+                                                ) : null}
+
+                                                <small
                                                     style={{
-                                                        objectFit: "cover",
-                                                        borderRadius: "5px",
+                                                        marginTop: "5px",
+                                                        textAlign: "center",
+                                                        fontSize: "10px",
+                                                        wordBreak: "break-word",
                                                     }}
-                                                />
+                                                >
+                                                    {file.name}
+                                                </small>
+
                                                 <button
                                                     type="button"
                                                     onClick={() =>

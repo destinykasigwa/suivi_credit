@@ -2,3 +2,8 @@
 1. Middleware/CheckUserRole
 2. Controllers/AccessConfigController
 3. Providers/AppServiceProvider
+
+GIT
+git remote set-url origin https://github.com/destinykasigwa/suivi_credit.git //SE POSITIONNE SUR UN DEPOT SPECIFIQUE
+git push origin master //FAIT UN PUSH SUR LA DEOT SPECIFIQUE
+php artisan storage:link // crée lien symbolique storage dans le dossier public pour que tes fichiers stockés dans storage/app/public soient accessibles via une URL publique.

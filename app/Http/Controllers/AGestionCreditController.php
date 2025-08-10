@@ -38,7 +38,7 @@ class AGestionCreditController extends Controller
             'date_demande'  => 'required|string',
             'frequence_mensualite' => 'required|string',
             'nombre_echeance' => 'required|string',
-            'NumDossier' => 'required|string',
+            // 'NumDossier' => 'required|string',
             'gestionnaire' => 'required|string',
             'source_fond' => 'required|string',
             'monnaie' => 'required|string',
@@ -50,7 +50,8 @@ class AGestionCreditController extends Controller
             // 'num_titre' => 'required|string',
             // 'valeur_garantie' => 'required|string',
             // 'description_titre' => 'required|string',
-            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            // 'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'images.*' => 'mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -162,5 +163,44 @@ class AGestionCreditController extends Controller
             "status" => 1,
             "msg" => "Dossier de crédit supprimé avec succès"
         ]);
+    }
+
+
+    public function showDossier($id)
+    {
+        // Récupère le dossier
+        $dossier = DB::table('credits')->where('id_credit', $id)->first();
+
+        if (!$dossier) {
+            return response()->json(['message' => 'Dossier non trouvé'], 404);
+        }
+
+        // Récupère les fichiers liés (images + pdfs)
+        $fichiers = DB::table('credits_images')
+            ->where('credits_id', $id)
+            ->pluck('path'); // ou 'fichier_url' selon ta table
+
+        // Sépare images et pdfs
+        $images = [];
+        $pdfs = [];
+
+        foreach ($fichiers as $fichier) {
+            $ext = strtolower(pathinfo($fichier, PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $images[] = $fichier;
+            } elseif ($ext === 'pdf') {
+                $pdfs[] = $fichier;
+            }
+        }
+
+        // Retourne la réponse JSON
+        // Convertis l'objet $dossier (stdClass) en tableau associatif
+        $dossierArray = (array) $dossier;
+
+        // Ajoute images et pdfs dans ce tableau
+        $dossierArray['images'] = $images;
+        $dossierArray['pdfs'] = $pdfs;
+
+        return response()->json(['data' => $dossierArray]);
     }
 }

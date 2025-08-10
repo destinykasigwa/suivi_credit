@@ -616,4 +616,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
         "gestion_credit/pages/dossier-credit/delete/{id}",
         [AGestionCreditController::class, 'getCreditToDelete']
     );
+    //PREVISUALISATION D'UN DOSSIER
+
+    Route::get('/suivi-credit/dossiers/{id}', [AGestionCreditController::class, 'showDossier']);
 });

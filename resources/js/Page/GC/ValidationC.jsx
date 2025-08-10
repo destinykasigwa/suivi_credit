@@ -1,9 +1,11 @@
 //import styles from "../styles/RegisterForm.module.css";
 import { useState, useEffect, useRef } from "react";
+// import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import ModalBootstrapVisualisation from "../Modals/ModalsGC/ModalBootstrapVisualisation";
 import "../../styles/style.css";
 
 const ValidationC = () => {
@@ -12,6 +14,7 @@ const ValidationC = () => {
     const [fetchData, setFetchData] = useState();
     const [searchRefCredit, setsearchRefCredit] = useState();
     const [fetchSearchedCredit, setFetchSearchedCredit] = useState();
+    const [dossierIdSelected, setDossierIdSelected] = useState(null);
 
     useEffect(() => {
         // Place automatiquement le curseur dans le champ à l'ouverture de la page
@@ -98,6 +101,12 @@ const ValidationC = () => {
 
         return date.toString();
     };
+
+    // const handleVisualiser = (dossier) => {
+    //     setSelectedDossier(dossier);
+    //     setShowModal(true);
+    // };
+
     return (
         <>
             <div className="container-fluid" style={{ marginTop: "10px" }}>
@@ -202,10 +211,18 @@ const ValidationC = () => {
                                                           <button
                                                               type="button"
                                                               className="btn btn-primary"
+                                                              data-toggle="modal"
+                                                              data-target="#modalVisualisationDossier"
+                                                              onClick={() =>
+                                                                  setDossierIdSelected(
+                                                                      credit.id_credit
+                                                                  )
+                                                              }
                                                           >
                                                               Visualiser{" "}
                                                               <i className="fas fa-eye"></i>
                                                           </button>
+
                                                           <button
                                                               type="button"
                                                               className="btn btn-success"
@@ -257,6 +274,13 @@ const ValidationC = () => {
                                                           <button
                                                               type="button"
                                                               className="btn btn-primary"
+                                                              data-toggle="modal"
+                                                              data-target="#modalVisualisationDossier"
+                                                              onClick={() =>
+                                                                  setDossierIdSelected(
+                                                                      res.id_credit
+                                                                  )
+                                                              }
                                                           >
                                                               Visualiser{" "}
                                                               <i className="fas fa-eye"></i>
@@ -271,6 +295,11 @@ const ValidationC = () => {
                                                           <button
                                                               type="button"
                                                               className="btn btn-danger"
+                                                              onClick={() => {
+                                                                  handleDeleteCredit(
+                                                                      credit.id_credit
+                                                                  );
+                                                              }}
                                                           >
                                                               Supprimer{" "}
                                                               <i
@@ -285,6 +314,12 @@ const ValidationC = () => {
                                       })}
                             </tbody>
                         </table>
+                        {dossierIdSelected && (
+                            <ModalBootstrapVisualisation
+                                dossierId={dossierIdSelected}
+                                onClose={() => setDossierIdSelected(null)}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

@@ -20,3 +20,7 @@
     color: green;
 
 }
+.other-input{
+box-shadow:"inset 0 0 5px 5px #888";
+font-size:"15px";                                                                     
+}
