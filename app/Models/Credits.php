@@ -33,11 +33,22 @@ class Credits extends Model
         'valeur_comptable',
         'num_titre',
         'valeur_garantie',
-        'description_titre'
+        'date_sortie_titre',
+        'date_expiration_titre',
+        'description_titre',
+        'signature_file'
     ];
 
     public function images()
     {
         return $this->hasMany(CreditsImages::class);
     }
+
+
+    public function signatures()
+    {
+        return $this->hasMany(Signature::class, 'credit_id');
+    }
+
+    protected $primaryKey = 'id_credit';
 }

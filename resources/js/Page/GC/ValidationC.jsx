@@ -226,6 +226,13 @@ const ValidationC = () => {
                                                           <button
                                                               type="button"
                                                               className="btn btn-success"
+                                                              data-toggle="modal"
+                                                              data-target="#modalVisualisationDossier"
+                                                              onClick={() =>
+                                                                  setDossierIdSelected(
+                                                                      credit.id_credit
+                                                                  )
+                                                              }
                                                           >
                                                               Modifier{" "}
                                                               <i className="fas fa-pen"></i>
@@ -288,6 +295,13 @@ const ValidationC = () => {
                                                           <button
                                                               type="button"
                                                               className="btn btn-success"
+                                                              data-toggle="modal"
+                                                              data-target="#modalVisualisationDossier"
+                                                              onClick={() =>
+                                                                  setDossierIdSelected(
+                                                                      credit.id_credit
+                                                                  )
+                                                              }
                                                           >
                                                               Modifier{" "}
                                                               <i className="fas fa-pen"></i>

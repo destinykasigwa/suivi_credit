@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Credits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AGestionCreditController extends Controller
@@ -51,7 +52,7 @@ class AGestionCreditController extends Controller
             // 'valeur_garantie' => 'required|string',
             // 'description_titre' => 'required|string',
             // 'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
-            'images.*' => 'mimes:jpg,jpeg,png,pdf|max:2048',
+            'images.*' => 'mimes:jpg,jpeg,png,pdf|max:5048',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -83,8 +84,9 @@ class AGestionCreditController extends Controller
                 'valeur_comptable' => $request->valeur_comptable,
                 'num_titre' => $request->num_titre,
                 'valeur_garantie' => $request->valeur_garantie,
+                'date_sortie_titre' => $request->date_sortie_titre,
+                'date_expiration_titre' => $request->date_expiration_titre,
                 'description_titre' => $request->description_titre,
-
             ]);
 
             foreach ($request->file('images') as $image) {
@@ -178,7 +180,7 @@ class AGestionCreditController extends Controller
         // Récupère les fichiers liés (images + pdfs)
         $fichiers = DB::table('credits_images')
             ->where('credits_id', $id)
-            ->pluck('path'); // ou 'fichier_url' selon ta table
+            ->pluck('path');
 
         // Sépare images et pdfs
         $images = [];
@@ -193,14 +195,93 @@ class AGestionCreditController extends Controller
             }
         }
 
-        // Retourne la réponse JSON
+        // 🔹 Récupère les fichiers de signatures liés
+        // $signatures = DB::table('signatures')
+        //     ->where('credit_id', $id) // correspond à id_credit dans credits
+        //     ->pluck('signature_file');
+        // Historique (liste complète)
+        $signatures = DB::table('signatures')
+            ->where('credit_id', $id)
+            ->pluck('signature_file');
+
+        // Dernier fichier uniquement
+        $lastSignature = DB::table('signatures')
+            ->where('credit_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->value('signature_file');
+
+
         // Convertis l'objet $dossier (stdClass) en tableau associatif
         $dossierArray = (array) $dossier;
 
-        // Ajoute images et pdfs dans ce tableau
+        // Ajoute images, pdfs et signatures
         $dossierArray['images'] = $images;
         $dossierArray['pdfs'] = $pdfs;
+        $dossierArray['signatures'] = $signatures;
+        $dossierArray['lastSignature'] = $lastSignature;
 
         return response()->json(['data' => $dossierArray]);
+    }
+
+    //UPDATE DOSSIER
+    public function updateDossier(Request $request)
+    {
+
+        Credits::where("id_credit", $request->idDossier)->update([
+            "NumCompte" => $request->NumCompte,
+            "NomCompte" => $request->NomCompte,
+            "produit_credit" => $request->produit_credit,
+            "type_credit" => $request->type_credit,
+            "recouvreur" => $request->recouvreur,
+            "montant_demande" => $request->montant_demande,
+            "date_demande" => $request->date_demande,
+            "frequence_mensualite" => $request->frequence_mensualite,
+            "nombre_echeance" => $request->nombre_echeance,
+            "NumDossier" => $request->NumDossier,
+            "gestionnaire" => $request->gestionnaire,
+            "source_fond" => $request->source_fond,
+            "monnaie" => $request->monnaie,
+            "duree_credit" => $request->duree_credit,
+            "intervale_jrs" => $request->intervale_jrs,
+            "taux_interet" => $request->taux_interet,
+            "type_garantie" => $request->type_garantie,
+            "valeur_comptable" => $request->valeur_comptable,
+            "num_titre" => $request->num_titre,
+            "valeur_garantie" => $request->valeur_garantie,
+            "date_sortie_titre" => $request->date_sortie_titre,
+            "date_expiration_titre" => $request->date_expiration_titre,
+            "description_titre" => $request->description_titre,
+
+        ]);
+
+        return response()->json([
+            "status" => 1,
+            "msg" => "Mise à jour effectuée avec succès ! "
+        ]);
+    }
+
+    //PERMET D'AJOUTER LE FICHIER DE SIGNATURE AU DOSSIER
+
+    public function addFileDossier(Request $request)
+    {
+        $request->validate([
+            'signature_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+            // 'signed_by' => 'nullable|string|max:255'
+        ]);
+
+        $credit = Credits::findOrFail($request->idDossier);
+
+        $path = $request->file('signature_file')->store('signatures', 'public');
+
+        $credit->signatures()->create([
+            'signature_file' => $path,
+            'signed_by' => Auth::user()->name,
+        ]);
+
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Signature ajoutée avec succès.',
+            'signature_file' => $path
+        ]);
     }
 }

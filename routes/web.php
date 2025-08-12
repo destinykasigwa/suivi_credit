@@ -619,4 +619,8 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     //PREVISUALISATION D'UN DOSSIER
 
     Route::get('/suivi-credit/dossiers/{id}', [AGestionCreditController::class, 'showDossier']);
+
+    Route::post('/gestion_credit/dossier-credit/upadate', [AGestionCreditController::class, 'updateDossier']);
+
+    Route::post('/gestion_credit/page/validation-dossier/add-file', [AGestionCreditController::class, 'addFileDossier']);
 });

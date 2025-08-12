@@ -4,35 +4,40 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Bars } from "react-loader-spinner";
 import "../../styles/style.css";
 
 const MontageCreditA = () => {
     const inputRef = useRef(null);
     const [error, setError] = useState([]);
     const [images, setImages] = useState([]);
-    const [NumCompte, setNumCompte] = useState();
-    const [NomCompte, setNomCompte] = useState();
-    const [produit_credit, setproduit_credit] = useState();
-    const [type_credit, settype_credit] = useState();
-    const [recouvreur, setrecouvreur] = useState();
-    const [montant_demande, setmontant_demande] = useState();
+    const [NumCompte, setNumCompte] = useState("");
+    const [NomCompte, setNomCompte] = useState("");
+    const [produit_credit, setproduit_credit] = useState("");
+    const [type_credit, settype_credit] = useState("");
+    const [recouvreur, setrecouvreur] = useState("");
+    const [montant_demande, setmontant_demande] = useState("");
     const [date_demande, setdate_demande] = useState(new Date());
     const formattedDate = date_demande.toISOString().split("T")[0];
-    const [frequence_mensualite, setfrequence_mensualite] = useState();
-    const [nombre_echeance, setnombre_echeance] = useState();
-    const [NumDossier, setNumDossier] = useState();
-    const [gestionnaire, setgestionnaire] = useState();
-    const [source_fond, setsource_fond] = useState();
-    const [monnaie, setmonnaie] = useState();
-    const [duree_credit, setduree_credit] = useState();
-    const [intervale_jrs, setintervale_jrs] = useState();
-    const [taux_interet, settaux_interet] = useState();
-    const [type_garantie, settype_garantie] = useState();
-    const [valeur_comptable, setvaleur_comptable] = useState();
+    const [frequence_mensualite, setfrequence_mensualite] = useState("");
+    const [nombre_echeance, setnombre_echeance] = useState("");
+    const [NumDossier, setNumDossier] = useState("");
+    const [gestionnaire, setgestionnaire] = useState("");
+    const [source_fond, setsource_fond] = useState("");
+    const [monnaie, setmonnaie] = useState("");
+    const [duree_credit, setduree_credit] = useState("");
+    const [intervale_jrs, setintervale_jrs] = useState("");
+    const [taux_interet, settaux_interet] = useState("");
+    const [type_garantie, settype_garantie] = useState("");
+    const [valeur_comptable, setvaleur_comptable] = useState("");
     const [num_titre, setnum_titre] = useState();
-    const [valeur_garantie, setvaleur_garantie] = useState();
-    const [description_titre, setdescription_titre] = useState();
+    const [valeur_garantie, setvaleur_garantie] = useState("");
+    const [description_titre, setdescription_titre] = useState("");
+    const [date_sortie_titre, setdate_sortie_titre] = useState("");
+    const [date_expiration_titre, setdate_expiration_titre] = useState("");
+
     const [objetCredit, setObjetCredit] = useState("");
+    const [isLoadingBar, setIsLoadingBar] = useState();
     // const handleImageChange = (e) => {
     //     const files = Array.from(e.target.files);
     //     setImages(files);
@@ -77,7 +82,7 @@ const MontageCreditA = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setIsLoadingBar(true);
         const formData = new FormData();
         formData.append("NumCompte", NumCompte);
         formData.append("NomCompte", NomCompte);
@@ -99,6 +104,8 @@ const MontageCreditA = () => {
         formData.append("valeur_comptable", valeur_comptable);
         formData.append("num_titre", num_titre);
         formData.append("valeur_garantie", valeur_garantie);
+        formData.append("date_sortie_titre", date_sortie_titre);
+        formData.append("date_expiration_titre", date_expiration_titre);
         formData.append("description_titre", description_titre);
         formData.append("objet_credit", objetCredit);
 
@@ -118,6 +125,7 @@ const MontageCreditA = () => {
             );
 
             if (response.data.status == 1) {
+                setIsLoadingBar(false);
                 console.log("Succès :", response.data);
                 setObjetCredit("");
                 setNumCompte("");
@@ -152,12 +160,7 @@ const MontageCreditA = () => {
 
                 // Réinitialiser les champs si besoin
             } else {
-                //setError(response.data.validate_error);
-                // Concaténer tous les messages d'erreur dans un seul texte
-                // const errors = response.data.validate_error;
-                // const errorMessages = Object.values(errors)
-                //     .flat() // pour aplatir les tableaux
-                //     .join("\n"); // pour chaque erreur sur une ligne
+                setIsLoadingBar(false);
                 Swal.fire({
                     title: "Erreur",
                     text: response.data.msg,
@@ -199,6 +202,38 @@ const MontageCreditA = () => {
                 </div>
                 <form>
                     <div className="row mt-3 card rounded-0 p-3">
+                        {isLoadingBar && (
+                            <div
+                                style={{
+                                    position: "fixed",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                    zIndex: 1000,
+                                }}
+                            >
+                                <div>
+                                    <Bars
+                                        height="80"
+                                        width="80"
+                                        color="#4fa94d"
+                                        ariaLabel="loading"
+                                    />
+                                    <h5
+                                        style={{
+                                            color: "#fff",
+                                        }}
+                                    >
+                                        Patientez...
+                                    </h5>
+                                </div>
+                            </div>
+                        )}
                         <div
                             className="container"
                             style={{ marginRight: "3px" }}
@@ -996,6 +1031,7 @@ const MontageCreditA = () => {
                                                         Valeur garantie
                                                     </label>
                                                 </td>
+
                                                 <td>
                                                     <input
                                                         type="text"
@@ -1008,6 +1044,58 @@ const MontageCreditA = () => {
                                                             );
                                                         }}
                                                         value={valeur_garantie}
+                                                    />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label
+                                                        htmlFor="date_sortie_titre"
+                                                        className="label-style"
+                                                    >
+                                                        Date sortie titre
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        className="input-style"
+                                                        name="date_sortie_titre"
+                                                        id="date_sortie_titre"
+                                                        onChange={(e) => {
+                                                            setdate_sortie_titre(
+                                                                e.target.value
+                                                            );
+                                                        }}
+                                                        value={
+                                                            date_sortie_titre
+                                                        }
+                                                    />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label
+                                                        htmlFor="date_expiration_titre"
+                                                        className="label-style"
+                                                    >
+                                                        Date Expiration titre
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        className="input-style"
+                                                        name="date_expiration_titre"
+                                                        id="date_expiration_titre"
+                                                        onChange={(e) => {
+                                                            setdate_expiration_titre(
+                                                                e.target.value
+                                                            );
+                                                        }}
+                                                        value={
+                                                            date_expiration_titre
+                                                        }
                                                     />
                                                 </td>
                                             </tr>
