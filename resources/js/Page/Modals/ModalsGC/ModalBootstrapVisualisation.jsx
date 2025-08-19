@@ -6,11 +6,10 @@ import axios from "axios";
 import ValidationFile from "../../GC/Reports/ValidationFile";
 import Swal from "sweetalert2";
 import { FaDownload } from "react-icons/fa";
+import { Bars } from "react-loader-spinner";
 
 export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [dossier, setDossier] = useState(null);
-    const modalRef = useRef(null);
-    const bsModal = useRef(null);
 
     const [NumCompte, setNumCompte] = useState();
     const [NomCompte, setNomCompte] = useState();
@@ -38,6 +37,9 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [date_sortie_titre, setdate_sortie_titre] = useState("");
     const [date_expiration_titre, setdate_expiration_titre] = useState("");
     const [signature_file, setsignature_file] = useState();
+    const [statutDossier, setstatutDossier] = useState("");
+    const [isLoadingBar, setIsLoadingBar] = useState();
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         if (!dossierId) return;
@@ -75,31 +77,11 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 setdate_demande(data.date_demande);
                 setdate_sortie_titre(data.date_sortie_titre);
                 setdate_expiration_titre(data.date_expiration_titre);
+                setstatutDossier(data.statutDossier);
                 setGetDossierId(data.id_credit);
             })
             .catch(() => setDossier(null));
     };
-
-    useEffect(() => {
-        if (!modalRef.current) return;
-        bsModal.current = new window.bootstrap.Modal(modalRef.current);
-        bsModal.current.show();
-
-        // À la fermeture du modal
-        modalRef.current.addEventListener("hidden.bs.modal", () => {
-            onClose();
-            setDossier(null);
-        });
-
-        return () => {
-            // Nettoyage écouteurs si le composant est démonté
-            if (modalRef.current)
-                modalRef.current.removeEventListener(
-                    "hidden.bs.modal",
-                    () => {}
-                );
-        };
-    }, [dossierId, onClose]);
 
     if (!dossierId) return null;
 
@@ -131,6 +113,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
         });
 
         if (confirmation.isConfirmed) {
+            setIsLoadingBar(true);
             const res = await axios.post(
                 "gestion_credit/dossier-credit/upadate",
                 {
@@ -155,10 +138,12 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     valeur_garantie,
                     description_titre,
                     date_demande,
+                    statutDossier,
                     idDossier: getDossierId,
                 }
             );
             if (res.data.status == 1) {
+                setIsLoadingBar(false);
                 Swal.fire({
                     title: "Modification",
                     text: res.data.msg,
@@ -167,12 +152,23 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     confirmButtonText: "Okay",
                 });
                 getDossierCredit();
+            } else {
+                setIsLoadingBar(false);
+                Swal.fire({
+                    title: "Modification",
+                    text: res.data.msg,
+                    icon: "error",
+                    timer: 8000,
+                    confirmButtonText: "Okay",
+                });
             }
         }
     };
 
     const handleSubmitAddFile = async (e) => {
         e.preventDefault();
+        setIsLoadingBar(true);
+        setProgress(0);
         try {
             const formData = new FormData();
             formData.append("signature_file", signature_file);
@@ -183,6 +179,12 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     "Accept-Language": "en-US,en;q=0.8",
                     "content-type": "multipart/form-data",
                 },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    setProgress(percentCompleted);
+                },
             };
 
             const url = "gestion_credit/page/validation-dossier/add-file";
@@ -190,6 +192,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 .post(url, formData, config)
                 .then((response) => {
                     if (response.data.status == 1) {
+                        setIsLoadingBar(false);
                         Swal.fire({
                             title: "Succès",
                             text: response.data.msg,
@@ -197,6 +200,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                             button: "OK!",
                         });
                     } else {
+                        setIsLoadingBar(false);
                         Swal.fire({
                             title: "Erreur",
                             text: response.data.msg,
@@ -237,20 +241,67 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     };
 
     return (
-        <div
-            className="modal fade"
-            tabIndex="-1"
-            aria-hidden="true"
-            ref={modalRef}
-            id="modalVisualisation"
-        >
-            <div className="modal fade" id="modalVisualisationDossier">
+        <>
+            <div
+                className="modal fade"
+                tabIndex="-1"
+                aria-hidden="true"
+                // ref={modalRef}
+                id="modalVisualisationDossier"
+            >
                 <div className="modal-dialog modal-xl">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">
-                                Détails du dossier{" "}
-                                <strong> {NumDossier}</strong>
+                                Détails du dossier
+                                <strong> {NumDossier}</strong> {" | "}
+                                <label className="label-style">Statut</label>
+                                {statutDossier == "Décaissé" ? (
+                                    <select
+                                        type="text"
+                                        className="input-style"
+                                        style={{
+                                            width: "100px",
+                                        }}
+                                        value={statutDossier}
+                                        onChange={(e) =>
+                                            setstatutDossier(e.target.value)
+                                        }
+                                        disabled
+                                    >
+                                        <option value={statutDossier}>
+                                            {statutDossier}
+                                        </option>
+                                        <option value="Accepté">Accepté</option>
+                                        <option value="Refusé">Refusé</option>
+                                        <option value="Encours">Encours</option>
+                                        <option value="Décaissé">
+                                            Décaissé
+                                        </option>
+                                    </select>
+                                ) : (
+                                    <select
+                                        type="text"
+                                        className="input-style"
+                                        style={{
+                                            width: "100px",
+                                        }}
+                                        value={statutDossier}
+                                        onChange={(e) =>
+                                            setstatutDossier(e.target.value)
+                                        }
+                                    >
+                                        <option value={statutDossier}>
+                                            {statutDossier}
+                                        </option>
+                                        <option value="Accepté">Accepté</option>
+                                        <option value="Refusé">Refusé</option>
+                                        <option value="Encours">Encours</option>
+                                        <option value="Décaissé">
+                                            Décaissé
+                                        </option>
+                                    </select>
+                                )}
                             </h5>
                             <button
                                 type="button"
@@ -263,6 +314,38 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                             </button>
                         </div>
                         <div className="modal-body">
+                            {isLoadingBar && (
+                                <div
+                                    style={{
+                                        position: "fixed",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                        zIndex: 1000,
+                                        flexDirection: "column",
+                                    }}
+                                >
+                                    <Bars
+                                        height="80"
+                                        width="80"
+                                        color="#4fa94d"
+                                        ariaLabel="loading"
+                                    />
+                                    <h5
+                                        style={{
+                                            color: "#fff",
+                                            marginTop: "10px",
+                                        }}
+                                    >
+                                        Patientez... {progress}%
+                                    </h5>
+                                </div>
+                            )}
                             {!dossier && <p>Chargement...</p>}
                             {dossier && (
                                 <>
@@ -996,6 +1079,6 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('date_sortie_titre')->nullable();
             $table->string('date_expiration_titre')->nullable();
             $table->string('description_titre')->nullable();
-            $table->string('signature_file')->nullable();
+            $table->string('statutDossier')->nullable();
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ class UtilisateurController extends Controller
 
     public function getUsersHomePage()
     {
-        return view("eco.pages.utilisateurs");
+        return view("gestion_credit.pages.utilisateurs");
     }
 
     //GET USERS
@@ -118,6 +118,11 @@ class UtilisateurController extends Controller
             ProfilsUser::create([
                 "user_id" => $request->userId,
                 "profil_id" => $request->profilId
+            ]);
+
+            $getProfileName = Profile::where("id", $request->profilId)->first()->nom_profile;
+            User::where("id", $request->userId)->update([
+                "role" => $getProfileName
             ]);
             return response()->json(["status" => 1, "msg" => "Profil bien accordé."]);
         } else {

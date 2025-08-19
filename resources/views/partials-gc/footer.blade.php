@@ -12,9 +12,7 @@ $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"'
         <div class="col-12 text-center py-3">
             <p>
                 <strong>Designed by Destin KASIGWA</strong> ::
-                <strong style="color: brown">Date Système:
-                    {{ date_format(date_create($dateSaisie->DateSystem), 'd/m/Y') }}
-                </strong> ::
+
                 <strong>Utilisateur connecté : {{ $userInfo->name }}</strong>
             </p>
         </div>

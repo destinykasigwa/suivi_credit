@@ -31,12 +31,12 @@
                              </a>
                              <ul class="nav nav-treeview">
                                  <li class="nav-item">
-                                     <a href="" class="nav-link">
+                                     <a href="{{ route('gestion_credit.pages.credit-decaisse') }}" class="nav-link">
                                          <i class="far fa-circle nav-icon"></i>
-                                         <p>Rapport 1</p>
+                                         <p>Credits décaissés</p>
                                      </a>
                                  </li>
-                                 <li class="nav-item">
+                                 {{-- <li class="nav-item">
                                      <a href="" class="nav-link">
                                          <i class="far fa-circle nav-icon"></i>
                                          <p>Rapport 2</p>
@@ -65,12 +65,12 @@
                                          <i class="far fa-circle nav-icon"></i>
                                          <p>Rapport 5</p>
                                      </a>
-                                 </li>
+                                 </li> --}}
 
                              </ul>
                          </li>
 
-                         <li class="nav-item">
+                         {{-- <li class="nav-item">
                              <a href="#" class="nav-link">
                                  <i class="fas fa-tasks"></i>
                                  <p>
@@ -87,40 +87,40 @@
                                  </li>
 
                              </ul>
-                         </li>
+                         </li> --}}
                          <li class="nav-header">----------------------------------</li>
-                         @if (isset($isIT) and $isIT)
-                             <li class="nav-item">
-                                 <a href="#" class="nav-link">
-                                     <i class="fas fa-tasks"></i>
-                                     <p>
-                                         Paramètre
-                                         <i class="fas fa-angle-left right"></i>
-                                     </p>
-                                 </a>
-                                 <ul class="nav nav-treeview">
-                                     <li class="nav-item">
-                                         <a href="{{ route('eco.pages.utilisateurs') }}" class="nav-link">
-                                             <i class="far fa-circle nav-icon"></i>
-                                             <p>Utilisateurs</p>
-                                         </a>
-                                     </li>
-                                     <li class="nav-item">
+                         {{-- @if (isset($isIT) and $isIT) --}}
+                         <li class="nav-item">
+                             <a href="#" class="nav-link">
+                                 <i class="fas fa-tasks"></i>
+                                 <p>
+                                     Paramètre
+                                     <i class="fas fa-angle-left right"></i>
+                                 </p>
+                             </a>
+                             <ul class="nav nav-treeview">
+                                 <li class="nav-item">
+                                     <a href="{{ route('gestion_credit.pages.utilisateurs') }}" class="nav-link">
+                                         <i class="far fa-circle nav-icon"></i>
+                                         <p>Utilisateurs</p>
+                                     </a>
+                                 </li>
+                                 {{-- <li class="nav-item">
                                          <a href="{{ route('eco.pages.compte-param') }}" class="nav-link">
                                              <i class="far fa-circle nav-icon"></i>
                                              <p>Paramètres généraux</p>
                                          </a>
-                                     </li>
-                                     {{-- <li class="nav-item">
+                                     </li> --}}
+                                 {{-- <li class="nav-item">
                                      <a href="pages/tables/simple.html" class="nav-link">
                                          <i class="far fa-circle nav-icon"></i>
                                          <p>Gestion de profil</p>
                                      </a>
                                  </li> --}}
 
-                                 </ul>
-                             </li>
-                         @endif
+                             </ul>
+                         </li>
+                         {{-- @endif --}}
 
                      </ul>
          </nav>

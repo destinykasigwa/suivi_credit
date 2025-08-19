@@ -174,7 +174,8 @@
                         <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Rapport</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown04">
-                            <a class="dropdown-item" href="">Rapport 1</a>
+                            <a class="dropdown-item"
+                                href="{{ route('gestion_credit.pages.credit-decaisse') }}">Crédits décaissés</a>
 
 
                         </div>

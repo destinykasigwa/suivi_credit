@@ -30,7 +30,7 @@ const MontageCreditA = () => {
     const [taux_interet, settaux_interet] = useState("");
     const [type_garantie, settype_garantie] = useState("");
     const [valeur_comptable, setvaleur_comptable] = useState("");
-    const [num_titre, setnum_titre] = useState();
+    const [num_titre, setnum_titre] = useState("");
     const [valeur_garantie, setvaleur_garantie] = useState("");
     const [description_titre, setdescription_titre] = useState("");
     const [date_sortie_titre, setdate_sortie_titre] = useState("");
@@ -38,6 +38,7 @@ const MontageCreditA = () => {
 
     const [objetCredit, setObjetCredit] = useState("");
     const [isLoadingBar, setIsLoadingBar] = useState();
+    const [progress, setProgress] = useState(0);
     // const handleImageChange = (e) => {
     //     const files = Array.from(e.target.files);
     //     setImages(files);
@@ -83,6 +84,7 @@ const MontageCreditA = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoadingBar(true);
+        setProgress(0);
         const formData = new FormData();
         formData.append("NumCompte", NumCompte);
         formData.append("NomCompte", NomCompte);
@@ -120,6 +122,12 @@ const MontageCreditA = () => {
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
+                    },
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        setProgress(percentCompleted);
                     },
                 }
             );
@@ -215,23 +223,20 @@ const MontageCreditA = () => {
                                     alignItems: "center",
                                     backgroundColor: "rgba(0, 0, 0, 0.5)",
                                     zIndex: 1000,
+                                    flexDirection: "column",
                                 }}
                             >
-                                <div>
-                                    <Bars
-                                        height="80"
-                                        width="80"
-                                        color="#4fa94d"
-                                        ariaLabel="loading"
-                                    />
-                                    <h5
-                                        style={{
-                                            color: "#fff",
-                                        }}
-                                    >
-                                        Patientez...
-                                    </h5>
-                                </div>
+                                <Bars
+                                    height="80"
+                                    width="80"
+                                    color="#4fa94d"
+                                    ariaLabel="loading"
+                                />
+                                <h5
+                                    style={{ color: "#fff", marginTop: "10px" }}
+                                >
+                                    Patientez... {progress}%
+                                </h5>
                             </div>
                         )}
                         <div
@@ -1131,7 +1136,7 @@ const MontageCreditA = () => {
                             </fieldset>
                         </div>
 
-                        <fieldset className="border p-2">
+                        <fieldset className="border p-2 mt-1">
                             <legend
                                 className="float-none w-auto p-0"
                                 style={{ fontSize: "15px" }}

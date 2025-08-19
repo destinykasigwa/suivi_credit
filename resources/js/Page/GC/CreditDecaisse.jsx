@@ -9,9 +9,8 @@ import ModalBootstrapVisualisation from "../Modals/ModalsGC/ModalBootstrapVisual
 import "../../styles/style.css";
 import { MdTimeline } from "react-icons/md";
 import CreditTimeline from "../Modals/ModalsGC/TimeLine";
-import ModalContratPret from "../Modals/ModalsGC/ModalContratPret";
 
-const ValidationC = () => {
+const CreditDecaisse = () => {
     const inputRef = useRef(null);
     const [loading, setloading] = useState(false);
     const [fetchData, setFetchData] = useState();
@@ -27,7 +26,9 @@ const ValidationC = () => {
 
     const getDataCredit = async () => {
         try {
-            const res = await axios.get("/montage-credit/validation/rapport");
+            const res = await axios.get(
+                "montage-credit/rapport/credit/decaisse"
+            );
 
             // Vérifie si le tableau existe et contient des données
             if (Array.isArray(res.data.data) && res.data.data.length > 0) {
@@ -46,7 +47,7 @@ const ValidationC = () => {
     const handleSeachCredit = async (ref) => {
         setloading(true);
         const res = await axios.get(
-            "/montage_credit/page/validation/credit/reference/" + ref
+            "montage_credit/page/credit/decaisse/reference/" + ref
         );
         if (res.data.status == 1) {
             setloading(false);
@@ -86,14 +87,6 @@ const ValidationC = () => {
                     confirmButtonText: "Okay",
                 });
                 getDataCredit();
-            } else {
-                Swal.fire({
-                    title: "Suppression",
-                    text: res.data.msg,
-                    icon: "error",
-                    timer: 8000,
-                    confirmButtonText: "Okay",
-                });
             }
         }
     };
@@ -249,7 +242,7 @@ const ValidationC = () => {
                                                               TimeLine{" "}
                                                               {/* <i className="fas fa-pen"></i> */}
                                                           </button>
-                                                          <button
+                                                          {/* <button
                                                               type="button"
                                                               className="btn btn-danger"
                                                               onClick={() => {
@@ -263,24 +256,7 @@ const ValidationC = () => {
                                                                   class="fa fa-trash"
                                                                   aria-hidden="true"
                                                               ></i>
-                                                          </button>
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-info"
-                                                              data-toggle="modal"
-                                                              data-target="#modalContratPret"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      credit.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              Contrat prêt{" "}
-                                                              <i
-                                                                  class="fa fa-file"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                          </button>
+                                                          </button> */}
                                                       </div>
                                                   </td>
                                               </tr>
@@ -351,23 +327,6 @@ const ValidationC = () => {
                                                                   aria-hidden="true"
                                                               ></i>
                                                           </button>
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-info"
-                                                              data-toggle="modal"
-                                                              data-target="#modalContratPret"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      credit.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              Contrat prêt{" "}
-                                                              <i
-                                                                  class="fa fa-file"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                          </button>
                                                       </div>
                                                   </td>
                                               </tr>
@@ -388,13 +347,6 @@ const ValidationC = () => {
                                 onClose={() => setDossierIdSelected(null)}
                             />
                         )}
-
-                        {dossierIdSelected && (
-                            <ModalContratPret
-                                creditId={dossierIdSelected}
-                                onClose={() => setDossierIdSelected(null)}
-                            />
-                        )}
                     </div>
                 </div>
             </div>
@@ -402,4 +354,4 @@ const ValidationC = () => {
     );
 };
 
-export default ValidationC;
+export default CreditDecaisse;

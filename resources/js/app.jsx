@@ -52,6 +52,7 @@ import SMSbanking from "./Page/SMSBanking";
 import ResetPassWord from "./Page/ResetPassWord";
 import MontageCreditA from "./Page/GC/MontageCreditA";
 import ValidationC from "./Page/GC/ValidationC";
+import CreditDecaisse from "./Page/GC/CreditDecaisse";
 
 if (document.getElementById("app")) {
     ReactDOM.createRoot(document.getElementById("app")).render(
@@ -310,6 +311,14 @@ if (document.getElementById("validationC")) {
     ReactDOM.createRoot(document.getElementById("validationC")).render(
         <BrowserRouter>
             <ValidationC />
+        </BrowserRouter>
+    );
+}
+
+if (document.getElementById("creditDecaisseA")) {
+    ReactDOM.createRoot(document.getElementById("creditDecaisseA")).render(
+        <BrowserRouter>
+            <CreditDecaisse />
         </BrowserRouter>
     );
 }

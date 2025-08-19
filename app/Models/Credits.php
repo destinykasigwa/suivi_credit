@@ -36,12 +36,13 @@ class Credits extends Model
         'date_sortie_titre',
         'date_expiration_titre',
         'description_titre',
-        'signature_file'
+        'statutDossier',
+
     ];
 
     public function images()
     {
-        return $this->hasMany(CreditsImages::class);
+        return $this->hasMany(CreditsImages::class, 'credits_id');
     }
 
 

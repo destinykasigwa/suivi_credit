@@ -33,6 +33,62 @@ export default function ValidationFile({ dossierId }) {
     //     }
     // };
 
+    // const exportToPDF = () => {
+    //     const content = document.getElementById("content-to-download");
+
+    //     if (!content) {
+    //         console.error("Element not found!");
+    //         return;
+    //     }
+
+    //     html2canvas(content, { scale: 2 })
+    //         .then((canvas) => {
+    //             const imgData = canvas.toDataURL("image/jpeg", 0.75);
+    //             const pdf = new jsPDF("p", "mm", "a4");
+
+    //             const pdfWidth = pdf.internal.pageSize.getWidth();
+    //             const pdfHeight = pdf.internal.pageSize.getHeight();
+    //             const imgProps = pdf.getImageProperties(imgData);
+    //             const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    //             let heightLeft = imgHeight;
+    //             let position = 0;
+
+    //             pdf.addImage(
+    //                 imgData,
+    //                 "JPEG",
+    //                 0,
+    //                 position,
+    //                 pdfWidth,
+    //                 imgHeight,
+    //                 undefined,
+    //                 "FAST"
+    //             );
+    //             heightLeft -= pdfHeight;
+
+    //             while (heightLeft >= 0) {
+    //                 position = heightLeft - imgHeight;
+    //                 pdf.addPage();
+    //                 pdf.addImage(
+    //                     imgData,
+    //                     "JPEG",
+    //                     0,
+    //                     position,
+    //                     pdfWidth,
+    //                     imgHeight,
+    //                     undefined,
+    //                     "FAST"
+    //                 );
+    //                 heightLeft -= pdfHeight;
+    //             }
+
+    //             pdf.autoPrint();
+    //             window.open(pdf.output("bloburl"), "_blank");
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error capturing canvas:", error);
+    //         });
+    // };
     const exportToPDF = () => {
         const content = document.getElementById("content-to-download");
 
@@ -82,8 +138,17 @@ export default function ValidationFile({ dossierId }) {
                     heightLeft -= pdfHeight;
                 }
 
-                pdf.autoPrint();
-                window.open(pdf.output("bloburl"), "_blank");
+                // Générer la date du jour
+                const today = new Date();
+                const day = String(today.getDate()).padStart(2, "0");
+                const month = String(today.getMonth() + 1).padStart(2, "0");
+                const year = today.getFullYear();
+
+                // Construire le nom du fichier avec NomCompte
+                const fileName = `${fetchData.NomCompte}_${day}-${month}-${year}.pdf`;
+
+                // Télécharger directement le PDF avec le bon nom
+                pdf.save(fileName);
             })
             .catch((error) => {
                 console.error("Error capturing canvas:", error);
@@ -352,7 +417,7 @@ export default function ValidationFile({ dossierId }) {
                             </div>
                             <div className="row align-items-center justify-content-center">
                                 <p>Liste des signatures</p>
-                                <div
+                                {/* <div
                                     className="col-md-2"
                                     style={{
                                         border: "1px solid black",
@@ -360,7 +425,7 @@ export default function ValidationFile({ dossierId }) {
                                     }}
                                 >
                                     AC
-                                </div>
+                                </div> */}
                                 <div
                                     className="col-md-2"
                                     style={{
@@ -377,7 +442,7 @@ export default function ValidationFile({ dossierId }) {
                                         padding: "35px",
                                     }}
                                 >
-                                    CA
+                                    C. Agence
                                 </div>
                                 <div
                                     className="col-md-2"

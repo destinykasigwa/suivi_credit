@@ -53,7 +53,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/eco/home', [EcoHomePage::class, 'ecoHomePage'])->name('eco.home');
     Route::get('/auth/forget-password', [Authentication::class, 'recuperationHomePage']);
     Route::get('/auth/reset-password', [Authentication::class, 'resetHomePage']);
-    Route::get('/eco/pages/utilisateurs', [UtilisateurController::class, 'getUsersHomePage'])->middleware('checkRole:isIT')->name('eco.pages.utilisateurs');
+    Route::get('/gestion_credit/pages/utilisateurs', [UtilisateurController::class, 'getUsersHomePage'])->middleware('checkRole:isIT')->name('gestion_credit.pages.utilisateurs');
     Route::get('/eco/pages/compte-param', [ComptesParamController::class, 'getComptesHomePage'])->name('eco.pages.compte-param');
     Route::get('/eco/pages/adhesion-membre', [AdhesionController::class, 'getAdhesionHomePage'])->name('eco.pages.adhesion-membre');
     Route::get('/eco/pages/depot-espece', [TransactionsController::class, 'getDepotEspeceHomePage'])->name('eco.pages.depot-espece');
@@ -623,4 +623,18 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('/gestion_credit/dossier-credit/upadate', [AGestionCreditController::class, 'updateDossier']);
 
     Route::post('/gestion_credit/page/validation-dossier/add-file', [AGestionCreditController::class, 'addFileDossier']);
+
+    Route::get('gestion_credit/modal/{creditId}/timeline', [AGestionCreditController::class, 'showTimeLine']);
+
+    Route::get('/gestion_credit/pages/credit-decaisse', [AGestionCreditController::class, 'CreditDecaisseHomePage'])->name('gestion_credit.pages.credit-decaisse');
+
+    Route::get('/montage-credit/rapport/credit/decaisse', [AGestionCreditController::class, 'getCreditDecaisse']);
+
+
+    Route::get(
+        "montage_credit/page/credit/decaisse/reference/{ref}",
+        [AGestionCreditController::class, 'getSearchedCreditDecaisse']
+    );
+
+    Route::post('/suivi-credit/pages/add-contrat', [AGestionCreditController::class, 'addNewFile']);
 });
