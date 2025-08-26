@@ -55,11 +55,37 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [isLoadingBar, setIsLoadingBar] = useState();
     const [progress, setProgress] = useState(0);
     const [contenu, setContenu] = useState("");
+    const endOfCommentsRef = useRef(null);
+
+    const [replyTo, setReplyTo] = useState(null);
+
+    const handleReply = (comment) => {
+        setReplyTo(comment);
+    };
+
+    const handleSubmitReply = () => {
+        const newComment = {
+            text: inputValue,
+            user: currentUser,
+            reply_to: replyTo ? replyTo.id : null, // lien parent
+        };
+
+        // Ici tu fais ton axios.post(...) avec reply_to
+        setReplyTo(null);
+        setInputValue("");
+    };
 
     useEffect(() => {
         if (!dossierId) return;
         getDossierCredit();
     }, [dossierId]);
+
+    // 🔽 Scroll automatique quand la liste change
+    useEffect(() => {
+        if (endOfCommentsRef.current) {
+            endOfCommentsRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [dossier && dossier.commentaires]);
 
     const getDossierCredit = () => {
         // Charger les données
@@ -258,7 +284,104 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             // }, 1000);
         }
     };
-    const saveComment = async (e) => {};
+    // const saveComment = async (e) => {
+    //     e.preventDefault();
+    //     setIsLoadingBar(true);
+    //     if (contenu.trim() === "") return;
+    //     setContenu(""); // vider l’input
+    //     const res = await axios.post(
+    //         "/gestion_credit/page/credit/commentaire/new",
+    //         {
+    //             getDossierId,
+    //             contenu,
+    //         }
+    //     );
+    //     if (res.data.status == 1) {
+    //         getDossierCredit();
+    //         setContenu("");
+    //         setIsLoadingBar(false);
+    //     } else {
+    //         Swal.fire({
+    //             title: "Commentaire",
+    //             text: res.data.msg,
+    //             icon: "error",
+    //             timer: 8000,
+    //             confirmButtonText: "Okay",
+    //         });
+    //         setIsLoadingBar(false);
+    //     }
+    // };
+    const saveComment = async (e) => {
+        e.preventDefault();
+        setIsLoadingBar(true);
+
+        if (contenu.trim() === "") {
+            setIsLoadingBar(false);
+            return;
+        }
+
+        try {
+            // construire les données à envoyer
+            const payload = {
+                getDossierId,
+                contenu,
+            };
+
+            // si on est en train de répondre à un commentaire
+            if (replyTo) {
+                payload.parent_id = replyTo.id; // ⚡ c’est le commentaire auquel on répond
+            }
+
+            // envoyer la requête
+            const res = await axios.post(
+                "/gestion_credit/page/credit/commentaire/new",
+                payload
+            );
+
+            if (res.data.status === 1) {
+                // recharge la liste
+                getDossierCredit();
+
+                // vider le champ texte
+                setContenu("");
+
+                // sortir du mode réponse
+                setReplyTo(null);
+
+                setIsLoadingBar(false);
+            } else {
+                Swal.fire({
+                    title: "Commentaire",
+                    text: res.data.msg,
+                    icon: "error",
+                    timer: 8000,
+                    confirmButtonText: "Okay",
+                });
+                setIsLoadingBar(false);
+            }
+        } catch (error) {
+            console.error("Erreur lors de l’enregistrement :", error);
+            Swal.fire({
+                title: "Erreur",
+                text: "Une erreur est survenue lors de l’enregistrement du commentaire.",
+                icon: "error",
+                timer: 8000,
+                confirmButtonText: "Okay",
+            });
+            setIsLoadingBar(false);
+        }
+    };
+
+    // Fonction format date
+    const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+        const jour = String(date.getDate()).padStart(2, "0");
+        const mois = String(date.getMonth() + 1).padStart(2, "0");
+        const annee = date.getFullYear();
+        const heures = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${jour}/${mois}/${annee} à ${heures}h${minutes}`;
+    };
     return (
         <>
             <div
@@ -1571,55 +1694,15 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             <ul className="list-group">
                                                 {dossier.commentaires.map(
                                                     (commentaire) => (
-                                                        <li
+                                                        <CommentaireItem
                                                             key={commentaire.id}
-                                                            className="list-group-item d-flex align-items-start"
-                                                        >
-                                                            <FaUserCircle className="me-3 fs-4 text-primary" />
-                                                            <div className="flex-grow-1">
-                                                                <div className="d-flex justify-content-between align-items-center mb-1">
-                                                                    <strong>
-                                                                        {
-                                                                            commentaire
-                                                                                .user
-                                                                                .name
-                                                                        }
-                                                                    </strong>
-
-                                                                    <small className="text-muted d-flex align-items-center gap-1">
-                                                                        <FaClock />{" "}
-                                                                        {new Date(
-                                                                            commentaire.created_at
-                                                                        ).toLocaleDateString(
-                                                                            "fr-FR",
-                                                                            {
-                                                                                day: "2-digit",
-                                                                                month: "2-digit",
-                                                                                year: "numeric",
-                                                                            }
-                                                                        )}{" "}
-                                                                        {new Date(
-                                                                            commentaire.created_at
-                                                                        ).getHours()}
-                                                                        h
-                                                                        {new Date(
-                                                                            commentaire.created_at
-                                                                        ).getMinutes() >
-                                                                        0
-                                                                            ? `:${new Date(
-                                                                                  commentaire.created_at
-                                                                              ).getMinutes()}`
-                                                                            : ""}
-                                                                    </small>
-                                                                </div>
-                                                                <p className="mb-0">
-                                                                    <FaCommentDots className="me-1 text-secondary" />
-                                                                    {
-                                                                        commentaire.contenu
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                        </li>
+                                                            commentaire={
+                                                                commentaire
+                                                            }
+                                                            handleReply={
+                                                                handleReply
+                                                            }
+                                                        />
                                                     )
                                                 )}
                                             </ul>
@@ -1630,9 +1713,33 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                 dossier.
                                             </p>
                                         )}
+                                        {/* 🔽 marqueur pour scroller jusqu’ici */}
+                                        <div ref={endOfCommentsRef}></div>
                                     </div>
-                                    {/* Formulaire pour ajouter un nouveau commentaire */}
-                                    <form className="mt-3 d-flex gap-2">
+
+                                    {replyTo && (
+                                        <div
+                                            className="alert alert-info p-2 rounded-0"
+                                            style={{ marginBottom: "-15px" }}
+                                        >
+                                            En réponse à{" "}
+                                            <strong>
+                                                {replyTo.user?.name ||
+                                                    "Utilisateur inconnu"}
+                                            </strong>
+                                            <button
+                                                type="button"
+                                                className="btn-close float-end"
+                                                aria-label="Close"
+                                                onClick={() => setReplyTo(null)}
+                                            ></button>
+                                        </div>
+                                    )}
+
+                                    <form
+                                        className="mt-3 d-flex gap-2"
+                                        onSubmit={saveComment}
+                                    >
                                         <div className="input-group">
                                             <span className="input-group-text">
                                                 <FaPencilAlt />
@@ -1640,7 +1747,15 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                placeholder="Écrire un commentaire..."
+                                                placeholder={
+                                                    replyTo
+                                                        ? `Répondre à ${
+                                                              replyTo.user
+                                                                  ?.name ||
+                                                              "Utilisateur"
+                                                          }...`
+                                                        : "Écrire un commentaire..."
+                                                }
                                                 value={contenu}
                                                 onChange={(e) =>
                                                     setContenu(e.target.value)
@@ -1648,8 +1763,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             />
                                             <button
                                                 type="submit"
-                                                className="btn btn-success d-flex align-items-center gap-1"
-                                                onClick={saveComment}
+                                                className="btn btn-success d-flex align-items-center gap-1 rounded-0"
                                             >
                                                 <FaPaperPlane /> Envoyer
                                             </button>
@@ -1664,3 +1778,84 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
         </>
     );
 }
+
+const CommentaireItem = ({ commentaire, handleReply, level = 0 }) => {
+    const [showReplies, setShowReplies] = useState(false);
+
+    return (
+        <li
+            className="list-group-item d-flex align-items-start"
+            style={{ marginLeft: level * 20 }}
+        >
+            {/* Cercle avec deux lettres du rôle */}
+            <div
+                className="me-3 d-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
+                style={{
+                    width: "35px",
+                    height: "35px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                }}
+            >
+                {commentaire.user.role === commentaire.user.role.toUpperCase()
+                    ? commentaire.user.role
+                    : commentaire.user.role
+                          .split(" ")
+                          .map((word) => word[0])
+                          .join("")
+                          .toUpperCase()}
+            </div>
+
+            <div className="flex-grow-1">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                    <strong style={{ fontSize: "13px" }}>
+                        {commentaire.user.name}
+                    </strong>
+                    <small className="text-muted">
+                        {new Date(commentaire.created_at).toLocaleDateString(
+                            "fr-FR"
+                        )}
+                    </small>
+                </div>
+
+                <p className="mb-1" style={{ fontSize: "14px" }}>
+                    {commentaire.contenu}
+                </p>
+                <button
+                    onClick={() => handleReply(commentaire)}
+                    className="btn btn-sm btn-link"
+                >
+                    Répondre
+                </button>
+
+                {/* Afficher le bouton pour les réponses */}
+                {commentaire.replies && commentaire.replies.length > 0 && (
+                    <button
+                        className="btn btn-sm btn-outline-secondary mt-1"
+                        onClick={() => setShowReplies(!showReplies)}
+                    >
+                        {showReplies
+                            ? "Masquer les réponses"
+                            : `${commentaire.replies.length} réponse(s) ⬇`}
+                    </button>
+                )}
+
+                {/* Conteneur des réponses */}
+                {showReplies &&
+                    commentaire.replies &&
+                    commentaire.replies.length > 0 && (
+                        <ul className="list-group mt-2 reponses">
+                            {commentaire.replies.map((reply) => (
+                                <CommentaireItem
+                                    key={reply.id}
+                                    commentaire={reply}
+                                    handleReply={handleReply}
+                                    level={level + 1}
+                                />
+                            ))}
+                        </ul>
+                    )}
+            </div>
+        </li>
+    );
+};

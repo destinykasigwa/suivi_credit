@@ -639,4 +639,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('/suivi-credit/pages/add-contrat', [AGestionCreditController::class, 'addNewFile']);
 
     Route::get('gestion_credit/dashboard/stats', [AGestionCreditController::class, 'DashBoardStat']);
+
+
+    Route::post('gestion_credit/page/credit/commentaire/new', [AGestionCreditController::class, 'NewComment']);
 });

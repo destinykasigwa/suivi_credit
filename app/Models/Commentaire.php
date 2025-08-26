@@ -9,7 +9,7 @@ class Commentaire extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['credit_id', 'user_id', 'contenu'];
+    protected $fillable = ['credit_id', 'user_id', 'contenu', "parent_id"];
 
     public function credit()
     {
@@ -19,5 +19,15 @@ class Commentaire extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Commentaire::class, 'parent_id')->with('user', 'replies');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Commentaire::class, 'parent_id');
     }
 }

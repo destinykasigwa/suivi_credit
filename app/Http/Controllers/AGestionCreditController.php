@@ -102,12 +102,15 @@ class AGestionCreditController extends Controller
                 'objet_credit' => $request->objetCredit,
             ]);
 
-            $idCredit = Credits::latest()->first()->id_credit;
-            Commentaire::create([
-                'credit_id' => $idCredit,
-                'user_id' => auth()->id(),
-                'contenu' => $request->description_titre,
-            ]);
+            if (isset($request->description_titre)) {
+                $idCredit = Credits::latest()->first()->id_credit;
+                Commentaire::create([
+                    'credit_id' => $idCredit,
+                    'user_id' => auth()->id(),
+                    'contenu' => $request->description_titre,
+                ]);
+            }
+
             foreach ($request->file('images') as $image) {
                 // Conserver le nom original mais ajouter un timestamp devant
                 $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
@@ -233,8 +236,14 @@ class AGestionCreditController extends Controller
             return response()->json(['message' => 'Dossier non trouvé'], 404);
         }
         //RECUPERE LES COMMENTAIRES LIES AU DOSSIER
-        $commentaires = Commentaire::with('user')
+        // $commentaires = Commentaire::with('user')
+        //     ->where('credit_id', $id)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+        // Récupérer les commentaires liés au dossier avec leurs réponses et l’auteur
+        $commentaires = Commentaire::with(['user', 'replies.user'])
             ->where('credit_id', $id)
+            ->whereNull('parent_id') // uniquement les commentaires racine
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -575,5 +584,28 @@ class AGestionCreditController extends Controller
             'delaiSignatures' => $delaiSignatures,
             'timeline' => $timeline,
         ]);
+    }
+
+    //PERMET DE POSTER UN NOUVEAU COMMENTAIRE
+
+    public function NewComment(Request $request)
+    {
+        if (isset($request->contenu)) {
+            Commentaire::create([
+                'credit_id' => $request->getDossierId,
+                'user_id' => auth()->id(),
+                'contenu' => $request->contenu,
+                'parent_id' => $request->parent_id,
+            ]);
+            return response()->json([
+                "status" => 1,
+                "msg" => "Commentaire posté avec fixé"
+            ]);
+        } else {
+            return response()->json([
+                "status" => 0,
+                "msg" => "Votre commentaire n'est peut pas être vide"
+            ]);
+        }
     }
 }

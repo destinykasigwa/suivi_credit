@@ -24,3 +24,22 @@
 box-shadow:"inset 0 0 5px 5px #888";
 font-size:"15px";                                                                     
 }
+
+
+/* Conteneur des réponses */
+.reponses {
+  margin-top: 8px;
+  margin-left: 20px;              /* indentation des replies */
+  border-left: 2px solid #e0e0e0; /* trait vertical léger */
+  padding-left: 15px;             /* espace entre le trait et le texte */
+}
+
+/* Chaque réponse */
+.reponses .list-group-item {
+  background: #fff;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* léger relief */
+}
+

@@ -22,6 +22,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->unsignedBigInteger('user_id');    // users.id est unsigned par défaut
             $table->text('contenu');
+            $table->integer('parent_id');
             $table->timestamps();
 
             $table->foreign('user_id')
