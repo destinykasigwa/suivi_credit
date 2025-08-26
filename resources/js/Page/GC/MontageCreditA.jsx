@@ -35,6 +35,9 @@ const MontageCreditA = () => {
     const [description_titre, setdescription_titre] = useState("");
     const [date_sortie_titre, setdate_sortie_titre] = useState("");
     const [date_expiration_titre, setdate_expiration_titre] = useState("");
+    const [nombre_membre_groupe, setnombre_membre_groupe] = useState("");
+    const [nombre_homme_groupe, setnombre_homme_groupe] = useState("");
+    const [nombre_femme_groupe, setnombre_femme_groupe] = useState("");
 
     const [objetCredit, setObjetCredit] = useState("");
     const [isLoadingBar, setIsLoadingBar] = useState();
@@ -109,6 +112,9 @@ const MontageCreditA = () => {
         formData.append("date_sortie_titre", date_sortie_titre);
         formData.append("date_expiration_titre", date_expiration_titre);
         formData.append("description_titre", description_titre);
+        formData.append("nombre_membre_groupe", nombre_membre_groupe);
+        formData.append("nombre_homme_groupe", nombre_homme_groupe);
+        formData.append("nombre_femme_groupe", nombre_femme_groupe);
         formData.append("objet_credit", objetCredit);
 
         images.forEach((img) => {
@@ -375,6 +381,110 @@ const MontageCreditA = () => {
                                                     </select>
                                                 </td>
                                             </tr>
+                                            {produit_credit ===
+                                                "Crédit Groupe Solidaire" && (
+                                                <>
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="nombre_membre_groupe"
+                                                                className="label-style"
+                                                            >
+                                                                Nbre mbre
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                className="input-style"
+                                                                style={{
+                                                                    width: "80px",
+                                                                }}
+                                                                name="nombre_membre_groupe"
+                                                                id="nombre_membre_groupe"
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    setnombre_membre_groupe(
+                                                                        e.target
+                                                                            .value
+                                                                    );
+                                                                }}
+                                                                value={
+                                                                    nombre_membre_groupe
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="nombre_homme_groupe"
+                                                                className="label-style"
+                                                            >
+                                                                Nbre Homme
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                className="input-style"
+                                                                style={{
+                                                                    width: "80px",
+                                                                }}
+                                                                name="nombre_homme_groupe"
+                                                                id="nombre_homme_groupe"
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    setnombre_homme_groupe(
+                                                                        e.target
+                                                                            .value
+                                                                    );
+                                                                }}
+                                                                value={
+                                                                    nombre_homme_groupe
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <label
+                                                                htmlFor="nombre_femme_groupe"
+                                                                className="label-style"
+                                                            >
+                                                                Nbre Femme
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="text"
+                                                                className="input-style"
+                                                                style={{
+                                                                    width: "80px",
+                                                                }}
+                                                                name="nombre_femme_groupe"
+                                                                id="nombre_femme_groupe"
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    setnombre_femme_groupe(
+                                                                        e.target
+                                                                            .value
+                                                                    );
+                                                                }}
+                                                                value={
+                                                                    nombre_femme_groupe
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </>
+                                            )}
+
                                             <tr>
                                                 <td>
                                                     <label
@@ -679,6 +789,43 @@ const MontageCreditA = () => {
                                             <tr>
                                                 <td>
                                                     <label
+                                                        htmlFor="ObjetCredit"
+                                                        className="label-style"
+                                                    >
+                                                        Objet crédit
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <select
+                                                        type="text"
+                                                        className="input-style"
+                                                        style={{
+                                                            width: "150px",
+                                                        }}
+                                                        name="ObjetCredit"
+                                                        id="ObjetCredit"
+                                                        onChange={(e) => {
+                                                            setObjetCredit(
+                                                                e.target.value
+                                                            );
+                                                        }}
+                                                        value={objetCredit}
+                                                    >
+                                                        <option value="">
+                                                            1
+                                                        </option>
+                                                        <option value="">
+                                                            2
+                                                        </option>
+                                                        <option value="">
+                                                            3
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label
                                                         htmlFor="gestionnaire"
                                                         className="label-style"
                                                     >
@@ -809,7 +956,7 @@ const MontageCreditA = () => {
                                                         htmlFor="duree_credit"
                                                         className="label-style"
                                                     >
-                                                        Durée crédit
+                                                        Durée crédit(jrs)
                                                     </label>
                                                 </td>
                                                 <td>

@@ -5,7 +5,17 @@ import "../../../styles/style.css";
 import axios from "axios";
 import ValidationFile from "../../GC/Reports/ValidationFile";
 import Swal from "sweetalert2";
-import { FaDownload } from "react-icons/fa";
+import {
+    FaDownload,
+    FaUserCircle,
+    FaClock,
+    FaPencilAlt,
+    FaPaperPlane,
+    FaComments,
+    FaInfoCircle,
+    FaCommentDots,
+} from "react-icons/fa";
+// import { FaDownload } from "react-icons/fa";
 import { Bars } from "react-loader-spinner";
 
 export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
@@ -37,9 +47,14 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [date_sortie_titre, setdate_sortie_titre] = useState("");
     const [date_expiration_titre, setdate_expiration_titre] = useState("");
     const [signature_file, setsignature_file] = useState();
+    const [nombre_membre_groupe, setnombre_membre_groupe] = useState("");
+    const [nombre_homme_groupe, setnombre_homme_groupe] = useState("");
+    const [nombre_femme_groupe, setnombre_femme_groupe] = useState("");
+    const [objetCredit, setObjetCredit] = useState("");
     const [statutDossier, setstatutDossier] = useState("");
     const [isLoadingBar, setIsLoadingBar] = useState();
     const [progress, setProgress] = useState(0);
+    const [contenu, setContenu] = useState("");
 
     useEffect(() => {
         if (!dossierId) return;
@@ -52,7 +67,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             .get(`suivi-credit/dossiers/${dossierId}`)
             .then((res) => {
                 const data = res.data.data; // récupère l'objet dossier complet
-
+                console.log(data);
                 setDossier(data); // stocke tout l'objet dossier dans dossier
                 setNumCompte(data.NumCompte);
                 setNomCompte(data.NomCompte);
@@ -77,6 +92,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 setdate_demande(data.date_demande);
                 setdate_sortie_titre(data.date_sortie_titre);
                 setdate_expiration_titre(data.date_expiration_titre);
+                setnombre_membre_groupe(data.nombre_membre_groupe);
+                setnombre_homme_groupe(data.nombre_homme_groupe);
+                setnombre_femme_groupe(data.nombre_femme_groupe);
+                setObjetCredit(data.objet_credit);
                 setstatutDossier(data.statutDossier);
                 setGetDossierId(data.id_credit);
             })
@@ -239,7 +258,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             // }, 1000);
         }
     };
-
+    const saveComment = async (e) => {};
     return (
         <>
             <div
@@ -252,57 +271,140 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 <div className="modal-dialog modal-xl">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title">
-                                Détails du dossier
-                                <strong> {NumDossier}</strong> {" | "}
-                                <label className="label-style">Statut</label>
-                                {statutDossier == "Décaissé" ? (
-                                    <select
-                                        type="text"
-                                        className="input-style"
+                            <div className="row">
+                                <div className="col-md-12 card rounded-10 p-1">
+                                    <div
                                         style={{
-                                            width: "100px",
+                                            color: "black",
+                                            display: "flex", // Utilisation de Flexbox
+                                            justifyContent: "space-between", // Distribution des éléments aux extrémités
+                                            alignItems: "center", // Alignement vertical des éléments
                                         }}
-                                        value={statutDossier}
-                                        onChange={(e) =>
-                                            setstatutDossier(e.target.value)
-                                        }
-                                        disabled
                                     >
-                                        <option value={statutDossier}>
-                                            {statutDossier}
-                                        </option>
-                                        <option value="Accepté">Accepté</option>
-                                        <option value="Refusé">Refusé</option>
-                                        <option value="Encours">Encours</option>
-                                        <option value="Décaissé">
-                                            Décaissé
-                                        </option>
-                                    </select>
-                                ) : (
-                                    <select
-                                        type="text"
-                                        className="input-style"
-                                        style={{
-                                            width: "100px",
-                                        }}
-                                        value={statutDossier}
-                                        onChange={(e) =>
-                                            setstatutDossier(e.target.value)
-                                        }
-                                    >
-                                        <option value={statutDossier}>
-                                            {statutDossier}
-                                        </option>
-                                        <option value="Accepté">Accepté</option>
-                                        <option value="Refusé">Refusé</option>
-                                        <option value="Encours">Encours</option>
-                                        <option value="Décaissé">
-                                            Décaissé
-                                        </option>
-                                    </select>
-                                )}
-                            </h5>
+                                        <h5
+                                            className="text-bold p-1"
+                                            style={{ margin: 0 }}
+                                        >
+                                            Détails du dossier
+                                            <strong> {NumDossier}</strong>{" "}
+                                            {" | "}
+                                            <label className="label-style">
+                                                Statut
+                                            </label>
+                                            {statutDossier == "Décaissé" ? (
+                                                <select
+                                                    type="text"
+                                                    className="input-style"
+                                                    style={{
+                                                        width: "100px",
+                                                    }}
+                                                    value={statutDossier}
+                                                    onChange={(e) =>
+                                                        setstatutDossier(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    disabled
+                                                >
+                                                    <option
+                                                        value={statutDossier}
+                                                    >
+                                                        {statutDossier}
+                                                    </option>
+
+                                                    <option value="Refusé">
+                                                        Refusé
+                                                    </option>
+                                                    <option value="Encours">
+                                                        Encours
+                                                    </option>
+                                                    <option value="Décaissé">
+                                                        Décaissé
+                                                    </option>
+                                                </select>
+                                            ) : (
+                                                <select
+                                                    type="text"
+                                                    className="input-style"
+                                                    style={{
+                                                        width: "100px",
+                                                    }}
+                                                    value={statutDossier}
+                                                    onChange={(e) =>
+                                                        setstatutDossier(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                >
+                                                    <option
+                                                        value={statutDossier}
+                                                    >
+                                                        {statutDossier}
+                                                    </option>
+
+                                                    <option value="Refusé">
+                                                        Refusé
+                                                    </option>
+                                                    <option value="Encours">
+                                                        Encours
+                                                    </option>
+                                                    <option value="Décaissé">
+                                                        Décaissé
+                                                    </option>
+                                                </select>
+                                            )}
+                                        </h5>
+                                        <h5
+                                            className="text-bold p-1"
+                                            style={{ margin: 0 }}
+                                        >
+                                            {dossier &&
+                                                dossier.signatures &&
+                                                dossier.signatures.length >
+                                                    0 && (
+                                                    <div
+                                                        className="col-md-12"
+                                                        style={{
+                                                            border: "2px solid #dcdcdc",
+                                                            padding: "10px",
+                                                            height: "70px",
+                                                        }}
+                                                    >
+                                                        <button
+                                                            onClick={
+                                                                handleSignatureClick
+                                                            }
+                                                            className="btn btn-primary d-flex align-items-center gap-2"
+                                                            style={{
+                                                                borderRadius:
+                                                                    "25px",
+                                                                padding:
+                                                                    "8px 16px",
+                                                            }}
+                                                        >
+                                                            <FaDownload />
+                                                            Télécharger la fiche
+                                                            et signer
+                                                        </button>
+                                                    </div>
+                                                )}
+                                        </h5>
+                                        <h5>
+                                            <button
+                                                className="btn btn-outline-primary d-flex align-items-center gap-2"
+                                                type="button"
+                                                data-bs-toggle="offcanvas"
+                                                data-bs-target="#offcanvasCommentaires"
+                                                aria-controls="offcanvasCommentaires"
+                                            >
+                                                Commentaires
+                                                <FaCommentDots />
+                                            </button>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+
                             <button
                                 type="button"
                                 class="close"
@@ -353,563 +455,948 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                         <form>
                                             <div className="row">
                                                 <div className="col-md-4 card rounded-0">
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Num compte :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "100px",
-                                                            }}
-                                                            value={NumCompte}
-                                                            onChange={(e) =>
-                                                                setNumCompte(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Num Dossier :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "100px",
-                                                            }}
-                                                            value={NumDossier}
-                                                            onChange={(e) =>
-                                                                setNumDossier(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Nom Compte :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            value={NomCompte}
-                                                            onChange={(e) =>
-                                                                setNomCompte(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Produit de crédit :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "150px",
-                                                            }}
-                                                            value={
-                                                                produit_credit
-                                                            }
-                                                            onChange={(e) =>
-                                                                setproduit_credit(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Type crédit :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            value={type_credit}
-                                                            onChange={(e) =>
-                                                                settype_credit(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Recouvreur :
-                                                        </label>{" "}
-                                                        <select
-                                                            type="text"
-                                                            className="input-style"
-                                                            value={recouvreur}
-                                                            onChange={(e) =>
-                                                                setrecouvreur(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        >
-                                                            <option
-                                                                value={
-                                                                    recouvreur
-                                                                }
-                                                            >
-                                                                {recouvreur}
-                                                            </option>
-                                                            <option value="ALAME KUZANWA WILLY">
-                                                                ALAME KUZANWA
-                                                                WILLY
-                                                            </option>
-                                                            <option value="AKILI SANGARA JULIEN">
-                                                                AKILI SANGARA
-                                                                JULIEN
-                                                            </option>
-                                                            <option value="MAPENDO RUTH">
-                                                                MAPENDO RUTH
-                                                            </option>
-                                                            <option value="LAVIE MATEMBERA">
-                                                                LAVIE MATEMBERA
-                                                            </option>
-                                                            <option value="KANKINSINGI NGADU">
-                                                                KANKINSINGI
-                                                                NGADU
-                                                            </option>
-                                                            <option value="NEEMA MULINGA GRACE">
-                                                                NEEMA MULINGA
-                                                                GRACE
-                                                            </option>
-                                                            <option value="WIVINE ALISA">
-                                                                WIVINE ALISA
-                                                            </option>
-                                                            <option value="MOSES KATEMBO">
-                                                                MOSES KATEMBO
-                                                            </option>
-                                                            <option value="SAFARI KALEKERA">
-                                                                SAFARI KALEKERA
-                                                            </option>
-                                                        </select>
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Montant demande :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "60px",
-                                                            }}
-                                                            value={
-                                                                montant_demande
-                                                            }
-                                                            onChange={(e) =>
-                                                                setmontant_demande(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Date demande :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={dateParser(
-                                                                date_demande
-                                                            )}
-                                                            onChange={(e) =>
-                                                                setdate_demande(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Num compte :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "100px",
+                                                                    }}
+                                                                    value={
+                                                                        NumCompte
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setNumCompte(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                {" "}
+                                                                <label className="label-style">
+                                                                    Num Dossier
+                                                                    :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "100px",
+                                                                    }}
+                                                                    value={
+                                                                        NumDossier
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setNumDossier(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Nom Compte :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                {" "}
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    value={
+                                                                        NomCompte
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setNomCompte(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Produit de
+                                                                    crédit :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "150px",
+                                                                    }}
+                                                                    value={
+                                                                        produit_credit
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setproduit_credit(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Type crédit
+                                                                    :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    value={
+                                                                        type_credit
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        settype_credit(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                {" "}
+                                                                <label className="label-style">
+                                                                    Recouvreur :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    value={
+                                                                        recouvreur
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setrecouvreur(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option
+                                                                        value={
+                                                                            recouvreur
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            recouvreur
+                                                                        }
+                                                                    </option>
+                                                                    <option value="ALAME KUZANWA WILLY">
+                                                                        ALAME
+                                                                        KUZANWA
+                                                                        WILLY
+                                                                    </option>
+                                                                    <option value="AKILI SANGARA JULIEN">
+                                                                        AKILI
+                                                                        SANGARA
+                                                                        JULIEN
+                                                                    </option>
+                                                                    <option value="MAPENDO RUTH">
+                                                                        MAPENDO
+                                                                        RUTH
+                                                                    </option>
+                                                                    <option value="LAVIE MATEMBERA">
+                                                                        LAVIE
+                                                                        MATEMBERA
+                                                                    </option>
+                                                                    <option value="KANKINSINGI NGADU">
+                                                                        KANKINSINGI
+                                                                        NGADU
+                                                                    </option>
+                                                                    <option value="NEEMA MULINGA GRACE">
+                                                                        NEEMA
+                                                                        MULINGA
+                                                                        GRACE
+                                                                    </option>
+                                                                    <option value="WIVINE ALISA">
+                                                                        WIVINE
+                                                                        ALISA
+                                                                    </option>
+                                                                    <option value="MOSES KATEMBO">
+                                                                        MOSES
+                                                                        KATEMBO
+                                                                    </option>
+                                                                    <option value="SAFARI KALEKERA">
+                                                                        SAFARI
+                                                                        KALEKERA
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Montant
+                                                                    dmnde :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "60px",
+                                                                    }}
+                                                                    value={
+                                                                        montant_demande
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setmontant_demande(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                {" "}
+                                                                <label className="label-style">
+                                                                    Date demande
+                                                                    :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={dateParser(
+                                                                        date_demande
+                                                                    )}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setdate_demande(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+
+                                                        {produit_credit ===
+                                                            "Crédit Groupe Solidaire" && (
+                                                            <>
+                                                                <tr>
+                                                                    <td>
+                                                                        <label className="label-style">
+                                                                            Nbre
+                                                                            mbre
+                                                                            grpe
+                                                                            :
+                                                                        </label>{" "}
+                                                                    </td>
+                                                                    <td>
+                                                                        <input
+                                                                            type="text"
+                                                                            className="input-style"
+                                                                            style={{
+                                                                                width: "60px",
+                                                                            }}
+                                                                            value={
+                                                                                nombre_membre_groupe
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setnombre_membre_groupe(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <label className="label-style">
+                                                                            Nbre
+                                                                            mbre
+                                                                            homme
+                                                                            :
+                                                                        </label>{" "}
+                                                                    </td>
+                                                                    <td>
+                                                                        <input
+                                                                            type="text"
+                                                                            className="input-style"
+                                                                            style={{
+                                                                                width: "60px",
+                                                                            }}
+                                                                            value={
+                                                                                nombre_homme_groupe
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setnombre_homme_groupe(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                            </>
+                                                        )}
+                                                    </table>
                                                 </div>
                                                 <div className="col-md-4 card rounded-0">
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Frequence mens. :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "100px",
-                                                            }}
-                                                            value={
-                                                                frequence_mensualite
-                                                            }
-                                                            onChange={(e) =>
-                                                                setfrequence_mensualite(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Nbre Echnce:
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "50px",
-                                                            }}
-                                                            value={
-                                                                nombre_echeance
-                                                            }
-                                                            onChange={(e) =>
-                                                                setnombre_echeance(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Gestionnaire:
-                                                        </label>{" "}
-                                                        <select
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "150px",
-                                                            }}
-                                                            value={gestionnaire}
-                                                            onChange={(e) =>
-                                                                setgestionnaire(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        >
-                                                            <option
-                                                                value={
-                                                                    gestionnaire
-                                                                }
-                                                            >
-                                                                {gestionnaire}
-                                                            </option>
-                                                            <option value="ALAME KUZANWA WILLY">
-                                                                ALAME KUZANWA
-                                                                WILLY
-                                                            </option>
-                                                            <option value="AKILI SANGARA JULIEN">
-                                                                AKILI SANGARA
-                                                                JULIEN
-                                                            </option>
-                                                            <option value="MAPENDO RUTH">
-                                                                MAPENDO RUTH
-                                                            </option>
-                                                            <option value="LAVIE MATEMBERA">
-                                                                LAVIE MATEMBERA
-                                                            </option>
-                                                            <option value="KANKINSINGI NGADU">
-                                                                KANKINSINGI
-                                                                NGADU
-                                                            </option>
-                                                            <option value="NEEMA MULINGA GRACE">
-                                                                NEEMA MULINGA
-                                                                GRACE
-                                                            </option>
-                                                            <option value="WIVINE ALISA">
-                                                                WIVINE ALISA
-                                                            </option>
-                                                            <option value="MOSES KATEMBO">
-                                                                MOSES KATEMBO
-                                                            </option>
-                                                            <option value="SAFARI KALEKERA">
-                                                                SAFARI KALEKERA
-                                                            </option>
-                                                        </select>
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Source Fonds:
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "100px",
-                                                            }}
-                                                            value={source_fond}
-                                                            onChange={(e) =>
-                                                                setsource_fond(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Monnaie:
-                                                        </label>{" "}
-                                                        <select
-                                                            type="text"
-                                                            className="input-style"
-                                                            value={monnaie}
-                                                            onChange={(e) =>
-                                                                setmonnaie(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        >
-                                                            <option
-                                                                value={monnaie}
-                                                            >
-                                                                {monnaie}
-                                                            </option>
-                                                            <option
-                                                                value={monnaie}
-                                                            >
-                                                                {monnaie ==
-                                                                "CDF"
-                                                                    ? "USD"
-                                                                    : "CDF"}
-                                                            </option>
-                                                        </select>
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Durée crédit:
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={duree_credit}
-                                                            onChange={(e) =>
-                                                                setduree_credit(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Intervalle jrs:
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={
-                                                                intervale_jrs
-                                                            }
-                                                            onChange={(e) =>
-                                                                setintervale_jrs(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Taux intérêt:
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={taux_interet}
-                                                            onChange={(e) =>
-                                                                settaux_interet(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
+                                                    <table>
+                                                        {produit_credit ===
+                                                            "Crédit Groupe Solidaire" && (
+                                                            <tr>
+                                                                <td>
+                                                                    <label className="label-style">
+                                                                        Nbre
+                                                                        mbre
+                                                                        femme :
+                                                                    </label>{" "}
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="input-style"
+                                                                        style={{
+                                                                            width: "60px",
+                                                                        }}
+                                                                        value={
+                                                                            nombre_femme_groupe
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setnombre_femme_groupe(
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        )}
+
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Objet crédit
+                                                                    :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "150px",
+                                                                    }}
+                                                                    value={
+                                                                        objetCredit
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setObjetCredit(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option value="1">
+                                                                        1
+                                                                    </option>
+                                                                    <option value="1">
+                                                                        2
+                                                                    </option>
+                                                                    <option value="1">
+                                                                        3
+                                                                    </option>
+                                                                    <option value="1">
+                                                                        4
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Frequence
+                                                                    mens. :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "100px",
+                                                                    }}
+                                                                    value={
+                                                                        frequence_mensualite
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setfrequence_mensualite(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Nbre Echnce:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "50px",
+                                                                    }}
+                                                                    value={
+                                                                        nombre_echeance
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setnombre_echeance(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Gestionnaire:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "150px",
+                                                                    }}
+                                                                    value={
+                                                                        gestionnaire
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setgestionnaire(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option
+                                                                        value={
+                                                                            gestionnaire
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            gestionnaire
+                                                                        }
+                                                                    </option>
+                                                                    <option value="ALAME KUZANWA WILLY">
+                                                                        ALAME
+                                                                        KUZANWA
+                                                                        WILLY
+                                                                    </option>
+                                                                    <option value="AKILI SANGARA JULIEN">
+                                                                        AKILI
+                                                                        SANGARA
+                                                                        JULIEN
+                                                                    </option>
+                                                                    <option value="MAPENDO RUTH">
+                                                                        MAPENDO
+                                                                        RUTH
+                                                                    </option>
+                                                                    <option value="LAVIE MATEMBERA">
+                                                                        LAVIE
+                                                                        MATEMBERA
+                                                                    </option>
+                                                                    <option value="KANKINSINGI NGADU">
+                                                                        KANKINSINGI
+                                                                        NGADU
+                                                                    </option>
+                                                                    <option value="NEEMA MULINGA GRACE">
+                                                                        NEEMA
+                                                                        MULINGA
+                                                                        GRACE
+                                                                    </option>
+                                                                    <option value="WIVINE ALISA">
+                                                                        WIVINE
+                                                                        ALISA
+                                                                    </option>
+                                                                    <option value="MOSES KATEMBO">
+                                                                        MOSES
+                                                                        KATEMBO
+                                                                    </option>
+                                                                    <option value="SAFARI KALEKERA">
+                                                                        SAFARI
+                                                                        KALEKERA
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Source
+                                                                    Fonds:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "100px",
+                                                                    }}
+                                                                    value={
+                                                                        source_fond
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setsource_fond(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Monnaie:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <select
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    value={
+                                                                        monnaie
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setmonnaie(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <option
+                                                                        value={
+                                                                            monnaie
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            monnaie
+                                                                        }
+                                                                    </option>
+                                                                    <option
+                                                                        value={
+                                                                            monnaie
+                                                                        }
+                                                                    >
+                                                                        {monnaie ==
+                                                                        "CDF"
+                                                                            ? "USD"
+                                                                            : "CDF"}
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Durée
+                                                                    crédit:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        duree_credit
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setduree_credit(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Intervalle
+                                                                    jrs:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        intervale_jrs
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setintervale_jrs(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Taux
+                                                                    intérêt:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        taux_interet
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        settaux_interet(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </div>
                                                 <div className="col-md-4 card rounded-0">
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Type Garantie:
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={
-                                                                type_garantie
-                                                            }
-                                                            onChange={(e) =>
-                                                                settype_credit(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            valeur compt. :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={
-                                                                valeur_comptable
-                                                            }
-                                                            onChange={(e) =>
-                                                                setvaleur_comptable(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Num titre :
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={num_titre}
-                                                            onChange={(e) =>
-                                                                setnum_titre(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Va. garantie :
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "80px",
-                                                            }}
-                                                            value={
-                                                                valeur_garantie
-                                                            }
-                                                            onChange={(e) =>
-                                                                setvaleur_garantie(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Date sortie titre
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "120px",
-                                                            }}
-                                                            value={
-                                                                date_sortie_titre
-                                                            }
-                                                            onChange={(e) =>
-                                                                setdate_sortie_titre(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        <label className="label-style">
-                                                            Date expiration
-                                                            titre
-                                                        </label>{" "}
-                                                        <input
-                                                            type="text"
-                                                            className="input-style"
-                                                            style={{
-                                                                width: "120px",
-                                                            }}
-                                                            value={
-                                                                date_expiration_titre
-                                                            }
-                                                            onChange={(e) =>
-                                                                setdate_expiration_titre(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        />
-                                                    </p>
-                                                    <p>
-                                                        {/* <label className="label-style">
-                                                        Descrition :
-                                                    </label>{" "} */}
-                                                        <textarea
-                                                            className="input-style"
-                                                            onChange={(e) =>
-                                                                setdescription_titre(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                        >
-                                                            {description_titre}
-                                                        </textarea>
-                                                    </p>
-                                                    <p>
-                                                        <button
-                                                            onClick={
-                                                                handleSubmitUpadate
-                                                            }
-                                                            className="btn btn-success mt-1"
-                                                            style={{
-                                                                borderRadius:
-                                                                    "25px",
-                                                                padding:
-                                                                    "8px 16px",
-                                                            }}
-                                                        >
-                                                            Modifier le dossier
-                                                        </button>
-                                                    </p>
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Type
+                                                                    Garantie:
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        type_garantie
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        settype_credit(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    valeur
+                                                                    compt. :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        valeur_comptable
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setvaleur_comptable(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Num titre :
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        num_titre
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setnum_titre(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Va. garantie
+                                                                    :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "80px",
+                                                                    }}
+                                                                    value={
+                                                                        valeur_garantie
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setvaleur_garantie(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Date sortie
+                                                                    titre
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "120px",
+                                                                    }}
+                                                                    value={
+                                                                        date_sortie_titre
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setdate_sortie_titre(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Date
+                                                                    expiration
+                                                                    titre
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="input-style"
+                                                                    style={{
+                                                                        width: "120px",
+                                                                    }}
+                                                                    value={
+                                                                        date_expiration_titre
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setdate_expiration_titre(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label className="label-style">
+                                                                    Descrition :
+                                                                </label>{" "}
+                                                            </td>
+                                                            <td>
+                                                                <textarea
+                                                                    className="input-style"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setdescription_titre(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        description_titre
+                                                                    }
+                                                                </textarea>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>
+                                                                <button
+                                                                    onClick={
+                                                                        handleSubmitUpadate
+                                                                    }
+                                                                    className="btn btn-success m-2"
+                                                                    style={{
+                                                                        borderRadius:
+                                                                            "25px",
+                                                                        padding:
+                                                                            "8px 16px",
+                                                                    }}
+                                                                >
+                                                                    Modifier le
+                                                                    dossier
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </form>
@@ -978,33 +1465,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     </div>
                                                 )}
                                         </div>
-                                        {dossier.signatures &&
-                                            dossier.signatures.length > 0 && (
-                                                <div
-                                                    className="col-md-2"
-                                                    style={{
-                                                        border: "2px solid #dcdcdc",
-                                                        padding: "10px",
-                                                        height: "70px",
-                                                    }}
-                                                >
-                                                    <button
-                                                        onClick={
-                                                            handleSignatureClick
-                                                        }
-                                                        className="btn btn-primary d-flex align-items-center gap-2"
-                                                        style={{
-                                                            borderRadius:
-                                                                "25px",
-                                                            padding: "8px 16px",
-                                                        }}
-                                                    >
-                                                        <FaDownload />
-                                                        Télécharger
-                                                    </button>
-                                                </div>
-                                            )}
-                                        <div className="col-md-3">
+
+                                        <div className="col-md-5">
                                             <form>
                                                 <table>
                                                     <tr>
@@ -1023,7 +1485,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                     type="file"
                                                                     id="images"
                                                                     name="signature_file"
-                                                                    accept="pdf/*"
+                                                                    accept="application/pdf"
                                                                     onChange={(
                                                                         e
                                                                     ) =>
@@ -1075,6 +1537,126 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                     </div>
                                 </>
                             )}
+
+                            <div>
+                                {/* Bouton pour ouvrir le offcanvas */}
+
+                                {/* Offcanvas Bootstrap */}
+                                <div
+                                    className="offcanvas offcanvas-end shadow"
+                                    tabIndex="-1"
+                                    id="offcanvasCommentaires"
+                                    aria-labelledby="offcanvasCommentairesLabel"
+                                >
+                                    <div className="offcanvas-header">
+                                        <h5
+                                            className="offcanvas-title d-flex align-items-center gap-2"
+                                            id="offcanvasCommentairesLabel"
+                                        >
+                                            <FaCommentDots /> Commentaires
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            className="btn-close text-reset"
+                                            data-bs-dismiss="offcanvas"
+                                            aria-label="Close"
+                                            // onClick={() =>
+                                            //     setShowCommentaires(false)
+                                            // }
+                                        ></button>
+                                    </div>
+                                    <div className="offcanvas-body">
+                                        {dossier &&
+                                        dossier.commentaires.length > 0 ? (
+                                            <ul className="list-group">
+                                                {dossier.commentaires.map(
+                                                    (commentaire) => (
+                                                        <li
+                                                            key={commentaire.id}
+                                                            className="list-group-item d-flex align-items-start"
+                                                        >
+                                                            <FaUserCircle className="me-3 fs-4 text-primary" />
+                                                            <div className="flex-grow-1">
+                                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                                    <strong>
+                                                                        {
+                                                                            commentaire
+                                                                                .user
+                                                                                .name
+                                                                        }
+                                                                    </strong>
+
+                                                                    <small className="text-muted d-flex align-items-center gap-1">
+                                                                        <FaClock />{" "}
+                                                                        {new Date(
+                                                                            commentaire.created_at
+                                                                        ).toLocaleDateString(
+                                                                            "fr-FR",
+                                                                            {
+                                                                                day: "2-digit",
+                                                                                month: "2-digit",
+                                                                                year: "numeric",
+                                                                            }
+                                                                        )}{" "}
+                                                                        {new Date(
+                                                                            commentaire.created_at
+                                                                        ).getHours()}
+                                                                        h
+                                                                        {new Date(
+                                                                            commentaire.created_at
+                                                                        ).getMinutes() >
+                                                                        0
+                                                                            ? `:${new Date(
+                                                                                  commentaire.created_at
+                                                                              ).getMinutes()}`
+                                                                            : ""}
+                                                                    </small>
+                                                                </div>
+                                                                <p className="mb-0">
+                                                                    <FaCommentDots className="me-1 text-secondary" />
+                                                                    {
+                                                                        commentaire.contenu
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-muted text-center mt-3">
+                                                <i className="bi bi-info-circle me-2"></i>
+                                                Aucun commentaire pour ce
+                                                dossier.
+                                            </p>
+                                        )}
+                                    </div>
+                                    {/* Formulaire pour ajouter un nouveau commentaire */}
+                                    <form className="mt-3 d-flex gap-2">
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <FaPencilAlt />
+                                            </span>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Écrire un commentaire..."
+                                                value={contenu}
+                                                onChange={(e) =>
+                                                    setContenu(e.target.value)
+                                                }
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="btn btn-success d-flex align-items-center gap-1"
+                                                onClick={saveComment}
+                                            >
+                                                <FaPaperPlane /> Envoyer
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

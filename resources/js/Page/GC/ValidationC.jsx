@@ -186,8 +186,9 @@ const ValidationC = () => {
                                 <tr>
                                     <th>NumCompte</th>
                                     <th>NomCompte</th>
-                                    <th>NumDossier</th>
+                                    {/* <th>NumDossier</th> */}
                                     <th>Date</th>
+                                    <th>Statut</th>
                                     <th
                                         style={{
                                             textAlign: "center",
@@ -204,11 +205,34 @@ const ValidationC = () => {
                                               <tr key={index}>
                                                   <td>{credit.NumCompte}</td>
                                                   <td>{credit.NomCompte}</td>
-                                                  <td>{credit.NumDossier}</td>
+                                                  {/* <td>{credit.NumDossier}</td> */}
                                                   <td>
                                                       {dateParser(
                                                           credit.date_demande
                                                       )}
+                                                  </td>
+                                                  <td>
+                                                      {credit.statutDossier ==
+                                                      "Refusé" ? (
+                                                          <label
+                                                              style={{
+                                                                  color: "red",
+                                                              }}
+                                                              htmlFor=""
+                                                          >
+                                                              Refusé
+                                                          </label>
+                                                      ) : credit.statutDossier ==
+                                                        "Encours" ? (
+                                                          <label
+                                                              style={{
+                                                                  color: "green",
+                                                              }}
+                                                              htmlFor=""
+                                                          >
+                                                              Encours
+                                                          </label>
+                                                      ) : null}
                                                   </td>
                                                   <td
                                                       style={{
@@ -275,7 +299,7 @@ const ValidationC = () => {
                                                                   )
                                                               }
                                                           >
-                                                              Contrat prêt{" "}
+                                                              Ajouter fichier{" "}
                                                               <i
                                                                   class="fa fa-file"
                                                                   aria-hidden="true"
@@ -292,11 +316,34 @@ const ValidationC = () => {
                                               <tr key={index}>
                                                   <td>{res.NumCompte}</td>
                                                   <td>{res.NomCompte}</td>
-                                                  <td>{res.NumDossier}</td>
+                                                  {/* <td>{res.NumDossier}</td> */}
                                                   <td>
                                                       {dateParser(
                                                           res.date_demande
                                                       )}
+                                                  </td>
+                                                  <td>
+                                                      {res.statutDossier ==
+                                                      "Refusé" ? (
+                                                          <label
+                                                              style={{
+                                                                  color: "red",
+                                                              }}
+                                                              htmlFor=""
+                                                          >
+                                                              Refusé
+                                                          </label>
+                                                      ) : res.statutDossier ==
+                                                        "Encours" ? (
+                                                          <label
+                                                              style={{
+                                                                  color: "green",
+                                                              }}
+                                                              htmlFor=""
+                                                          >
+                                                              Encours
+                                                          </label>
+                                                      ) : null}
                                                   </td>
                                                   <td
                                                       style={{
@@ -328,7 +375,7 @@ const ValidationC = () => {
                                                               data-target="#modalTimeLine"
                                                               onClick={() =>
                                                                   setDossierIdSelected(
-                                                                      credit.id_credit
+                                                                      res.id_credit
                                                                   )
                                                               }
                                                           >
@@ -341,7 +388,7 @@ const ValidationC = () => {
                                                               className="btn btn-danger"
                                                               onClick={() => {
                                                                   handleDeleteCredit(
-                                                                      credit.id_credit
+                                                                      res.id_credit
                                                                   );
                                                               }}
                                                           >
@@ -358,11 +405,11 @@ const ValidationC = () => {
                                                               data-target="#modalContratPret"
                                                               onClick={() =>
                                                                   setDossierIdSelected(
-                                                                      credit.id_credit
+                                                                      res.id_credit
                                                                   )
                                                               }
                                                           >
-                                                              Contrat prêt{" "}
+                                                              Ajouter fichier{" "}
                                                               <i
                                                                   class="fa fa-file"
                                                                   aria-hidden="true"

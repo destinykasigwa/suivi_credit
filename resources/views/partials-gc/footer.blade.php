@@ -13,7 +13,7 @@ $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"'
             <p>
                 <strong>Designed by Destin KASIGWA</strong> ::
 
-                <strong>Utilisateur connecté : {{ $userInfo->name }}</strong>
+                <strong>Utilisateur connecté : {{ $userInfo->name }} | Profile : {{ $userInfo->role }} </strong>
             </p>
         </div>
     </div>

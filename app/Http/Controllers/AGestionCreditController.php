@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Commentaire;
 use App\Models\Credits;
+use App\Models\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -41,14 +43,14 @@ class AGestionCreditController extends Controller
             'NomCompte'  => 'required|string',
             'produit_credit'  => 'required|string',
             'type_credit'  => 'required|string',
-            'recouvreur'  => 'required|string',
+            //'recouvreur'  => 'required|string',
             'montant_demande'  => 'required|string',
             'date_demande'  => 'required|string',
             'frequence_mensualite' => 'required|string',
             'nombre_echeance' => 'required|string',
             // 'NumDossier' => 'required|string',
-            'gestionnaire' => 'required|string',
-            'source_fond' => 'required|string',
+            //'gestionnaire' => 'required|string',
+            //'source_fond' => 'required|string',
             'monnaie' => 'required|string',
             'duree_credit' => 'required|string',
             'intervale_jrs' => 'required|string',
@@ -93,9 +95,19 @@ class AGestionCreditController extends Controller
                 'valeur_garantie' => $request->valeur_garantie,
                 'date_sortie_titre' => $request->date_sortie_titre,
                 'date_expiration_titre' => $request->date_expiration_titre,
-                'description_titre' => $request->description_titre,
+                // 'description_titre' => $request->description_titre,
+                'nombre_membre_groupe' => $request->nombre_membre_groupe,
+                'nombre_homme_groupe' => $request->nombre_homme_groupe,
+                'nombre_femme_groupe' => $request->nombre_femme_groupe,
+                'objet_credit' => $request->objetCredit,
             ]);
 
+            $idCredit = Credits::latest()->first()->id_credit;
+            Commentaire::create([
+                'credit_id' => $idCredit,
+                'user_id' => auth()->id(),
+                'contenu' => $request->description_titre,
+            ]);
             foreach ($request->file('images') as $image) {
                 // Conserver le nom original mais ajouter un timestamp devant
                 $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
@@ -142,21 +154,18 @@ class AGestionCreditController extends Controller
 
     public function getSearchedCredit($ref)
     {
-        // Recherche des crédits par NumCompte
-        // $credits = DB::table('credits')
-        //     ->where(function ($query) use ($ref) {
-        //         $query->whereRaw('LOWER(NumCompte) = ?', [strtolower($ref)])
-        //             ->orWhereRaw('LOWER(NomCompte) LIKE ?', ['%' . strtolower($ref) . '%']);
-        //     })
-        //     ->limit(10)
-        //     ->get();
+
         $credits = DB::table('credits')
             ->where(function ($query) use ($ref) {
-                $query->where('NumCompte', $ref)
-                    ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                $query->where('statutDossier', '!=', 'Décaissé')
+                    ->where(function ($q) use ($ref) {
+                        $q->where('NumCompte', $ref)
+                            ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                    });
             })
             ->limit(10)
             ->get();
+
 
 
         // Ajout des images pour chaque crédit trouvé
@@ -223,6 +232,11 @@ class AGestionCreditController extends Controller
         if (!$dossier) {
             return response()->json(['message' => 'Dossier non trouvé'], 404);
         }
+        //RECUPERE LES COMMENTAIRES LIES AU DOSSIER
+        $commentaires = Commentaire::with('user')
+            ->where('credit_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // Récupère les fichiers liés (images + pdfs)
         $fichiers = DB::table('credits_images')
@@ -266,6 +280,8 @@ class AGestionCreditController extends Controller
         $dossierArray['pdfs'] = $pdfs;
         $dossierArray['signatures'] = $signatures;
         $dossierArray['lastSignature'] = $lastSignature;
+        $dossierArray['commentaires'] = $commentaires;
+
 
         return response()->json(['data' => $dossierArray]);
     }
@@ -306,6 +322,10 @@ class AGestionCreditController extends Controller
                 "date_sortie_titre" => $request->date_sortie_titre,
                 "date_expiration_titre" => $request->date_expiration_titre,
                 "description_titre" => $request->description_titre,
+                'nombre_membre_groupe' => $request->nombre_membre_groupe,
+                'nombre_homme_groupe' => $request->nombre_homme_groupe,
+                'nombre_femme_groupe' => $request->nombre_femme_groupe,
+                'objet_credit' => $request->objetCredit,
                 "statutDossier" => $request->statutDossier
             ]);
 
@@ -324,6 +344,14 @@ class AGestionCreditController extends Controller
             'signature_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
             // 'signed_by' => 'nullable|string|max:255'
         ]);
+        try {
+            $this->signerDossier($request->idDossier);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'msg' => $e->getMessage()
+            ]);
+        }
 
         $credit = Credits::findOrFail($request->idDossier);
         // $credit = Credits::where("id_credit", $request->idDossier)->first();
@@ -345,7 +373,7 @@ class AGestionCreditController extends Controller
     {
         $signatures = DB::table('signatures')
             ->where('credit_id', $creditId)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         $timeline = [];
@@ -436,5 +464,116 @@ class AGestionCreditController extends Controller
                 "msg" => "Aucun fichier reçu"
             ]);
         }
+    }
+
+    //CETE FONCTION PERMET D'EMPCEHER UN ACTEUR DE POSER LA SIGNATURE AVANT L'ACTEUR CONCERNE
+    public function signerDossier($refDossier)
+    {
+
+        // Rôles dans l’ordre chronologique
+        $roles = [
+            "Superviseur",
+            "Chef Agence",
+            "CTC",
+            "DG",
+            "CC"
+        ];
+
+        // Rôle de l’utilisateur courant
+        $currentRole = auth()->user()->role;
+
+        // Index du rôle courant
+        $currentIndex = array_search($currentRole, $roles);
+
+        if ($currentIndex === false) {
+            throw new \Exception("Rôle non autorisé");
+        }
+
+        // On récupère la signature du dossier
+        // $dossier = DB::table('signatures')
+        //     ->where('credit_id', $refDossier)
+        //     ->first();
+
+        // if (! $dossier) {
+        //     throw new \Exception("Dossier introuvable");
+        // }
+
+        // Vérifier si le rôle précédent a signé
+        if ($currentIndex > 0) {
+            $previousRole = $roles[$currentIndex - 1];
+
+            // Vérifier que le champ signed_by contient déjà le rôle précédent
+            $hasPreviousSigned = DB::table('signatures')
+                ->where('credit_id', $refDossier)
+                ->where('signed_by', $previousRole)
+                ->exists();
+
+
+            if (!$hasPreviousSigned) {
+
+                throw new \Exception("Le rôle $previousRole doit signer avant vous.");
+            }
+        }
+
+        // Vérifier que le rôle courant n’a pas déjà signé
+        $alreadySigned = DB::table('signatures')
+            ->where('credit_id', $refDossier)
+            ->where('signed_by', $currentRole)
+            ->exists();
+
+        if ($alreadySigned) {
+            throw new \Exception("Vous avez déjà signé ce dossier.");
+        }
+    }
+
+
+
+
+    public function DashBoardStat()
+    {
+        // 1. Statistiques sur les crédits
+        $stats = [
+            'credits_encours'   => Credits::where('statutDossier', 'Encours')->count(),
+            'credits_decaisse'  => Credits::where('statutDossier', 'Décaissé')->count(),
+            'credits_rejetes'   => Credits::where('statutDossier', 'Refusé')->count(),
+        ];
+
+        // 2. Répartition des signatures par acteur (signed_by)
+        // 2. Répartition des signatures par acteur (signed_by)
+        // $signatures = Signature::select('signed_by', DB::raw('count(*) as total'))
+        //     ->groupBy('signed_by')
+        //     ->orderByRaw('MIN(id) ASC') // ou created_at si tu veux l’ordre chronologique
+        //     ->get();
+        $signatures = Signature::select('signed_by', DB::raw('count(*) as total'))
+            ->groupBy('signed_by')
+            ->get();
+
+
+        // 3. Temps moyen de signature par acteur (en jours)
+        $delaiSignatures = Signature::select(
+            'signed_by',
+            DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
+        )
+            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
+            ->groupBy('signed_by')
+            ->orderByRaw('MIN(id) ASC') // ou created_at si tu veux l’ordre chronologique
+            ->get();
+
+        // 4. Timeline globale : temps moyen par mois
+        $timeline = Signature::select(
+            DB::raw("DATE_FORMAT(signatures.created_at, '%Y-%m') as mois"),
+            DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
+        )
+            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
+            ->groupBy('mois')
+            ->orderBy('mois')
+            ->get();
+
+        return response()->json([
+            'stats' => $stats,
+            'signatures' => $signatures,
+            'delaiSignatures' => $delaiSignatures,
+            'timeline' => $timeline,
+        ]);
     }
 }

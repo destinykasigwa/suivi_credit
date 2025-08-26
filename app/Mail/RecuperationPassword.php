@@ -67,7 +67,7 @@ class RecuperationPassword extends Mailable
     public function build()
     {
         return $this
-            ->from('destinkasigwa@gmail.com')
+            ->from('contact@coopecakibayetu.org')
             ->subject('Recuperation de mot de passe')
             ->view('emails.recuperationpassword');
     }

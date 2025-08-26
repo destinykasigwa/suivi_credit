@@ -10,8 +10,8 @@
                          style="width: 100%;height:18px;" class="elevation-2" alt=""></a>
              </div> --}}
              <div class="info">
-                 <a href="eco/home" class="d-block text-light"
-                     style="font-size: 30px;margin-top:-10px"><strong>FinaPlus</strong></a>
+                 <a href="gestion_credit/home" class="d-block text-light"
+                     style="font-size: 20px;margin-top:-10px"><strong>AKIBA YETU</strong></a>
              </div>
          </div>
          <nav class="mt-2">

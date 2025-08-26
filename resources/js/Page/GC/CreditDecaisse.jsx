@@ -9,6 +9,7 @@ import ModalBootstrapVisualisation from "../Modals/ModalsGC/ModalBootstrapVisual
 import "../../styles/style.css";
 import { MdTimeline } from "react-icons/md";
 import CreditTimeline from "../Modals/ModalsGC/TimeLine";
+import ModalContratPret from "../Modals/ModalsGC/ModalContratPret";
 
 const CreditDecaisse = () => {
     const inputRef = useRef(null);
@@ -125,7 +126,7 @@ const CreditDecaisse = () => {
                                 color: "white",
                             }}
                         >
-                            <h5 className="text-bold p-1">Validation crédit</h5>
+                            <h5 className="text-bold p-1">Crédits décaissés</h5>
                         </div>{" "}
                     </div>
                 </div>
@@ -242,6 +243,7 @@ const CreditDecaisse = () => {
                                                               TimeLine{" "}
                                                               {/* <i className="fas fa-pen"></i> */}
                                                           </button>
+
                                                           {/* <button
                                                               type="button"
                                                               className="btn btn-danger"
@@ -257,6 +259,23 @@ const CreditDecaisse = () => {
                                                                   aria-hidden="true"
                                                               ></i>
                                                           </button> */}
+                                                          <button
+                                                              type="button"
+                                                              className="btn btn-info"
+                                                              data-toggle="modal"
+                                                              data-target="#modalContratPret"
+                                                              onClick={() =>
+                                                                  setDossierIdSelected(
+                                                                      credit.id_credit
+                                                                  )
+                                                              }
+                                                          >
+                                                              Fichiers{" "}
+                                                              <i
+                                                                  class="fa fa-file"
+                                                                  aria-hidden="true"
+                                                              ></i>
+                                                          </button>
                                                       </div>
                                                   </td>
                                               </tr>
@@ -304,7 +323,7 @@ const CreditDecaisse = () => {
                                                               data-target="#modalTimeLine"
                                                               onClick={() =>
                                                                   setDossierIdSelected(
-                                                                      credit.id_credit
+                                                                      res.id_credit
                                                                   )
                                                               }
                                                           >
@@ -312,7 +331,7 @@ const CreditDecaisse = () => {
                                                               TimeLine{" "}
                                                               {/* <i className="fas fa-pen"></i> */}
                                                           </button>
-                                                          <button
+                                                          {/* <button
                                                               type="button"
                                                               className="btn btn-danger"
                                                               onClick={() => {
@@ -324,6 +343,23 @@ const CreditDecaisse = () => {
                                                               Supprimer{" "}
                                                               <i
                                                                   class="fa fa-trash"
+                                                                  aria-hidden="true"
+                                                              ></i>
+                                                          </button> */}
+                                                          <button
+                                                              type="button"
+                                                              className="btn btn-info"
+                                                              data-toggle="modal"
+                                                              data-target="#modalContratPret"
+                                                              onClick={() =>
+                                                                  setDossierIdSelected(
+                                                                      res.id_credit
+                                                                  )
+                                                              }
+                                                          >
+                                                              Fichiers{" "}
+                                                              <i
+                                                                  class="fa fa-file"
                                                                   aria-hidden="true"
                                                               ></i>
                                                           </button>
@@ -343,6 +379,12 @@ const CreditDecaisse = () => {
 
                         {dossierIdSelected && (
                             <CreditTimeline
+                                creditId={dossierIdSelected}
+                                onClose={() => setDossierIdSelected(null)}
+                            />
+                        )}
+                        {dossierIdSelected && (
+                            <ModalContratPret
                                 creditId={dossierIdSelected}
                                 onClose={() => setDossierIdSelected(null)}
                             />

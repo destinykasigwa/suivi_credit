@@ -53,6 +53,7 @@ import ResetPassWord from "./Page/ResetPassWord";
 import MontageCreditA from "./Page/GC/MontageCreditA";
 import ValidationC from "./Page/GC/ValidationC";
 import CreditDecaisse from "./Page/GC/CreditDecaisse";
+import Dashboard from "./Page/GC/DashBoard";
 
 if (document.getElementById("app")) {
     ReactDOM.createRoot(document.getElementById("app")).render(
@@ -319,6 +320,14 @@ if (document.getElementById("creditDecaisseA")) {
     ReactDOM.createRoot(document.getElementById("creditDecaisseA")).render(
         <BrowserRouter>
             <CreditDecaisse />
+        </BrowserRouter>
+    );
+}
+
+if (document.getElementById("dashboadCreditA")) {
+    ReactDOM.createRoot(document.getElementById("dashboadCreditA")).render(
+        <BrowserRouter>
+            <Dashboard />
         </BrowserRouter>
     );
 }

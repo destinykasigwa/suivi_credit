@@ -52,6 +52,7 @@ export default function CreditTimeline({ creditId, onClose }) {
                         </button>
                     </div>
                     <div className="modal-body">
+                        {!timeline && <p>Chargement...</p>}
                         <div className="timeline-container">
                             <ul className="list-group">
                                 {timeline.map((item, index) => (

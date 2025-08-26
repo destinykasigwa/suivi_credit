@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FinaPlus</title>
+    <title>AKIBA YETU</title>
     <link rel="icon" href="{{ asset('images/bigtontine.png') }}">
     <base href="/">
     {{-- <base href="/"> --}}
@@ -70,7 +70,7 @@
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="eco/home" class="nav-link">Home</a>
+                <a href="gestion_credit/home" class="nav-link">Home</a>
             </li>
 
             {{-- <li class="nav-item d-none d-sm-inline-block">
@@ -103,7 +103,8 @@
                 </div>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a style="pointer-events: none" href="" class="nav-link">{{ auth()->user()->name }}</a>
+                <a style="pointer-events: none" href="" class="nav-link">{{ auth()->user()->name }} |
+                    {{ auth()->user()->role }}</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">

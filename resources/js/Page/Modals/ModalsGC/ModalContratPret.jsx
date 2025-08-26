@@ -157,6 +157,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                         )}
                         <div className="row">
                             <div className="col-md-7">
+                                {!dossier && <p>Chargement...</p>}
                                 {dossier &&
                                     dossier.images &&
                                     dossier.images.length > 0 && (
@@ -225,7 +226,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                                             style={{ fontSize: "15px" }}
                                         >
                                             <h6 className="text-bold unclear-text">
-                                                Ajouter le contrat de prêt
+                                                Ajouter un fichier
                                             </h6>
                                         </legend>
                                         <table>
@@ -244,7 +245,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                             type="file"
                                                             id="images"
                                                             name="addFile"
-                                                            accept="pdf/*"
+                                                            accept="application/pdf, image/*"
                                                             onChange={(e) =>
                                                                 setnewFile(
                                                                     e.target

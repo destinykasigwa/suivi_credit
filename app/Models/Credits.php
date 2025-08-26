@@ -36,6 +36,10 @@ class Credits extends Model
         'date_sortie_titre',
         'date_expiration_titre',
         'description_titre',
+        'nombre_membre_groupe',
+        'nombre_homme_groupe',
+        'nombre_femme_groupe',
+        'objet_credit',
         'statutDossier',
 
     ];
@@ -49,6 +53,12 @@ class Credits extends Model
     public function signatures()
     {
         return $this->hasMany(Signature::class, 'credit_id');
+    }
+
+
+    public function commentaires()
+    {
+        return $this->hasMany(Commentaire::class, 'credit_id');
     }
 
     protected $primaryKey = 'id_credit';

@@ -59,6 +59,7 @@ class UtilisateurController extends Controller
             "expirate_date" => $todayDate,
             "locked_state" => 0,
             "attempt_times" => 6,
+            "expirate_password" => 0,
             "reseted_password" => 1,
         ]);
         return response()->json(["status" => 1, "msg" => "le mot de passe de cet utilisateur a été réinitialisé."]);

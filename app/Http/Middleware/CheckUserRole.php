@@ -35,6 +35,6 @@ class CheckUserRole
             }
         }
         // Si aucun rôle ne correspond, rediriger
-        return redirect('eco/pages/unauthorized')->with('error', 'Vous n\'êtes pas autorisé à accéder à cette page.');
+        return redirect('gestion_credit/pages/unauthorized')->with('error', 'Vous n\'êtes pas autorisé à accéder à cette page.');
     }
 }

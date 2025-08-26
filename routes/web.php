@@ -43,8 +43,8 @@ use App\Http\Controllers\ClotureJourneeController;
 Route::get('/check-session-expiration', [SessionController::class, 'checkSessionExpiration']);
 Route::middleware(['web'])->group(function () {
     // Définissez vos routes ici
-    Route::get('/eco/pages/unauthorized', function () {
-        return view('eco.pages.unauthorized');
+    Route::get('/gestion_credit/pages/unauthorized', function () {
+        return view('gestion_credit.pages.unauthorized');
     });
     Route::get("/", [HomeController::class, 'home']);
     Route::get('/auth/login', [Authentication::class, 'loginIndex'])->name('auth.login');
@@ -637,4 +637,6 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     );
 
     Route::post('/suivi-credit/pages/add-contrat', [AGestionCreditController::class, 'addNewFile']);
+
+    Route::get('gestion_credit/dashboard/stats', [AGestionCreditController::class, 'DashBoardStat']);
 });
