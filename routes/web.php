@@ -631,6 +631,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::get('/montage-credit/rapport/credit/decaisse', [AGestionCreditController::class, 'getCreditDecaisse']);
 
 
+
     Route::get(
         "montage_credit/page/credit/decaisse/reference/{ref}",
         [AGestionCreditController::class, 'getSearchedCreditDecaisse']
@@ -642,4 +643,24 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
 
 
     Route::post('gestion_credit/page/credit/commentaire/new', [AGestionCreditController::class, 'NewComment']);
+
+
+    Route::delete('gestion_credit/page/credit/commentaire/{id}', [AGestionCreditController::class, 'deleteComment']);
+
+
+    //PERMET D'AJOUTER LES IMAGES DU MEMBRE
+
+    Route::post('gestion_credit/pages/dossier-credit/images-membre/add', [AGestionCreditController::class, 'addImageMembre']);
+
+    Route::delete('gestion_credit/pages/files/credit/pdf/{id}', [AGestionCreditController::class, 'deletePDFFile']);
+
+    Route::get('gestion_credit/pages/files/credit/excel/{id}', [AGestionCreditController::class, 'deleteExcelFile']);
+
+
+    Route::delete('gestion_credit/pages/files/credit/image/membre/{id}', [AGestionCreditController::class, 'deleteImageMembre']);
+
+
+    Route::delete('gestion_credit/pages/files/credit/image/activite/{id}', [AGestionCreditController::class, 'deleteImageActivite']);
+
+    Route::delete('gestion_credit/pages/files/credit/timeline/signature/delete/{id}', [AGestionCreditController::class, 'deleteSignature']);
 });

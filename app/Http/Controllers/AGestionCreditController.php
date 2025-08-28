@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Commentaire;
 use App\Models\Credits;
+use App\Models\CreditsImages;
 use App\Models\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +62,7 @@ class AGestionCreditController extends Controller
             // 'valeur_garantie' => 'required|string',
             // 'description_titre' => 'required|string',
             // 'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
-            'images.*' => 'mimes:jpg,jpeg,png,pdf|max:5048',
+            'images.*' => 'mimes:jpg,jpeg,png,pdf,xlsx,xls|max:5048',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -115,9 +116,20 @@ class AGestionCreditController extends Controller
                 // Conserver le nom original mais ajouter un timestamp devant
                 $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
                 $path = $image->storeAs('credits', $filename, 'public'); // Stocke dans storage/app/public/credits
-                $credit->images()->create([
-                    'path' => $path
-                ]);
+                // Copier seulement si c'est un fichier Excel
+                $extension = strtolower($image->getClientOriginalExtension());
+                if (in_array($extension, ['xlsx', 'xls'])) {
+                    $image->move(public_path('credit'), $filename);
+                    $credit->images()->create([
+                        'file_state' => 'ia',
+                        'path' => "credit/" . $filename
+                    ]);
+                } else {
+                    $credit->images()->create([
+                        'file_state' => 'ia',
+                        'path' => $path
+                    ]);
+                }
             }
         } else {
             return response()->json([
@@ -247,23 +259,42 @@ class AGestionCreditController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Récupère les fichiers liés (images + pdfs)
+        // Récupère les fichiers liés (images + pdfs) fichier lié à l'activité 
+        // $fichiers = DB::table('credits_images')
+        //     ->where('credits_id', $id)
+        //     ->where('file_state', "ia")
+        //     ->pluck('id', 'path');
         $fichiers = DB::table('credits_images')
             ->where('credits_id', $id)
-            ->pluck('path');
+            ->where('file_state', "ia")
+            ->select('id', 'path')
+            ->get();
+
+        // Récupère les images de l'activité du membre
+        $imageMembres = DB::table('credits_images')
+            ->where('credits_id', $id)
+            ->where('file_state', "im")
+            ->select('id', 'path')
+            ->get();
+        //dd($imageActivite);
 
         // Sépare images et pdfs
         $images = [];
         $pdfs = [];
+        $excels = [];
 
         foreach ($fichiers as $fichier) {
-            $ext = strtolower(pathinfo($fichier, PATHINFO_EXTENSION));
+            $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
                 $images[] = $fichier;
             } elseif ($ext === 'pdf') {
                 $pdfs[] = $fichier;
+            } elseif (in_array($ext, ['xlsx', 'xls'])) {
+                $excels[] = $fichier;
             }
         }
+
 
         // 🔹 Récupère les fichiers de signatures liés
         // $signatures = DB::table('signatures')
@@ -280,19 +311,24 @@ class AGestionCreditController extends Controller
             ->orderBy('created_at', 'desc')
             ->value('signature_file');
 
-
         // Convertis l'objet $dossier (stdClass) en tableau associatif
         $dossierArray = (array) $dossier;
-
+        //dd($excels);
         // Ajoute images, pdfs et signatures
         $dossierArray['images'] = $images;
         $dossierArray['pdfs'] = $pdfs;
+        $dossierArray['excels'] = $excels;
         $dossierArray['signatures'] = $signatures;
         $dossierArray['lastSignature'] = $lastSignature;
         $dossierArray['commentaires'] = $commentaires;
+        $dossierArray['current_user'] = auth()->user();
+        $dossierArray['imageMembre'] = $imageMembres;
 
 
-        return response()->json(['data' => $dossierArray]);
+
+        return response()->json([
+            'data' => $dossierArray
+        ]);
     }
 
     //UPDATE DOSSIER
@@ -391,20 +427,28 @@ class AGestionCreditController extends Controller
         foreach ($signatures as $sig) {
             $delay = null;
             if ($previousDate) {
-                $delay = \Carbon\Carbon::parse($previousDate)->diffInDays($sig->created_at);
+                // Comparer uniquement les jours (sans heures)
+                $delay = \Carbon\Carbon::parse($previousDate)->startOfDay()
+                    ->diffInDays(\Carbon\Carbon::parse($sig->created_at)->startOfDay());
             }
 
             $timeline[] = [
                 'signed_by' => $sig->signed_by,
                 'signature_file' => $sig->signature_file,
                 'signed_at' => $sig->created_at,
-                'delay_from_previous' => $delay
+                'delay_from_previous' => $delay,
+                'id' => $sig->id,
+
+
             ];
 
             $previousDate = $sig->created_at;
         }
 
-        return response()->json($timeline);
+        return response()->json([
+            "data" => $timeline,
+            'current_user' => auth()->user(),
+        ]);
     }
 
     public function getCreditDecaisse()
@@ -428,7 +472,7 @@ class AGestionCreditController extends Controller
         // Vérifier l'extension
         $file = $request->file('newFile');
 
-        $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+        $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'xlsx', 'xls'];
         $extension = strtolower($file->getClientOriginalExtension());
 
         if (!in_array($extension, $allowedExtensions)) {
@@ -457,9 +501,20 @@ class AGestionCreditController extends Controller
                 // Sauvegarder le fichier
                 $path = $file->storeAs('credits', $filename, 'public');
 
-                $checkStatus->images()->create([
-                    'path' => $path
-                ]);
+                $extension = strtolower($file->getClientOriginalExtension());
+                if (in_array($extension, ['xlsx', 'xls'])) {
+                    $file->move(public_path('credit'), $filename);
+                    $checkStatus->images()->create([
+                        'file_state' => 'ia',
+                        'path' => "credit/" . $filename
+                    ]);
+                } else {
+                    $checkStatus->images()->create([
+                        'file_state' => 'ia',
+                        'path' => $path
+                    ]);
+                }
+
 
                 return response()->json([
                     "status" => 1,
@@ -478,9 +533,9 @@ class AGestionCreditController extends Controller
     //CETE FONCTION PERMET D'EMPCEHER UN ACTEUR DE POSER LA SIGNATURE AVANT L'ACTEUR CONCERNE
     public function signerDossier($refDossier)
     {
-
         // Rôles dans l’ordre chronologique
         $roles = [
+            "AC",
             "Superviseur",
             "Chef Agence",
             "CTC",
@@ -588,8 +643,11 @@ class AGestionCreditController extends Controller
 
     //PERMET DE POSTER UN NOUVEAU COMMENTAIRE
 
+
+
     public function NewComment(Request $request)
     {
+
         if (isset($request->contenu)) {
             Commentaire::create([
                 'credit_id' => $request->getDossierId,
@@ -607,5 +665,115 @@ class AGestionCreditController extends Controller
                 "msg" => "Votre commentaire n'est peut pas être vide"
             ]);
         }
+    }
+
+
+    public function deleteComment($id)
+    {
+
+
+        $commentaire = Commentaire::find($id);
+        // dd($commentaire); // Vérifie tous les IDs existants
+        if (!$commentaire) {
+            return response()->json([
+                'status' => 0,
+                'msg' => 'Commentaire introuvable.'
+            ]);
+        }
+
+        // Supprimer aussi les réponses liées (cascade)
+        $commentaire->replies()->delete();
+        $commentaire->delete();
+
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Commentaire supprimé avec succès.'
+        ]);
+    }
+
+    //PERMET DE SUPPRIME UN FICHIER PDF
+
+    public function deletePDFFile($id)
+    {
+        $fileName = CreditsImages::where("path", $id)->first();
+        $fileName->delete();
+
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Fichier supprimé avec succès.'
+        ]);
+    }
+
+    public function deleteExcelFile($id)
+    {
+        $fileName = CreditsImages::where("id", $id)->first();
+        $fileName->delete();
+
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Fichier supprimé avec succès.'
+        ]);
+    }
+
+    public function addImageMembre(Request $request)
+    {
+        if ($request->hasFile('images')) {
+            $credit = Credits::findOrFail($request->creditId);
+            foreach ($request->file('images') as $image) {
+                // Conserver le nom original mais ajouter un timestamp devant
+                $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
+                $path = $image->storeAs('credits/images-membre', $filename, 'public'); // Stocke dans storage/app/public/credits/images-membre
+                $credit->images()->create([
+                    'file_state' => "im",
+                    'path' => $path
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 0,
+                'msg' => 'Aucune image séléctionnée',
+                // 'credit' => $credit->load('images'),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Crédit enregistré avec succès',
+            'credit' => $credit->load('images'),
+        ]);
+    }
+
+    //PERMET DE SUPPRIMER UNE IMAGE 
+    public function deleteImageMembre($id)
+    {
+
+        $image = CreditsImages::find($id);
+        $image->delete();
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Image supprimée avec succès',
+        ]);
+    }
+
+    //PERMET DE SUPPRIMER UNE IMAGE 
+    public function deleteImageActivite($id)
+    {
+        $image = CreditsImages::find($id);
+        $image->delete();
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Image supprimée avec succès',
+        ]);
+    }
+
+
+    public function deleteSignature($id)
+    {
+        $signature = Signature::find($id);
+        $signature->delete();
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Image supprimée avec succès',
+        ]);
     }
 }

@@ -299,7 +299,7 @@ const ValidationC = () => {
                                                                   )
                                                               }
                                                           >
-                                                              Ajouter fichier{" "}
+                                                              Fichiers{" "}
                                                               <i
                                                                   class="fa fa-file"
                                                                   aria-hidden="true"
@@ -409,7 +409,7 @@ const ValidationC = () => {
                                                                   )
                                                               }
                                                           >
-                                                              Ajouter fichier{" "}
+                                                              Fichiers{" "}
                                                               <i
                                                                   class="fa fa-file"
                                                                   aria-hidden="true"

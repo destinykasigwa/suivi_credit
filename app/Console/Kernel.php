@@ -17,8 +17,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('password:expiration')->everyMinute()->runInBackground();
-        $schedule->command('cloture:journee')->everyMinute()->runInBackground();
+        // $schedule->command('password:expiration')->everyMinute()->runInBackground();
+        // $schedule->command('cloture:journee')->everyMinute()->runInBackground();
+        if ($this->app->environment('production')) {
+            $schedule->command('password:expiration')->everyMinute()->runInBackground();
+            $schedule->command('cloture:journee')->everyMinute()->runInBackground();
+        }
 
         // Planifier la fonction RappelRemboursementCredit tous les jours à 8h00
         $schedule->call(function () {

@@ -140,7 +140,7 @@ const MontageCreditA = () => {
 
             if (response.data.status == 1) {
                 setIsLoadingBar(false);
-                console.log("Succès :", response.data);
+                // console.log("Succès :", response.data);
                 setObjetCredit("");
                 setNumCompte("");
                 setNomCompte("");
@@ -1289,7 +1289,7 @@ const MontageCreditA = () => {
                                 style={{ fontSize: "15px" }}
                             >
                                 <h6 className="text-bold unclear-text">
-                                    Pièces jointes
+                                    Images activités & titres
                                 </h6>
                             </legend>
 
@@ -1441,12 +1441,14 @@ const MontageCreditA = () => {
                                     <tr>
                                         <td></td>
                                         <td>
-                                            <button
-                                                onClick={handleSubmit}
-                                                className="btn btn-primary rounded-10 mt-1"
-                                            >
-                                                Enregistrer
-                                            </button>
+                                            {images.length > 0 && (
+                                                <button
+                                                    onClick={handleSubmit}
+                                                    className="btn btn-primary rounded-10 mt-1"
+                                                >
+                                                    Enregistrer
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 </div>

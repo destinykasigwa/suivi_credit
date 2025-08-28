@@ -20,6 +20,8 @@ import { Bars } from "react-loader-spinner";
 
 export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [dossier, setDossier] = useState(null);
+    const inputRef = useRef(null);
+    const offcanvasRef = useRef(null);
 
     const [NumCompte, setNumCompte] = useState();
     const [NomCompte, setNomCompte] = useState();
@@ -56,45 +58,59 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [progress, setProgress] = useState(0);
     const [contenu, setContenu] = useState("");
     const endOfCommentsRef = useRef(null);
-
     const [replyTo, setReplyTo] = useState(null);
 
     const handleReply = (comment) => {
         setReplyTo(comment);
+        // Mettre le focus dans l'input dès qu'on clique sur Répondre
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
     };
-
-    const handleSubmitReply = () => {
-        const newComment = {
-            text: inputValue,
-            user: currentUser,
-            reply_to: replyTo ? replyTo.id : null, // lien parent
-        };
-
-        // Ici tu fais ton axios.post(...) avec reply_to
-        setReplyTo(null);
-        setInputValue("");
-    };
-
-    useEffect(() => {
-        if (!dossierId) return;
-        getDossierCredit();
-    }, [dossierId]);
 
     // 🔽 Scroll automatique quand la liste change
     useEffect(() => {
+        // inputRef.current?.focus();
         if (endOfCommentsRef.current) {
             endOfCommentsRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, [dossier && dossier.commentaires]);
+    }, []);
 
-    const getDossierCredit = () => {
+    //  useEffect(() => {
+    //     // inputRef.current?.focus();
+    //     if (endOfCommentsRef.current) {
+    //         endOfCommentsRef.current.scrollIntoView({ behavior: "smooth" });
+    //     }
+    // }, [dossier && dossier.commentaires]);
+
+    useEffect(() => {
+        if (offcanvasRef.current) {
+            const offcanvasEl = offcanvasRef.current;
+
+            const handleShown = () => {
+                if (inputRef.current) inputRef.current.focus();
+            };
+
+            offcanvasEl.addEventListener("shown.bs.offcanvas", handleShown);
+
+            // nettoyage à la destruction du composant
+            return () => {
+                offcanvasEl.removeEventListener(
+                    "shown.bs.offcanvas",
+                    handleShown
+                );
+            };
+        }
+    }, []);
+
+    const getDossierCredit = async () => {
         // Charger les données
         axios
             .get(`suivi-credit/dossiers/${dossierId}`)
             .then((res) => {
                 const data = res.data.data; // récupère l'objet dossier complet
-                console.log(data);
                 setDossier(data); // stocke tout l'objet dossier dans dossier
+                console.log(data);
                 setNumCompte(data.NumCompte);
                 setNomCompte(data.NomCompte);
                 setproduit_credit(data.produit_credit);
@@ -127,6 +143,11 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             })
             .catch(() => setDossier(null));
     };
+
+    useEffect(() => {
+        if (!dossierId) return;
+        getDossierCredit();
+    }, [dossierId]);
 
     if (!dossierId) return null;
 
@@ -284,33 +305,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             // }, 1000);
         }
     };
-    // const saveComment = async (e) => {
-    //     e.preventDefault();
-    //     setIsLoadingBar(true);
-    //     if (contenu.trim() === "") return;
-    //     setContenu(""); // vider l’input
-    //     const res = await axios.post(
-    //         "/gestion_credit/page/credit/commentaire/new",
-    //         {
-    //             getDossierId,
-    //             contenu,
-    //         }
-    //     );
-    //     if (res.data.status == 1) {
-    //         getDossierCredit();
-    //         setContenu("");
-    //         setIsLoadingBar(false);
-    //     } else {
-    //         Swal.fire({
-    //             title: "Commentaire",
-    //             text: res.data.msg,
-    //             icon: "error",
-    //             timer: 8000,
-    //             confirmButtonText: "Okay",
-    //         });
-    //         setIsLoadingBar(false);
-    //     }
-    // };
+
     const saveComment = async (e) => {
         e.preventDefault();
         setIsLoadingBar(true);
@@ -338,7 +333,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 payload
             );
 
-            if (res.data.status === 1) {
+            if (res.data.status == 1) {
                 // recharge la liste
                 getDossierCredit();
 
@@ -373,15 +368,31 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     };
 
     // Fonction format date
-    const formatDateTime = (dateString) => {
-        const date = new Date(dateString);
-        const jour = String(date.getDate()).padStart(2, "0");
-        const mois = String(date.getMonth() + 1).padStart(2, "0");
-        const annee = date.getFullYear();
-        const heures = date.getHours();
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        return `${jour}/${mois}/${annee} à ${heures}h${minutes}`;
+    // const formatDateTime = (dateString) => {
+    //     const date = new Date(dateString);
+    //     const jour = String(date.getDate()).padStart(2, "0");
+    //     const mois = String(date.getMonth() + 1).padStart(2, "0");
+    //     const annee = date.getFullYear();
+    //     const heures = date.getHours();
+    //     const minutes = String(date.getMinutes()).padStart(2, "0");
+    //     return `${jour}/${mois}/${annee} à ${heures}h${minutes}`;
+    // };
+
+    const currentUserId = dossier && dossier.current_user?.id;
+    // Helper robuste : compte parents + réponses (à n niveaux)
+    const countAllComments = (list) => {
+        if (!Array.isArray(list)) return 0;
+        return list.reduce((total, c) => {
+            const children = Array.isArray(c.replies)
+                ? countAllComments(c.replies)
+                : 0;
+            return total + 1 + children;
+        }, 0);
     };
+
+    // Dans ton composant (avant le return)
+    const nbCommentaires = countAllComments(dossier?.commentaires || []);
+
     return (
         <>
             <div
@@ -522,6 +533,11 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             >
                                                 Commentaires
                                                 <FaCommentDots />
+                                                {nbCommentaires}
+                                                {/* {dossier && dossier.commentaires
+                                                    ? dossier.commentaires
+                                                          .length
+                                                    : 0} */}
                                             </button>
                                         </h5>
                                     </div>
@@ -533,6 +549,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                 class="close"
                                 data-dismiss="modal"
                                 aria-label="Close"
+                                onClick={onClose}
                             >
                                 {" "}
                                 <span aria-hidden="true">&times;</span>
@@ -1525,7 +1542,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                         </form>
                                     </div>
                                     <div className="row">
-                                        <div className="col-md-7">
+                                        {/* <div className="col-md-3">
                                             {dossier.images &&
                                                 dossier.images.length > 0 && (
                                                     <div>
@@ -1544,7 +1561,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                         key={i}
                                                                     >
                                                                         <img
-                                                                            src={`/storage/${img}`}
+                                                                            src={`/storage/${img.path}`}
                                                                             alt={`Image ${i}`}
                                                                             style={{
                                                                                 maxWidth:
@@ -1575,7 +1592,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                             (pdf, i) => (
                                                                 <a
                                                                     key={i}
-                                                                    href={`/storage/${pdf}`}
+                                                                    href={`/storage/${pdf.path}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="btn btn-outline-secondary btn-sm me-2"
@@ -1587,9 +1604,9 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                         )}
                                                     </div>
                                                 )}
-                                        </div>
+                                        </div> */}
 
-                                        <div className="col-md-5">
+                                        <div className="col-md-12">
                                             <form>
                                                 <table>
                                                     <tr>
@@ -1618,9 +1635,9 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 .files[0]
                                                                         )
                                                                     }
-                                                                    style={{
-                                                                        width: "80%",
-                                                                    }}
+                                                                    // style={{
+                                                                    //     width: "100%",
+                                                                    // }}
                                                                 />
                                                             </label>
                                                         </td>
@@ -1628,21 +1645,23 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     <tr>
                                                         <td>
                                                             {" "}
-                                                            <button
-                                                                onClick={
-                                                                    handleSubmitAddFile
-                                                                }
-                                                                className="btn btn-success mt-2"
-                                                                style={{
-                                                                    borderRadius:
-                                                                        "25px",
-                                                                    padding:
-                                                                        "8px 16px",
-                                                                }}
-                                                            >
-                                                                Joindre le
-                                                                fichier
-                                                            </button>
+                                                            {signature_file && (
+                                                                <button
+                                                                    onClick={
+                                                                        handleSubmitAddFile
+                                                                    }
+                                                                    className="btn btn-success mt-2"
+                                                                    style={{
+                                                                        borderRadius:
+                                                                            "25px",
+                                                                        padding:
+                                                                            "8px 16px",
+                                                                    }}
+                                                                >
+                                                                    Joindre le
+                                                                    fichier
+                                                                </button>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -1666,8 +1685,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
                                 {/* Offcanvas Bootstrap */}
                                 <div
-                                    className="offcanvas offcanvas-end shadow"
+                                    className="offcanvas offcanvas-end shadow "
                                     tabIndex="-1"
+                                    style={{ width: "600px" }} // largeur en px ou %
+                                    ref={offcanvasRef} // <-- ajout
                                     id="offcanvasCommentaires"
                                     aria-labelledby="offcanvasCommentairesLabel"
                                 >
@@ -1676,7 +1697,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             className="offcanvas-title d-flex align-items-center gap-2"
                                             id="offcanvasCommentairesLabel"
                                         >
-                                            <FaCommentDots /> Commentaires
+                                            <FaCommentDots /> Commentaires{" "}
+                                            {nbCommentaires}
                                         </h5>
                                         <button
                                             type="button"
@@ -1699,9 +1721,15 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                             commentaire={
                                                                 commentaire
                                                             }
+                                                            currentUserId={
+                                                                currentUserId
+                                                            } // <-- on passe en prop
                                                             handleReply={
                                                                 handleReply
                                                             }
+                                                            onDeleteComment={
+                                                                getDossierCredit
+                                                            } // passe la fonction ici
                                                         />
                                                     )
                                                 )}
@@ -1714,7 +1742,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             </p>
                                         )}
                                         {/* 🔽 marqueur pour scroller jusqu’ici */}
-                                        <div ref={endOfCommentsRef}></div>
+                                        {/* <div ref={endOfCommentsRef}></div> */}
                                     </div>
 
                                     {replyTo && (
@@ -1746,6 +1774,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                             </span>
                                             <input
                                                 type="text"
+                                                ref={inputRef}
                                                 className="form-control"
                                                 placeholder={
                                                     replyTo
@@ -1779,14 +1808,75 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     );
 }
 
-const CommentaireItem = ({ commentaire, handleReply, level = 0 }) => {
+const CommentaireItem = ({
+    commentaire,
+    handleReply,
+    level = 0,
+    currentUserId,
+    onDeleteComment,
+}) => {
     const [showReplies, setShowReplies] = useState(false);
+    const [isLoadingBar, setIsLoadingBar] = useState();
 
+    const deleteComment = async (id) => {
+        // try {
+        setIsLoadingBar(true);
+        const res = await axios.delete(
+            `/gestion_credit/page/credit/commentaire/${id}`
+        );
+        if (res.data.status === 1) {
+            // Recharger les commentaires après suppression
+            setIsLoadingBar(false);
+            Swal.fire({
+                icon: "success",
+                title: "Supprimé !",
+                text: res.data.msg,
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+            onDeleteComment(); // rafraîchit la liste
+        } else {
+            Swal.fire("Erreur", res.data.msg, "error");
+            setIsLoadingBar(false);
+        }
+        // } catch (error) {
+        //     Swal.fire(
+        //         "Erreur",
+        //         "Impossible de supprimer le commentaire",
+        //         "error"
+        //     );
+        // }
+    };
     return (
         <li
             className="list-group-item d-flex align-items-start"
             style={{ marginLeft: level * 20 }}
         >
+            {isLoadingBar && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 1000,
+                        flexDirection: "column",
+                    }}
+                >
+                    <Bars
+                        height="80"
+                        width="80"
+                        color="#4fa94d"
+                        ariaLabel="loading"
+                    />
+                </div>
+            )}
             {/* Cercle avec deux lettres du rôle */}
             <div
                 className="me-3 d-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
@@ -1812,9 +1902,18 @@ const CommentaireItem = ({ commentaire, handleReply, level = 0 }) => {
                         {commentaire.user.name}
                     </strong>
                     <small className="text-muted">
-                        {new Date(commentaire.created_at).toLocaleDateString(
-                            "fr-FR"
-                        )}
+                        <span>
+                            {new Date(
+                                commentaire.created_at
+                            ).toLocaleDateString("fr-FR")}{" "}
+                            à{" "}
+                            {new Date(
+                                commentaire.created_at
+                            ).toLocaleTimeString("fr-FR", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
+                        </span>
                     </small>
                 </div>
 
@@ -1827,6 +1926,14 @@ const CommentaireItem = ({ commentaire, handleReply, level = 0 }) => {
                 >
                     Répondre
                 </button>
+                {commentaire.user_id === currentUserId && ( // Seulement si c'est le propriétaire
+                    <button
+                        className="btn btn-sm btn-link text-danger"
+                        onClick={() => deleteComment(commentaire.id)}
+                    >
+                        Supprimer
+                    </button>
+                )}
 
                 {/* Afficher le bouton pour les réponses */}
                 {commentaire.replies && commentaire.replies.length > 0 && (
@@ -1844,13 +1951,14 @@ const CommentaireItem = ({ commentaire, handleReply, level = 0 }) => {
                 {showReplies &&
                     commentaire.replies &&
                     commentaire.replies.length > 0 && (
-                        <ul className="list-group mt-2 reponses">
+                        <ul className="list-group mt-2 reponses rounded-10">
                             {commentaire.replies.map((reply) => (
                                 <CommentaireItem
                                     key={reply.id}
                                     commentaire={reply}
                                     handleReply={handleReply}
                                     level={level + 1}
+                                    currentUserId={currentUserId} // <-- on passe en prop
                                 />
                             ))}
                         </ul>

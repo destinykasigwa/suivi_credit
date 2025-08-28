@@ -12,7 +12,7 @@ export default function ValidationFile({ dossierId }) {
 
     useEffect(() => {
         getDossierCredit();
-    }, []);
+    }, [dossierId]);
 
     const getDossierCredit = () => {
         // Charger les données
@@ -21,7 +21,7 @@ export default function ValidationFile({ dossierId }) {
             .then((res) => {
                 const data = res.data.data; // récupère l'objet dossier complet
                 setFetchData(data); // stocke tout l'objet dossier dans dossier
-                console.log(fetchData);
+                // console.log(fetchData);
             })
             .catch(() => setFetchData(null));
     };
@@ -417,7 +417,7 @@ export default function ValidationFile({ dossierId }) {
                             </div>
                             <div className="row align-items-center justify-content-center">
                                 <p>Liste des signatures</p>
-                                {/* <div
+                                <div
                                     className="col-md-2"
                                     style={{
                                         border: "1px solid black",
@@ -425,7 +425,7 @@ export default function ValidationFile({ dossierId }) {
                                     }}
                                 >
                                     AC
-                                </div> */}
+                                </div>
                                 <div
                                     className="col-md-2"
                                     style={{

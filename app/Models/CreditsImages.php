@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class CreditsImages extends Model
 {
     use HasFactory;
-    protected $fillable = ['credit_id', 'path'];
+    protected $fillable = ['credit_id', 'file_state', 'path'];
 
     public function credit()
     {

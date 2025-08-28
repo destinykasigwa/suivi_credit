@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('credits_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('credit_id')->constrained()->onDelete('cascade');
+            $table->string('file_state');
             $table->string('path'); // chemin vers le fichier
             $table->timestamps();
         });
