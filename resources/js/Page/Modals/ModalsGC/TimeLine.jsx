@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 export default function CreditTimeline({ creditId, onClose }) {
     const [timeline, setTimeline] = useState([]);
     const [currentUser, setCurrentUser] = useState();
+    const [selectedSignature, setSelectedSignature] = useState(null);
 
     useEffect(() => {
         getTimeLine();
@@ -131,34 +132,60 @@ export default function CreditTimeline({ creditId, onClose }) {
                                             )}
 
                                             {item.signature_file && (
-                                                <div className="d-flex align-items-center gap-2 mt-2">
-                                                    <a
-                                                        href={`storage/${item.signature_file}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="btn btn-outline-primary btn-sm"
-                                                    >
-                                                        Voir la signature
-                                                    </a>
+                                                <div className="d-flex flex-column gap-2 mt-2">
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <button
+                                                            className="btn btn-outline-primary btn-sm"
+                                                            onClick={() =>
+                                                                setSelectedSignature(
+                                                                    `storage/${item.signature_file}`
+                                                                )
+                                                            }
+                                                        >
+                                                            Voir la signature
+                                                        </button>
 
-                                                    {/* 👇 Bouton supprimer seulement si la signature appartient au user connecté */}
-                                                    {currentUser &&
-                                                        (item.signed_by ===
-                                                            currentUser.role ||
-                                                            currentUser.role ===
-                                                                "DG") && (
-                                                            <button
-                                                                className="btn btn-sm btn-danger ms-2"
-                                                                onClick={() =>
-                                                                    deleteSignature(
-                                                                        item.id
-                                                                    )
-                                                                }
-                                                            >
-                                                                Supprimer la
-                                                                signature
-                                                            </button>
-                                                        )}
+                                                        {/* 👇 Bouton supprimer seulement si la signature appartient au user connecté */}
+                                                        {currentUser &&
+                                                            (item.signed_by ===
+                                                                currentUser.role ||
+                                                                currentUser.role ===
+                                                                    "DG") && (
+                                                                <button
+                                                                    className="btn btn-sm btn-danger ms-2"
+                                                                    onClick={() =>
+                                                                        deleteSignature(
+                                                                            item.id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Supprimer la
+                                                                    signature
+                                                                </button>
+                                                            )}
+                                                    </div>
+
+                                                    {/* 👇 Affichage de l’iframe si l’utilisateur a cliqué */}
+                                                    {selectedSignature ===
+                                                        `storage/${item.signature_file}` && (
+                                                        <div
+                                                            className="mt-2 border rounded"
+                                                            style={{
+                                                                height: "400px",
+                                                            }}
+                                                        >
+                                                            <iframe
+                                                                src={`/pdfjs/web/viewer.html?file=/storage/${item.signature_file}`}
+                                                                style={{
+                                                                    width: "800px",
+                                                                    height: "400px",
+                                                                    border: "1px solid #ccc",
+                                                                    borderRadius:
+                                                                        "8px",
+                                                                }}
+                                                            ></iframe>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>

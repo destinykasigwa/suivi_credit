@@ -341,7 +341,7 @@ export default function ModalContratPret({ creditId, onClose }) {
             }
         }
     };
-    const currentUserRole = dossier && dossier.current_user?.role;
+    const currentUserRole = dossier?.current_user?.role || "";
     return (
         <div
             className="modal fade"
@@ -426,57 +426,58 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                 }}
                                                             >
                                                                 {/* Bouton de suppression visible seulement si AC */}
-                                                                {currentUserRole ===
-                                                                    "AC" && (
-                                                                    <button
-                                                                        onClick={() =>
-                                                                            deleteImageMembre(
-                                                                                img.id
-                                                                            )
-                                                                        }
-                                                                        style={{
-                                                                            position:
-                                                                                "absolute",
-                                                                            top: "6px",
-                                                                            right: "6px",
-                                                                            backgroundColor:
-                                                                                "rgba(255, 255, 255, 0.8)",
-                                                                            border: "none",
-                                                                            borderRadius:
-                                                                                "50%",
-                                                                            padding:
-                                                                                "6px",
-                                                                            cursor: "pointer",
-                                                                            boxShadow:
-                                                                                "0 2px 5px rgba(0,0,0,0.2)",
-                                                                            transition:
-                                                                                "background 0.2s ease",
-                                                                        }}
-                                                                        onMouseEnter={(
-                                                                            e
-                                                                        ) =>
-                                                                            (e.currentTarget.style.backgroundColor =
-                                                                                "rgba(255,0,0,0.8)")
-                                                                        }
-                                                                        onMouseLeave={(
-                                                                            e
-                                                                        ) =>
-                                                                            (e.currentTarget.style.backgroundColor =
-                                                                                "rgba(255,255,255,0.8)")
-                                                                        }
-                                                                        title="Supprimer"
-                                                                    >
-                                                                        <i
-                                                                            className="fa fa-trash"
-                                                                            aria-hidden="true"
+                                                                {currentUserRole &&
+                                                                    currentUserRole ===
+                                                                        "AC" && (
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                deleteImageMembre(
+                                                                                    img.id
+                                                                                )
+                                                                            }
                                                                             style={{
-                                                                                color: "red",
-                                                                                fontSize:
-                                                                                    "14px",
+                                                                                position:
+                                                                                    "absolute",
+                                                                                top: "6px",
+                                                                                right: "6px",
+                                                                                backgroundColor:
+                                                                                    "rgba(255, 255, 255, 0.8)",
+                                                                                border: "none",
+                                                                                borderRadius:
+                                                                                    "50%",
+                                                                                padding:
+                                                                                    "6px",
+                                                                                cursor: "pointer",
+                                                                                boxShadow:
+                                                                                    "0 2px 5px rgba(0,0,0,0.2)",
+                                                                                transition:
+                                                                                    "background 0.2s ease",
                                                                             }}
-                                                                        ></i>
-                                                                    </button>
-                                                                )}
+                                                                            onMouseEnter={(
+                                                                                e
+                                                                            ) =>
+                                                                                (e.currentTarget.style.backgroundColor =
+                                                                                    "rgba(255,0,0,0.8)")
+                                                                            }
+                                                                            onMouseLeave={(
+                                                                                e
+                                                                            ) =>
+                                                                                (e.currentTarget.style.backgroundColor =
+                                                                                    "rgba(255,255,255,0.8)")
+                                                                            }
+                                                                            title="Supprimer"
+                                                                        >
+                                                                            <i
+                                                                                className="fa fa-trash"
+                                                                                aria-hidden="true"
+                                                                                style={{
+                                                                                    color: "red",
+                                                                                    fontSize:
+                                                                                        "14px",
+                                                                                }}
+                                                                            ></i>
+                                                                        </button>
+                                                                    )}
 
                                                                 {/* Image avec effet zoom */}
                                                                 <Zoom>
@@ -525,57 +526,58 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                     }}
                                                                 >
                                                                     {/* Bouton de suppression visible seulement si AC */}
-                                                                    {currentUserRole ===
-                                                                        "AC" && (
-                                                                        <button
-                                                                            onClick={() =>
-                                                                                deleteImageActivite(
-                                                                                    img.id
-                                                                                )
-                                                                            }
-                                                                            style={{
-                                                                                position:
-                                                                                    "absolute",
-                                                                                top: "6px",
-                                                                                right: "6px",
-                                                                                backgroundColor:
-                                                                                    "rgba(255, 255, 255, 0.8)",
-                                                                                border: "none",
-                                                                                borderRadius:
-                                                                                    "50%",
-                                                                                padding:
-                                                                                    "6px",
-                                                                                cursor: "pointer",
-                                                                                boxShadow:
-                                                                                    "0 2px 5px rgba(0,0,0,0.2)",
-                                                                                transition:
-                                                                                    "background 0.2s ease",
-                                                                            }}
-                                                                            onMouseEnter={(
-                                                                                e
-                                                                            ) =>
-                                                                                (e.currentTarget.style.backgroundColor =
-                                                                                    "rgba(255,0,0,0.8)")
-                                                                            }
-                                                                            onMouseLeave={(
-                                                                                e
-                                                                            ) =>
-                                                                                (e.currentTarget.style.backgroundColor =
-                                                                                    "rgba(255,255,255,0.8)")
-                                                                            }
-                                                                            title="Supprimer"
-                                                                        >
-                                                                            <i
-                                                                                className="fa fa-trash"
-                                                                                aria-hidden="true"
+                                                                    {currentUserRole &&
+                                                                        currentUserRole ===
+                                                                            "AC" && (
+                                                                            <button
+                                                                                onClick={() =>
+                                                                                    deleteImageActivite(
+                                                                                        img.id
+                                                                                    )
+                                                                                }
                                                                                 style={{
-                                                                                    color: "red",
-                                                                                    fontSize:
-                                                                                        "14px",
+                                                                                    position:
+                                                                                        "absolute",
+                                                                                    top: "6px",
+                                                                                    right: "6px",
+                                                                                    backgroundColor:
+                                                                                        "rgba(255, 255, 255, 0.8)",
+                                                                                    border: "none",
+                                                                                    borderRadius:
+                                                                                        "50%",
+                                                                                    padding:
+                                                                                        "6px",
+                                                                                    cursor: "pointer",
+                                                                                    boxShadow:
+                                                                                        "0 2px 5px rgba(0,0,0,0.2)",
+                                                                                    transition:
+                                                                                        "background 0.2s ease",
                                                                                 }}
-                                                                            ></i>
-                                                                        </button>
-                                                                    )}
+                                                                                onMouseEnter={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    (e.currentTarget.style.backgroundColor =
+                                                                                        "rgba(255,0,0,0.8)")
+                                                                                }
+                                                                                onMouseLeave={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    (e.currentTarget.style.backgroundColor =
+                                                                                        "rgba(255,255,255,0.8)")
+                                                                                }
+                                                                                title="Supprimer"
+                                                                            >
+                                                                                <i
+                                                                                    className="fa fa-trash"
+                                                                                    aria-hidden="true"
+                                                                                    style={{
+                                                                                        color: "red",
+                                                                                        fontSize:
+                                                                                            "14px",
+                                                                                    }}
+                                                                                ></i>
+                                                                            </button>
+                                                                        )}
 
                                                                     {/* Image avec effet zoom */}
                                                                     <Zoom>
@@ -663,27 +665,28 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                         ""
                                                                     )}
                                                             </button>
-                                                            {currentUserRole ===
-                                                                "AC" && (
-                                                                <button
-                                                                    onClick={() =>
-                                                                        deletePdfFile(
-                                                                            pdf.id
-                                                                        )
-                                                                    }
-                                                                    className="flex items-center gap-1 px-2 py-1 text-red-600 bg-red-100 rounded-lg 
+                                                            {currentUserRole &&
+                                                                currentUserRole ===
+                                                                    "AC" && (
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            deletePdfFile(
+                                                                                pdf.id
+                                                                            )
+                                                                        }
+                                                                        className="flex items-center gap-1 px-2 py-1 text-red-600 bg-red-100 rounded-lg 
                                                                     hover:bg-red-200 hover:text-red-800 transition duration-200"
-                                                                    title="Supprimer ce fichier PDF"
-                                                                >
-                                                                    <i
-                                                                        className="fa fa-trash"
-                                                                        aria-hidden="true"
-                                                                    ></i>
-                                                                    <span className="text-sm font-medium">
-                                                                        Supprimer
-                                                                    </span>
-                                                                </button>
-                                                            )}
+                                                                        title="Supprimer ce fichier PDF"
+                                                                    >
+                                                                        <i
+                                                                            className="fa fa-trash"
+                                                                            aria-hidden="true"
+                                                                        ></i>
+                                                                        <span className="text-sm font-medium">
+                                                                            Supprimer
+                                                                        </span>
+                                                                    </button>
+                                                                )}
                                                         </span>
                                                     </>
                                                 ))}
@@ -730,27 +733,28 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                             ""
                                                                         )}
                                                                 </button>
-                                                                {currentUserRole ===
-                                                                    "AC" && (
-                                                                    <button
-                                                                        onClick={() =>
-                                                                            deleteExcelFile(
-                                                                                excel.id
-                                                                            )
-                                                                        }
-                                                                        className="flex items-center gap-1 px-2 py-1 text-red-600 bg-red-100 rounded-lg 
+                                                                {currentUserRole &&
+                                                                    currentUserRole ===
+                                                                        "AC" && (
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                deleteExcelFile(
+                                                                                    excel.id
+                                                                                )
+                                                                            }
+                                                                            className="flex items-center gap-1 px-2 py-1 text-red-600 bg-red-100 rounded-lg 
                                                                     hover:bg-red-200 hover:text-red-800 transition duration-200"
-                                                                        title="Supprimer ce fichier PDF"
-                                                                    >
-                                                                        <i
-                                                                            className="fa fa-trash"
-                                                                            aria-hidden="true"
-                                                                        ></i>
-                                                                        <span className="text-sm font-medium">
-                                                                            Supprimer
-                                                                        </span>
-                                                                    </button>
-                                                                )}
+                                                                            title="Supprimer ce fichier PDF"
+                                                                        >
+                                                                            <i
+                                                                                className="fa fa-trash"
+                                                                                aria-hidden="true"
+                                                                            ></i>
+                                                                            <span className="text-sm font-medium">
+                                                                                Supprimer
+                                                                            </span>
+                                                                        </button>
+                                                                    )}
                                                             </span>
                                                         </>
                                                     )

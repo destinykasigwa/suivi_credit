@@ -1955,13 +1955,16 @@ const CommentaireItem = ({
                     fontWeight: "bold",
                 }}
             >
-                {commentaire.user.role === commentaire.user.role.toUpperCase()
-                    ? commentaire.user.role
-                    : commentaire.user.role
-                          .split(" ")
-                          .map((word) => word[0])
-                          .join("")
-                          .toUpperCase()}
+                {commentaire.user?.role
+                    ? commentaire.user.role ===
+                      commentaire.user.role.toUpperCase()
+                        ? commentaire.user.role
+                        : commentaire.user.role
+                              .split(" ")
+                              .map((word) => word[0])
+                              .join("")
+                              .toUpperCase()
+                    : ""}
             </div>
 
             <div className="flex-grow-1">
