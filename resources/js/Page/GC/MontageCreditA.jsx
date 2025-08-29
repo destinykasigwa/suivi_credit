@@ -724,6 +724,27 @@ const MontageCreditA = () => {
                                                         <option value="Trimensuelle">
                                                             Trimensuelle
                                                         </option>
+                                                        <option value="Echéance">
+                                                            Echéance
+                                                        </option>
+                                                        <option value="Semestriel">
+                                                            Semestriel
+                                                        </option>
+                                                        <option value="Quatrimestriel">
+                                                            Quatrimestriel
+                                                        </option>
+                                                        <option value="Quintemestriel">
+                                                            Quintemestriel
+                                                        </option>
+                                                        <option value="Hebdomadaire">
+                                                            Hebdomadaire
+                                                        </option>
+                                                        <option value="Bihebdomadaire">
+                                                            Bihebdomadaire
+                                                        </option>
+                                                        <option value="Trihebdomadaire">
+                                                            Trihebdomadaire
+                                                        </option>
                                                     </select>
                                                 </td>
                                             </tr>
@@ -812,13 +833,56 @@ const MontageCreditA = () => {
                                                         value={objetCredit}
                                                     >
                                                         <option value="">
-                                                            1
+                                                            Séléctionnez
                                                         </option>
-                                                        <option value="">
-                                                            2
+                                                        <option value="Frais de scolarité,académique,soins médicaux">
+                                                            Frais de
+                                                            scolarité,académique,soins
+                                                            médicaux
                                                         </option>
-                                                        <option value="">
-                                                            3
+                                                        <option value="Dot, mariage, anniversaire, baptême, funéraille">
+                                                            Dot, mariage,
+                                                            anniversaire,
+                                                            baptême, funéraille
+                                                        </option>
+                                                        <option value="Frais de justice, loyer, paiement dette">
+                                                            Frais de justice,
+                                                            loyer, paiement
+                                                            dette
+                                                        </option>
+                                                        <option value="Entretien ménage et équipement en mobilier">
+                                                            Entretien ménage et
+                                                            équipement en
+                                                            mobilier
+                                                        </option>
+                                                        <option value="Avance sur salaire">
+                                                            Avance sur salaire
+                                                        </option>
+                                                        <option value="Achat parcelle bâtie ou bâtie">
+                                                            Achat parcelle bâtie
+                                                            ou bâtie
+                                                        </option>
+                                                        <option value="Construcion et achat matériel de construction">
+                                                            Construcion et achat
+                                                            matériel de
+                                                            construction
+                                                        </option>
+                                                        <option value="Commerce">
+                                                            Commerce
+                                                        </option>
+                                                        <option value="Préfinancement de marché">
+                                                            Préfinancement de
+                                                            marché
+                                                        </option>
+                                                        <option value="Amélioration champ, plantation/agriculture">
+                                                            Amélioration champ,
+                                                            plantation/agriculture
+                                                        </option>
+                                                        <option value="Achat moto, voiture">
+                                                            Achat moto, voiture
+                                                        </option>
+                                                        <option value="Autres">
+                                                            Autres
                                                         </option>
                                                     </select>
                                                 </td>
@@ -912,6 +976,12 @@ const MontageCreditA = () => {
                                                         </option>
                                                         <option value="FPM">
                                                             FPM
+                                                        </option>
+                                                        <option value="BQUE MONDIALE">
+                                                            BQUE MONDIALE
+                                                        </option>
+                                                        <option value="UNCDF">
+                                                            UNCDF
                                                         </option>
                                                     </select>
                                                 </td>

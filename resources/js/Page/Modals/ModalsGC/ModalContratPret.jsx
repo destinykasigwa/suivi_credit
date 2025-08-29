@@ -786,7 +786,8 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                         border: "none",
                                                     }}
                                                     src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-                                                        `https://app.coopecakibayetu.org/${selectedFile}`
+                                                        // `https://app.coopecakibayetu.org/${selectedFile}`
+                                                        `${window.location.origin}/${selectedFile}`
                                                     )}`}
                                                 />
                                             )}

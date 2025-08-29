@@ -343,6 +343,7 @@ class AGestionCreditController extends Controller
                 "msg" => "Impossible de modifier un dossier déjà décaissé ! "
             ]);
         } else {
+            //dd($request->all());
             Credits::where("id_credit", $request->idDossier)->update([
                 "NumCompte" => $request->NumCompte,
                 "NomCompte" => $request->NomCompte,
@@ -418,7 +419,7 @@ class AGestionCreditController extends Controller
     {
         $signatures = DB::table('signatures')
             ->where('credit_id', $creditId)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc') // ordre chronologique
             ->get();
 
         $timeline = [];
@@ -428,8 +429,8 @@ class AGestionCreditController extends Controller
             $delay = null;
             if ($previousDate) {
                 // Comparer uniquement les jours (sans heures)
-                $delay = \Carbon\Carbon::parse($previousDate)->startOfDay()
-                    ->diffInDays(\Carbon\Carbon::parse($sig->created_at)->startOfDay());
+                $delay = \Carbon\Carbon::parse($sig->created_at)->startOfDay()
+                    ->diffInDays(\Carbon\Carbon::parse($previousDate)->startOfDay());
             }
 
             $timeline[] = [
@@ -438,8 +439,6 @@ class AGestionCreditController extends Controller
                 'signed_at' => $sig->created_at,
                 'delay_from_previous' => $delay,
                 'id' => $sig->id,
-
-
             ];
 
             $previousDate = $sig->created_at;
@@ -450,6 +449,7 @@ class AGestionCreditController extends Controller
             'current_user' => auth()->user(),
         ]);
     }
+
 
     public function getCreditDecaisse()
     {
@@ -621,6 +621,7 @@ class AGestionCreditController extends Controller
             ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
             ->groupBy('signed_by')
             ->orderByRaw('MIN(id) ASC') // ou created_at si tu veux l’ordre chronologique
+            //->orderBy(DB::raw('MIN(signatures.created_at)'))
             ->get();
 
         // 4. Timeline globale : temps moyen par mois

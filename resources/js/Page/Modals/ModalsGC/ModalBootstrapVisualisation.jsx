@@ -205,6 +205,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     description_titre,
                     date_demande,
                     statutDossier,
+                    nombre_membre_groupe,
+                    nombre_homme_groupe,
+                    nombre_femme_groupe,
+                    objetCredit,
                     idDossier: getDossierId,
                 }
             );
@@ -987,6 +991,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                 <select
                                                                     type="text"
                                                                     className="input-style"
+                                                                    name="objetCredit"
                                                                     style={{
                                                                         width: "150px",
                                                                     }}
@@ -1003,17 +1008,80 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                         )
                                                                     }
                                                                 >
-                                                                    <option value="1">
-                                                                        1
+                                                                    <option
+                                                                        value={
+                                                                            objetCredit
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            objetCredit
+                                                                        }
                                                                     </option>
-                                                                    <option value="1">
-                                                                        2
+                                                                    <option value="Frais de scolarité,académique,soins médicaux">
+                                                                        Frais de
+                                                                        scolarité,académique,soins
+                                                                        médicaux
                                                                     </option>
-                                                                    <option value="1">
-                                                                        3
+                                                                    <option value="Dot, mariage, anniversaire, baptême, funéraille">
+                                                                        Dot,
+                                                                        mariage,
+                                                                        anniversaire,
+                                                                        baptême,
+                                                                        funéraille
                                                                     </option>
-                                                                    <option value="1">
-                                                                        4
+                                                                    <option value="Frais de justice, loyer, paiement dette">
+                                                                        Frais de
+                                                                        justice,
+                                                                        loyer,
+                                                                        paiement
+                                                                        dette
+                                                                    </option>
+                                                                    <option value="Entretien ménage et équipement en mobilier">
+                                                                        Entretien
+                                                                        ménage
+                                                                        et
+                                                                        équipement
+                                                                        en
+                                                                        mobilier
+                                                                    </option>
+                                                                    <option value="Avance sur salaire">
+                                                                        Avance
+                                                                        sur
+                                                                        salaire
+                                                                    </option>
+                                                                    <option value="Achat parcelle bâtie ou bâtie">
+                                                                        Achat
+                                                                        parcelle
+                                                                        bâtie ou
+                                                                        bâtie
+                                                                    </option>
+                                                                    <option value="Construcion et achat matériel de construction">
+                                                                        Construcion
+                                                                        et achat
+                                                                        matériel
+                                                                        de
+                                                                        construction
+                                                                    </option>
+                                                                    <option value="Commerce">
+                                                                        Commerce
+                                                                    </option>
+                                                                    <option value="Préfinancement de marché">
+                                                                        Préfinancement
+                                                                        de
+                                                                        marché
+                                                                    </option>
+                                                                    <option value="Amélioration champ, plantation/agriculture">
+                                                                        Amélioration
+                                                                        champ,
+                                                                        plantation/agriculture
+                                                                    </option>
+                                                                    <option value="Achat moto, voiture">
+                                                                        Achat
+                                                                        moto,
+                                                                        voiture
+                                                                    </option>
+                                                                    <option value="Autres">
+                                                                        Autres
                                                                     </option>
                                                                 </select>
                                                             </td>
