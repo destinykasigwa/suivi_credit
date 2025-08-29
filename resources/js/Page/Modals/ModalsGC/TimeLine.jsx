@@ -134,18 +134,25 @@ export default function CreditTimeline({ creditId, onClose }) {
                                             {item.signature_file && (
                                                 <div className="d-flex flex-column gap-2 mt-2">
                                                     <div className="d-flex align-items-center gap-2">
+                                                        {/* 👇 Bouton toggle */}
                                                         <button
                                                             className="btn btn-outline-primary btn-sm"
                                                             onClick={() =>
                                                                 setSelectedSignature(
-                                                                    `storage/${item.signature_file}`
+                                                                    selectedSignature ===
+                                                                        `storage/${item.signature_file}`
+                                                                        ? null
+                                                                        : `storage/${item.signature_file}`
                                                                 )
                                                             }
                                                         >
-                                                            Voir la signature
+                                                            {selectedSignature ===
+                                                            `storage/${item.signature_file}`
+                                                                ? "Masquer la signature"
+                                                                : "Voir la signature"}
                                                         </button>
 
-                                                        {/* 👇 Bouton supprimer seulement si la signature appartient au user connecté */}
+                                                        {/* 👇 Supprimer uniquement si c'est l'user connecté */}
                                                         {currentUser &&
                                                             (item.signed_by ===
                                                                 currentUser.role ||
@@ -165,7 +172,7 @@ export default function CreditTimeline({ creditId, onClose }) {
                                                             )}
                                                     </div>
 
-                                                    {/* 👇 Affichage de l’iframe si l’utilisateur a cliqué */}
+                                                    {/* 👇 Affichage de l’iframe si actif */}
                                                     {selectedSignature ===
                                                         `storage/${item.signature_file}` && (
                                                         <div
@@ -177,7 +184,7 @@ export default function CreditTimeline({ creditId, onClose }) {
                                                             <iframe
                                                                 src={`/pdfjs/web/viewer.html?file=/storage/${item.signature_file}`}
                                                                 style={{
-                                                                    width: "800px",
+                                                                    width: "700px",
                                                                     height: "400px",
                                                                     border: "1px solid #ccc",
                                                                     borderRadius:
