@@ -182,6 +182,12 @@ export default function CreditTimeline({ creditId, onClose }) {
                                                             }}
                                                         >
                                                             <iframe
+                                                                title="PDF Viewer"
+                                                                width="100%"
+                                                                height="600px"
+                                                                src={`/storage/${item.signature_file}`}
+                                                            ></iframe>
+                                                            <iframe
                                                                 src={`/pdfjs/web/viewer.html?file=/storage/${item.signature_file}`}
                                                                 style={{
                                                                     width: "700px",

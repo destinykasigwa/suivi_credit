@@ -110,7 +110,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             .then((res) => {
                 const data = res.data.data; // récupère l'objet dossier complet
                 setDossier(data); // stocke tout l'objet dossier dans dossier
-                console.log(data);
+                //console.log(data);
                 setNumCompte(data.NumCompte);
                 setNomCompte(data.NomCompte);
                 setproduit_credit(data.produit_credit);

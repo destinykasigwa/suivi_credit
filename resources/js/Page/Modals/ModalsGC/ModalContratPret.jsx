@@ -342,6 +342,16 @@ export default function ModalContratPret({ creditId, onClose }) {
         }
     };
     const currentUserRole = dossier?.current_user?.role || "";
+
+    const getFileName = (path) => {
+        return path
+            .replace(/^credit\//, "") // enlève "credit/" au début s'il existe
+            .replace(/\.[^/.]+$/, "") // enlève l'extension (.pdf, .xlsx, etc.)
+            .split("_") // coupe par "_"
+            .slice(2) // supprime les 2 premiers (date + heure)
+            .join("_"); // recompose le reste
+    };
+
     return (
         <div
             className="modal fade"
@@ -502,109 +512,110 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                     )}
                                                 </div>
                                             </div>
-
-                                            <div>
-                                                <h6>Images du membre</h6>
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        flexWrap: "wrap",
-                                                        gap: "10px",
-                                                    }}
-                                                >
-                                                    {dossier.imageMembre.map(
-                                                        (img, i) => (
-                                                            <>
-                                                                <div
-                                                                    key={i}
-                                                                    style={{
-                                                                        position:
-                                                                            "relative",
-                                                                        display:
-                                                                            "inline-block",
-                                                                        margin: "8px",
-                                                                    }}
-                                                                >
-                                                                    {/* Bouton de suppression visible seulement si AC */}
-                                                                    {currentUserRole &&
-                                                                        currentUserRole ===
-                                                                            "AC" && (
-                                                                            <button
-                                                                                onClick={() =>
-                                                                                    deleteImageActivite(
-                                                                                        img.id
-                                                                                    )
-                                                                                }
-                                                                                style={{
-                                                                                    position:
-                                                                                        "absolute",
-                                                                                    top: "6px",
-                                                                                    right: "6px",
-                                                                                    backgroundColor:
-                                                                                        "rgba(255, 255, 255, 0.8)",
-                                                                                    border: "none",
-                                                                                    borderRadius:
-                                                                                        "50%",
-                                                                                    padding:
-                                                                                        "6px",
-                                                                                    cursor: "pointer",
-                                                                                    boxShadow:
-                                                                                        "0 2px 5px rgba(0,0,0,0.2)",
-                                                                                    transition:
-                                                                                        "background 0.2s ease",
-                                                                                }}
-                                                                                onMouseEnter={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    (e.currentTarget.style.backgroundColor =
-                                                                                        "rgba(255,0,0,0.8)")
-                                                                                }
-                                                                                onMouseLeave={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    (e.currentTarget.style.backgroundColor =
-                                                                                        "rgba(255,255,255,0.8)")
-                                                                                }
-                                                                                title="Supprimer"
-                                                                            >
-                                                                                <i
-                                                                                    className="fa fa-trash"
-                                                                                    aria-hidden="true"
-                                                                                    style={{
-                                                                                        color: "red",
-                                                                                        fontSize:
-                                                                                            "14px",
-                                                                                    }}
-                                                                                ></i>
-                                                                            </button>
-                                                                        )}
-
-                                                                    {/* Image avec effet zoom */}
-                                                                    <Zoom>
-                                                                        <img
-                                                                            src={`/storage/${img.path}`}
-                                                                            alt={`Image ${i}`}
-                                                                            style={{
-                                                                                width: "150px",
-                                                                                height: "150px",
-                                                                                objectFit:
-                                                                                    "cover",
-                                                                                borderRadius:
-                                                                                    "10px",
-                                                                                cursor: "zoom-in",
-                                                                                boxShadow:
-                                                                                    "0 2px 8px rgba(0,0,0,0.2)",
-                                                                            }}
-                                                                        />
-                                                                    </Zoom>
-                                                                </div>
-                                                            </>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </div>
                                         </>
                                     )}
+
+                                <div>
+                                    <h6>Images du membre</h6>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexWrap: "wrap",
+                                            gap: "10px",
+                                        }}
+                                    >
+                                        {dossier &&
+                                            dossier.imageMembre.map(
+                                                (img, i) => (
+                                                    <>
+                                                        <div
+                                                            key={i}
+                                                            style={{
+                                                                position:
+                                                                    "relative",
+                                                                display:
+                                                                    "inline-block",
+                                                                margin: "8px",
+                                                            }}
+                                                        >
+                                                            {/* Bouton de suppression visible seulement si AC */}
+                                                            {currentUserRole &&
+                                                                currentUserRole ===
+                                                                    "AC" && (
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            deleteImageActivite(
+                                                                                img.id
+                                                                            )
+                                                                        }
+                                                                        style={{
+                                                                            position:
+                                                                                "absolute",
+                                                                            top: "6px",
+                                                                            right: "6px",
+                                                                            backgroundColor:
+                                                                                "rgba(255, 255, 255, 0.8)",
+                                                                            border: "none",
+                                                                            borderRadius:
+                                                                                "50%",
+                                                                            padding:
+                                                                                "6px",
+                                                                            cursor: "pointer",
+                                                                            boxShadow:
+                                                                                "0 2px 5px rgba(0,0,0,0.2)",
+                                                                            transition:
+                                                                                "background 0.2s ease",
+                                                                        }}
+                                                                        onMouseEnter={(
+                                                                            e
+                                                                        ) =>
+                                                                            (e.currentTarget.style.backgroundColor =
+                                                                                "rgba(255,0,0,0.8)")
+                                                                        }
+                                                                        onMouseLeave={(
+                                                                            e
+                                                                        ) =>
+                                                                            (e.currentTarget.style.backgroundColor =
+                                                                                "rgba(255,255,255,0.8)")
+                                                                        }
+                                                                        title="Supprimer"
+                                                                    >
+                                                                        <i
+                                                                            className="fa fa-trash"
+                                                                            aria-hidden="true"
+                                                                            style={{
+                                                                                color: "red",
+                                                                                fontSize:
+                                                                                    "14px",
+                                                                            }}
+                                                                        ></i>
+                                                                    </button>
+                                                                )}
+
+                                                            {/* Image avec effet zoom */}
+                                                            <Zoom>
+                                                                <img
+                                                                    src={`/storage/${img.path}`}
+                                                                    alt={`Image ${i}`}
+                                                                    style={{
+                                                                        width: "150px",
+                                                                        height: "150px",
+                                                                        objectFit:
+                                                                            "cover",
+                                                                        borderRadius:
+                                                                            "10px",
+                                                                        cursor: "zoom-in",
+                                                                        boxShadow:
+                                                                            "0 2px 8px rgba(0,0,0,0.2)",
+                                                                    }}
+                                                                />
+                                                            </Zoom>
+                                                        </div>
+                                                    </>
+                                                )
+                                            )}
+                                    </div>
+                                </div>
 
                                 {/* {dossier &&
                                     dossier.pdfs &&
@@ -657,13 +668,16 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                     )
                                                                 }
                                                             >
-                                                                {pdf.path
+                                                                {/* {pdf.path
                                                                     .split("_")
                                                                     .pop()
                                                                     .replace(
                                                                         ".pdf",
                                                                         ""
-                                                                    )}
+                                                                    )} */}
+                                                                {getFileName(
+                                                                    pdf.path
+                                                                )}
                                                             </button>
                                                             {currentUserRole &&
                                                                 currentUserRole ===
@@ -723,7 +737,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                         )
                                                                     }
                                                                 >
-                                                                    {excel.path
+                                                                    {/* {excel.path
                                                                         .split(
                                                                             "_"
                                                                         )
@@ -731,7 +745,10 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                         .replace(
                                                                             ".xlsx",
                                                                             ""
-                                                                        )}
+                                                                        )} */}
+                                                                    {getFileName(
+                                                                        excel.path
+                                                                    )}
                                                                 </button>
                                                                 {currentUserRole &&
                                                                     currentUserRole ===
@@ -810,7 +827,8 @@ export default function ModalContratPret({ creditId, onClose }) {
                                             style={{ fontSize: "15px" }}
                                         >
                                             <h6 className="text-bold unclear-text">
-                                                Ajouter un fichier
+                                                Ajouter un fichier & photo
+                                                activité
                                             </h6>
                                         </legend>
                                         <table>

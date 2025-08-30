@@ -696,8 +696,8 @@ class AGestionCreditController extends Controller
 
     public function deletePDFFile($id)
     {
-        $fileName = CreditsImages::where("path", $id)->first();
-        $fileName->delete();
+        $file = CreditsImages::find($id);
+        $file->delete();
 
         return response()->json([
             'status' => 1,
