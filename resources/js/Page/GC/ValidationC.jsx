@@ -10,6 +10,7 @@ import "../../styles/style.css";
 import { MdTimeline } from "react-icons/md";
 import CreditTimeline from "../Modals/ModalsGC/TimeLine";
 import ModalContratPret from "../Modals/ModalsGC/ModalContratPret";
+import TruncatedName from "./TruncatedName";
 
 const ValidationC = () => {
     const inputRef = useRef(null);
@@ -19,6 +20,7 @@ const ValidationC = () => {
     const [fetchSearchedCredit, setFetchSearchedCredit] = useState();
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
     const [type_recherche, settype_recherche] = useState();
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         // Place automatiquement le curseur dans le champ à l'ouverture de la page
@@ -122,6 +124,127 @@ const ValidationC = () => {
     //     setSelectedDossier(dossier);
     //     setShowModal(true);
     // };
+
+    // Calculate the index of the first and last item of the current page
+    let itemsPerPage = 5;
+    const totalPages = Math.ceil(fetchData && fetchData.length / itemsPerPage);
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems =
+        fetchData && fetchData.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+    const renderPagination = () => {
+        const pageNumbers = [];
+        const maxPagesToShow = 5;
+        const halfMaxPagesToShow = Math.floor(maxPagesToShow / 2);
+        let startPage, endPage;
+
+        if (totalPages <= maxPagesToShow) {
+            startPage = 1;
+            endPage = totalPages;
+        } else if (currentPage <= halfMaxPagesToShow) {
+            startPage = 1;
+            endPage = maxPagesToShow;
+        } else if (currentPage + halfMaxPagesToShow >= totalPages) {
+            startPage = totalPages - maxPagesToShow + 1;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - halfMaxPagesToShow;
+            endPage = currentPage + halfMaxPagesToShow;
+        }
+
+        if (startPage > 1) {
+            pageNumbers.push(
+                <li key={1}>
+                    <button onClick={() => handlePageChange(1)}>1</button>
+                </li>
+            );
+            if (startPage > 2) {
+                pageNumbers.push(<li key="start-ellipsis">...</li>);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(
+                <li key={i} className={i === currentPage ? "active" : ""}>
+                    <button
+                        style={
+                            i === currentPage
+                                ? selectedButtonStyle
+                                : buttonStyle
+                        }
+                        onClick={() => handlePageChange(i)}
+                    >
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pageNumbers.push(<li key="end-ellipsis">...</li>);
+            }
+            pageNumbers.push(
+                <li key={totalPages}>
+                    <button onClick={() => handlePageChange(totalPages)}>
+                        {totalPages}
+                    </button>
+                </li>
+            );
+        }
+
+        return pageNumbers;
+    };
+
+    const goToNextPage = () => {
+        setCurrentPage((prevPage) =>
+            Math.min(
+                prevPage + 1,
+                Math.ceil(fetchData && fetchData.length / itemsPerPage)
+            )
+        );
+    };
+
+    const goToPrevPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+    };
+
+    const paginationStyle = {
+        listStyle: "none",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "",
+    };
+
+    const buttonStylePrevNext = {
+        padding: "2px 20px",
+        backgroundColor: "steelblue",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "0 5px",
+    };
+    const buttonStyle = {
+        padding: "1px 5px",
+        backgroundColor: "steelblue",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "0 5px",
+    };
+
+    const selectedButtonStyle = {
+        ...buttonStyle,
+        backgroundColor: "#FFC107", // Change color for selected button
+    };
 
     return (
         <>
@@ -356,12 +479,14 @@ const ValidationC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {!fetchSearchedCredit && fetchData
-                                    ? fetchData.map((credit, index) => {
+                                {!fetchSearchedCredit && currentItems
+                                    ? currentItems.map((credit, index) => {
                                           return (
                                               <tr key={index}>
                                                   <td>{credit.NumCompte}</td>
-                                                  <td>{credit.NomCompte}</td>
+                                                  <TruncatedName
+                                                      name={credit.NomCompte}
+                                                  />
                                                   {/* <td>{credit.NumDossier}</td> */}
                                                   <td>
                                                       {dateParser(
@@ -579,6 +704,36 @@ const ValidationC = () => {
                                       })}
                             </tbody>
                         </table>
+                        <div className="h-130 d-flex align-items-center justify-content-center">
+                            <ul style={paginationStyle}>
+                                <li>
+                                    <button
+                                        onClick={goToPrevPage}
+                                        disabled={currentPage === 1}
+                                        style={buttonStylePrevNext}
+                                    >
+                                        Previous
+                                    </button>
+                                </li>
+                                {renderPagination()}
+                                <li>
+                                    <button
+                                        onClick={goToNextPage}
+                                        disabled={
+                                            currentPage ===
+                                            Math.ceil(
+                                                fetchData &&
+                                                    fetchData.length /
+                                                        itemsPerPage
+                                            )
+                                        }
+                                        style={buttonStylePrevNext}
+                                    >
+                                        Next
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                         {dossierIdSelected && (
                             <ModalBootstrapVisualisation
                                 dossierId={dossierIdSelected}

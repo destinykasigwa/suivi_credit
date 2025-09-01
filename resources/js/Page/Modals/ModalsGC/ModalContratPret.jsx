@@ -5,6 +5,7 @@ import Zoom from "react-medium-image-zoom";
 import Swal from "sweetalert2";
 import { Bars } from "react-loader-spinner";
 import "../../../styles/style.css";
+import ModalTitreCredit from "./ModalTitreCredit";
 //import * as XLSX from "xlsx";
 
 export default function ModalContratPret({ creditId, onClose }) {
@@ -16,7 +17,7 @@ export default function ModalContratPret({ creditId, onClose }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileType, setFileType] = useState(null); // "pdf" ou "excel"
     const [type_image, settype_image] = useState();
-
+    const [dossierIdSelected, setDossierIdSelected] = useState(null);
     const [location, setLocation] = useState(null);
     const [error, setError] = useState(null);
 
@@ -424,9 +425,43 @@ export default function ModalContratPret({ creditId, onClose }) {
             <div className="modal-dialog modal-xl">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h4>
-                            <i className="fas fa-file"></i> Fichiers
-                        </h4>
+                        <div className="row">
+                            <div className="col-md-12 card rounded-10 p-1">
+                                <div
+                                    style={{
+                                        color: "black",
+                                        display: "flex", // Utilisation de Flexbox
+                                        justifyContent: "space-between", // Distribution des éléments aux extrémités
+                                        alignItems: "center", // Alignement vertical des éléments
+                                    }}
+                                >
+                                    <h5
+                                        className="text-bold p-1"
+                                        style={{ margin: 0 }}
+                                    >
+                                        <i className="fas fa-file"></i> Fichiers
+                                    </h5>
+
+                                    <h5
+                                        className="text-bold p-1"
+                                        style={{ margin: 0 }}
+                                    >
+                                        <button
+                                            className="btn btn-outline-primary d-flex align-items-center gap-2 ml-1"
+                                            type="button"
+                                            data-toggle="modal"
+                                            data-target="#modalVisualisationTitre"
+                                            onClick={() =>
+                                                setDossierIdSelected(creditId)
+                                            }
+                                        >
+                                            Voir tous le titres
+                                        </button>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+
                         <button
                             type="button"
                             class="close"
@@ -1111,6 +1146,9 @@ export default function ModalContratPret({ creditId, onClose }) {
                     </div>
                 </div>
             </div>
+            {dossierIdSelected && (
+                <ModalTitreCredit onClose={() => setDossierIdSelected(null)} />
+            )}
         </div>
     );
 }

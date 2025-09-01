@@ -668,4 +668,10 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('gestion_credit/files/get-gps', [AGestionCreditController::class, 'addGPS']);
 
     Route::get('gestion_credit/pages/get-gps/map/{dossierId}', [AGestionCreditController::class, 'getGPS']);
+
+
+    Route::get('suivi-credit/dossiers/titre-credit/all', [AGestionCreditController::class, 'getAllTitreCredit']);
+
+
+    Route::get('montage_credit/page/titre/credit/reference/{ref}', [AGestionCreditController::class, 'getSeachedTitreCredit']);
 });

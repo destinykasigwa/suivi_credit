@@ -75,11 +75,9 @@ export default function ModalVisualisationGPS({ dossierId, onClose }) {
                     <div className="modal-body">
                         {!location && <p>Chargement...</p>}
 
-                        {location && (
+                        {location && location.latitude && location.longitude ? (
                             <div className="card p-3 shadow-sm">
-                                <h5 className="mb-3">
-                                    Votre position actuelle :
-                                </h5>
+                                <h5 className="mb-3">Localisation :</h5>
 
                                 {/* Affichage de la carte dans l'application */}
                                 <iframe
@@ -105,6 +103,11 @@ export default function ModalVisualisationGPS({ dossierId, onClose }) {
                                     🚀 Ouvrir dans Google Maps
                                 </button>
                             </div>
+                        ) : (
+                            <h5 className="mb-3">
+                                Vous devez prendre la localisation pour ce
+                                dossier...
+                            </h5>
                         )}
                     </div>
                 </div>

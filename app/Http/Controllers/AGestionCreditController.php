@@ -159,7 +159,7 @@ class AGestionCreditController extends Controller
         $credits = DB::table('credits')
             ->where("statutDossier", "!=", "Décaissé")
             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-            ->limit(10)
+            ->limit(100)
             ->get();
 
         foreach ($credits as $credit) {
@@ -905,14 +905,18 @@ class AGestionCreditController extends Controller
     public function addGPS(Request $request)
     {
 
-        Credits::where("id_credit", $request->creditId)->update([
-            "latitude" => $request->latitude,
-            "longitude" => $request->longitude,
-        ]);
-        return response()->json([
-            'status' => 1,
-            'msg' => 'Le lacolisation a été bien enregistrée',
-        ]);
+        try {
+            Credits::where("id_credit", $request->creditId)->update([
+                "latitude" => $request->latitude,
+                "longitude" => $request->longitude,
+            ]);
+            return response()->json([
+                'status' => 1,
+                'msg' => 'Le lacolisation a été bien enregistrée',
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     public function getGPS($dossierId)
@@ -922,5 +926,90 @@ class AGestionCreditController extends Controller
             'status' => 1,
             'data' => $data
         ]);
+    }
+
+    public function getAllTitreCredit()
+    {
+
+        try {
+            $fichiers = DB::table('credits')
+                ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
+                ->where('file_state', 'it')
+                ->limit(100)
+                ->get();
+
+            // Sépare images et pdfs
+            $images = [];
+            $pdfs = [];
+
+
+            foreach ($fichiers as $fichier) {
+                $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    $images[] = $fichier;
+                } elseif ($ext === 'pdf') {
+                    $pdfs[] = $fichier;
+                }
+            }
+
+            // Convertis l'objet $dossier (stdClass) en tableau associatif
+            $dossierArray = (array) $fichiers;
+            //dd($excels);
+            // Ajoute images, pdfs et signatures
+            $dossierArray['images'] = $images;
+            $dossierArray['pdfs'] = $pdfs;
+            $dossierArray['current_user'] = auth()->user();
+            // $dossierArray['imageMembre'] = $imageMembres;
+
+            return response()->json([
+                'data' => $dossierArray,
+                'status' => 1
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function getSeachedTitreCredit($ref)
+    {
+        try {
+            $fichiers = DB::table('credits')
+                ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
+                ->where('credits_images.file_state', 'it')
+                ->where('credits.NomCompte', 'LIKE', '%' . $ref . '%')
+                ->get();
+
+            // Sépare images et pdfs
+            $images = [];
+            $pdfs = [];
+
+
+            foreach ($fichiers as $fichier) {
+                $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    $images[] = $fichier;
+                } elseif ($ext === 'pdf') {
+                    $pdfs[] = $fichier;
+                }
+            }
+
+            // Convertis l'objet $dossier (stdClass) en tableau associatif
+            $dossierArray = (array) $fichiers;
+            //dd($excels);
+            // Ajoute images, pdfs et signatures
+            $dossierArray['images'] = $images;
+            $dossierArray['pdfs'] = $pdfs;
+            $dossierArray['current_user'] = auth()->user();
+            // $dossierArray['imageMembre'] = $imageMembres;
+
+            return response()->json([
+                'data' => $dossierArray,
+                'status' => 1
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }
