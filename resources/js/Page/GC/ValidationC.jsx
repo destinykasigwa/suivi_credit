@@ -18,6 +18,7 @@ const ValidationC = () => {
     const [searchRefCredit, setsearchRefCredit] = useState();
     const [fetchSearchedCredit, setFetchSearchedCredit] = useState();
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
+    const [type_recherche, settype_recherche] = useState();
 
     useEffect(() => {
         // Place automatiquement le curseur dans le champ à l'ouverture de la page
@@ -45,8 +46,12 @@ const ValidationC = () => {
 
     const handleSeachCredit = async (ref) => {
         setloading(true);
-        const res = await axios.get(
-            "/montage_credit/page/validation/credit/reference/" + ref
+        const res = await axios.post(
+            "/montage_credit/page/validation/credit/reference",
+            {
+                ref,
+                type_recherche,
+            }
         );
         if (res.data.status == 1) {
             setloading(false);
@@ -139,22 +144,174 @@ const ValidationC = () => {
 
                 <div className="row mt-3 card rounded-0 p-3">
                     <div className="col-md-12">
-                        <div className="col-md-4 float-end mb-1">
+                        <div className="col-md-6 float-end mb-1">
                             <div className="input-group input-group-sm">
-                                <input
+                                <select
                                     type="text"
+                                    className="input-style"
                                     style={{
-                                        borderRadius: "0px",
+                                        width: "auto",
+                                        color: "steelblue",
                                     }}
-                                    // ref={textInput}
-                                    className="form-control font-weight-bold"
-                                    placeholder="Rechercher..."
-                                    name="searchRefOperation"
-                                    value={searchRefCredit}
+                                    name="type_recherche"
+                                    id="type_recherche"
                                     onChange={(e) => {
-                                        setsearchRefCredit(e.target.value);
+                                        settype_recherche(e.target.value);
                                     }}
-                                />
+                                    value={type_recherche}
+                                >
+                                    <option value="">Type de recherche</option>
+                                    <option value="AC">Agent crédit</option>
+
+                                    <option value="type_credit">
+                                        Type crédit
+                                    </option>
+                                </select>
+                                {type_recherche == "AC" ? (
+                                    <select
+                                        type="text"
+                                        style={{
+                                            borderRadius: "0px",
+                                        }}
+                                        // ref={textInput}
+                                        className="form-control font-weight-bold"
+                                        name="searchRefOperation"
+                                        value={searchRefCredit}
+                                        onChange={(e) => {
+                                            setsearchRefCredit(e.target.value);
+                                        }}
+                                    >
+                                        <option value="">Sélectionnez</option>
+                                        <option value="ALAME KUZANWA WILLY">
+                                            ALAME KUZANWA WILLY
+                                        </option>
+                                        <option value="AKILI SANGARA JULIEN">
+                                            AKILI SANGARA JULIEN
+                                        </option>
+                                        <option value="MAPENDO RUTH">
+                                            MAPENDO RUTH
+                                        </option>
+                                        <option value="LAVIE MATEMBERA">
+                                            LAVIE MATEMBERA
+                                        </option>
+                                        <option value="KANKINSINGI NGADU">
+                                            KANKINSINGI NGADU
+                                        </option>
+                                        <option value="NEEMA MULINGA GRACE">
+                                            NEEMA MULINGA GRACE
+                                        </option>
+                                        <option value="WIVINE ALISA">
+                                            WIVINE ALISA
+                                        </option>
+                                        <option value="MOSES KATEMBO">
+                                            MOSES KATEMBO
+                                        </option>
+                                        <option value="SAFARI KALEKERA">
+                                            SAFARI KALEKERA
+                                        </option>
+                                    </select>
+                                ) : type_recherche == "type_credit" ? (
+                                    <select
+                                        type="text"
+                                        style={{
+                                            borderRadius: "0px",
+                                        }}
+                                        // ref={textInput}
+                                        className="form-control font-weight-bold"
+                                        // placeholder="Rechercher par type crédit"
+                                        name="searchRefOperation"
+                                        value={searchRefCredit}
+                                        onChange={(e) => {
+                                            setsearchRefCredit(e.target.value);
+                                        }}
+                                    >
+                                        <option value="">Sélectionnez</option>
+                                        <option value="Crédit Express à CT">
+                                            Crédit Express à CT
+                                        </option>
+                                        <option value="Crédits à la consommation à CT">
+                                            Crédits à la consommation à CT
+                                        </option>
+                                        <option value="Crédit aux MPME à CT ">
+                                            Crédit aux MPME à CT
+                                        </option>
+                                        <option value="Crédit Staff à MT ">
+                                            Crédit Staff à MT
+                                        </option>
+                                        <option value="Crédit aux Groupes Solidaires USD ">
+                                            Crédit aux Groupes Solidaires USD
+                                        </option>
+                                        <option value="Crédit Salaire à CT ">
+                                            Crédit Salaire à CT
+                                        </option>
+                                        <option value="Crédit à l'habitat CT ">
+                                            Crédit à l'habitat CT
+                                        </option>
+                                        <option value="Crédits à la consommation à MT ">
+                                            Crédits à la consommation à MT
+                                        </option>
+                                        <option value="Crédit aux MPME à MT ">
+                                            Crédit aux MPME à MT
+                                        </option>
+                                        <option value="Crédit aux MPME à CT en FC  ">
+                                            Crédit aux MPME à CT en FC
+                                        </option>
+                                        <option value="Crédit aux MPME à CT en FC   ">
+                                            Crédit aux MPME à CT en FC
+                                        </option>
+                                        <option value="Crédit aux Groupes Solidaires FC   ">
+                                            Crédit aux Groupes Solidaires FC
+                                        </option>
+                                        <option value="Crédit Agro-Pastoral à CT   ">
+                                            Crédit Agro-Pastoral à CT
+                                        </option>
+                                        <option value="Crédit Agro-Pastoral à CT   ">
+                                            Crédit Agro-Pastoral à CT
+                                        </option>
+                                        <option value="Crédit Agro-Pastoral à CT   ">
+                                            Crédit Agro-Pastoral à CT
+                                        </option>
+                                        <option value="Crédit MWANGAZA   ">
+                                            Crédit MWANGAZA
+                                        </option>
+                                        <option value="Crédit Salaire à MT en FC   ">
+                                            Crédit Salaire à MT en FC
+                                        </option>
+                                        <option value="Crédits JIKO BORA Menage (CT)   ">
+                                            Crédits JIKO BORA Menage (CT)
+                                        </option>
+                                        <option value="Crédits JIKO BORA Grand Cons  (CT)   ">
+                                            Crédits JIKO BORA Grand Cons (CT)
+                                        </option>
+                                        <option value="Crédits TUFAIDIKE WOTE en USD   ">
+                                            Crédits TUFAIDIKE WOTE en USD
+                                        </option>
+                                        <option value="Crédits TUFAIDIKE WOTE en FC   ">
+                                            Crédits TUFAIDIKE WOTE en FC
+                                        </option>
+                                        <option value="Crédit aux salariés domiciliés à MT   ">
+                                            Crédit aux salariés domiciliés à MT
+                                        </option>
+                                        <option value="Crédit aux MPME à MT en FC    ">
+                                            Crédit aux MPME à MT en FC
+                                        </option>
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        style={{
+                                            borderRadius: "0px",
+                                        }}
+                                        // ref={textInput}
+                                        className="form-control font-weight-bold"
+                                        placeholder="Rechercher..."
+                                        name="searchRefOperation"
+                                        value={searchRefCredit}
+                                        onChange={(e) => {
+                                            setsearchRefCredit(e.target.value);
+                                        }}
+                                    />
+                                )}
                                 <td>
                                     <button
                                         type="button"

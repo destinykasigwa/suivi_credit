@@ -4,6 +4,7 @@ import axios from "axios";
 import Zoom from "react-medium-image-zoom";
 import Swal from "sweetalert2";
 import { Bars } from "react-loader-spinner";
+import "../../../styles/style.css";
 //import * as XLSX from "xlsx";
 
 export default function ModalContratPret({ creditId, onClose }) {
@@ -14,6 +15,23 @@ export default function ModalContratPret({ creditId, onClose }) {
     const [images, setImages] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileType, setFileType] = useState(null); // "pdf" ou "excel"
+    const [type_image, settype_image] = useState();
+
+    const [location, setLocation] = useState(null);
+    const [error, setError] = useState(null);
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            setLocation({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+            });
+            setError(null);
+        },
+        (err) => {
+            setError("Impossible de récupérer la position : " + err.message);
+        }
+    );
 
     const handleViewFile = (file, type) => {
         setSelectedFile(file);
@@ -37,7 +55,7 @@ export default function ModalContratPret({ creditId, onClose }) {
             .then((res) => {
                 const data = res.data.data; // récupère l'objet dossier complet
                 setDossier(data); // stocke tout l'objet dossier dans dossier
-                // console.log(dossier);
+                console.log(dossier);
             })
             .catch(() => setDossier(null));
     };
@@ -132,12 +150,13 @@ export default function ModalContratPret({ creditId, onClose }) {
         setImages((prev) => prev.filter((_, index) => index !== indexToRemove));
     };
 
-    const handleSubmitAddFileImageMembre = async (e) => {
+    const handleSubmitAddFileImage = async (e) => {
         e.preventDefault();
         setIsLoadingBar(true);
         setProgress(0);
         const formData = new FormData();
         formData.append("creditId", creditId);
+        formData.append("type_image", type_image);
         images.forEach((img) => {
             formData.append("images[]", img); // Laravel s’attend à un tableau ici
         });
@@ -341,6 +360,39 @@ export default function ModalContratPret({ creditId, onClose }) {
             }
         }
     };
+
+    const getGPS = async (e) => {
+        e.preventDefault();
+        if (!navigator.geolocation) {
+            Swal.fire({
+                title: "GPS",
+                text: "La géolocalisation n'est pas supportée par ce navigateur",
+                icon: "success",
+                timer: 8000,
+                confirmButtonText: "Okay",
+            });
+            setError(
+                "La géolocalisation n'est pas supportée par ce navigateur."
+            );
+            return;
+        }
+
+        const res = await axios.post("/gestion_credit/files/get-gps", {
+            latitude: location.latitude,
+            longitude: location.longitude,
+            creditId,
+        });
+        if (res.data.status == 1) {
+            Swal.fire({
+                title: "GPS",
+                text: res.data.msg,
+                icon: "success",
+                timer: 8000,
+                confirmButtonText: "Okay",
+            });
+        }
+    };
+
     const currentUserRole = dossier?.current_user?.role || "";
 
     const getFileName = (path) => {
@@ -351,6 +403,15 @@ export default function ModalContratPret({ creditId, onClose }) {
             .slice(2) // supprime les 2 premiers (date + heure)
             .join("_"); // recompose le reste
     };
+
+    // Regrouper les images par file_state
+    const groupedImages = dossier?.images?.reduce((acc, img) => {
+        if (!acc[img.file_state]) {
+            acc[img.file_state] = [];
+        }
+        acc[img.file_state].push(img);
+        return acc;
+    }, {});
 
     return (
         <div
@@ -410,12 +471,23 @@ export default function ModalContratPret({ creditId, onClose }) {
                         <div className="row">
                             <div className="col-md-12">
                                 {!dossier && <p>Chargement...</p>}
-                                {dossier &&
-                                    dossier.images &&
-                                    dossier.images.length > 0 && (
-                                        <>
-                                            <div>
-                                                <h6>Images activités</h6>
+                                {groupedImages &&
+                                    Object.keys(groupedImages).map(
+                                        (state, idx) => (
+                                            <div key={idx} className="mb-4">
+                                                {/* Titre en fonction du type */}
+                                                <h6>
+                                                    {state === "ia"
+                                                        ? "Images Activité"
+                                                        : state === "im"
+                                                        ? "Images Membres"
+                                                        : state === "it"
+                                                        ? "Image titre"
+                                                        : state === "ig"
+                                                        ? "Image garantie"
+                                                        : ""}
+                                                </h6>
+
                                                 <div
                                                     style={{
                                                         display: "flex",
@@ -423,7 +495,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                         gap: "10px",
                                                     }}
                                                 >
-                                                    {dossier.images.map(
+                                                    {groupedImages[state].map(
                                                         (img, i) => (
                                                             <div
                                                                 key={i}
@@ -435,116 +507,12 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                     margin: "8px",
                                                                 }}
                                                             >
-                                                                {/* Bouton de suppression visible seulement si AC */}
-                                                                {currentUserRole &&
-                                                                    currentUserRole ===
-                                                                        "AC" && (
-                                                                        <button
-                                                                            onClick={() =>
-                                                                                deleteImageMembre(
-                                                                                    img.id
-                                                                                )
-                                                                            }
-                                                                            style={{
-                                                                                position:
-                                                                                    "absolute",
-                                                                                top: "6px",
-                                                                                right: "6px",
-                                                                                backgroundColor:
-                                                                                    "rgba(255, 255, 255, 0.8)",
-                                                                                border: "none",
-                                                                                borderRadius:
-                                                                                    "50%",
-                                                                                padding:
-                                                                                    "6px",
-                                                                                cursor: "pointer",
-                                                                                boxShadow:
-                                                                                    "0 2px 5px rgba(0,0,0,0.2)",
-                                                                                transition:
-                                                                                    "background 0.2s ease",
-                                                                            }}
-                                                                            onMouseEnter={(
-                                                                                e
-                                                                            ) =>
-                                                                                (e.currentTarget.style.backgroundColor =
-                                                                                    "rgba(255,0,0,0.8)")
-                                                                            }
-                                                                            onMouseLeave={(
-                                                                                e
-                                                                            ) =>
-                                                                                (e.currentTarget.style.backgroundColor =
-                                                                                    "rgba(255,255,255,0.8)")
-                                                                            }
-                                                                            title="Supprimer"
-                                                                        >
-                                                                            <i
-                                                                                className="fa fa-trash"
-                                                                                aria-hidden="true"
-                                                                                style={{
-                                                                                    color: "red",
-                                                                                    fontSize:
-                                                                                        "14px",
-                                                                                }}
-                                                                            ></i>
-                                                                        </button>
-                                                                    )}
-
-                                                                {/* Image avec effet zoom */}
-                                                                <Zoom>
-                                                                    <img
-                                                                        src={`/storage/${img.path}`}
-                                                                        alt={`Image ${i}`}
-                                                                        style={{
-                                                                            width: "150px",
-                                                                            height: "150px",
-                                                                            objectFit:
-                                                                                "cover",
-                                                                            borderRadius:
-                                                                                "10px",
-                                                                            cursor: "zoom-in",
-                                                                            boxShadow:
-                                                                                "0 2px 8px rgba(0,0,0,0.2)",
-                                                                        }}
-                                                                    />
-                                                                </Zoom>
-                                                            </div>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-
-                                <div>
-                                    <h6>Images du membre</h6>
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            flexWrap: "wrap",
-                                            gap: "10px",
-                                        }}
-                                    >
-                                        {dossier &&
-                                            dossier.imageMembre.map(
-                                                (img, i) => (
-                                                    <>
-                                                        <div
-                                                            key={i}
-                                                            style={{
-                                                                position:
-                                                                    "relative",
-                                                                display:
-                                                                    "inline-block",
-                                                                margin: "8px",
-                                                            }}
-                                                        >
-                                                            {/* Bouton de suppression visible seulement si AC */}
-                                                            {currentUserRole &&
-                                                                currentUserRole ===
+                                                                {/* Bouton suppression si AC */}
+                                                                {currentUserRole ===
                                                                     "AC" && (
                                                                     <button
                                                                         onClick={() =>
-                                                                            deleteImageActivite(
+                                                                            deleteImageMembre(
                                                                                 img.id
                                                                             )
                                                                         }
@@ -563,8 +531,6 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                             cursor: "pointer",
                                                                             boxShadow:
                                                                                 "0 2px 5px rgba(0,0,0,0.2)",
-                                                                            transition:
-                                                                                "background 0.2s ease",
                                                                         }}
                                                                         onMouseEnter={(
                                                                             e
@@ -592,30 +558,31 @@ export default function ModalContratPret({ creditId, onClose }) {
                                                                     </button>
                                                                 )}
 
-                                                            {/* Image avec effet zoom */}
-                                                            <Zoom>
-                                                                <img
-                                                                    src={`/storage/${img.path}`}
-                                                                    alt={`Image ${i}`}
-                                                                    style={{
-                                                                        width: "150px",
-                                                                        height: "150px",
-                                                                        objectFit:
-                                                                            "cover",
-                                                                        borderRadius:
-                                                                            "10px",
-                                                                        cursor: "zoom-in",
-                                                                        boxShadow:
-                                                                            "0 2px 8px rgba(0,0,0,0.2)",
-                                                                    }}
-                                                                />
-                                                            </Zoom>
-                                                        </div>
-                                                    </>
-                                                )
-                                            )}
-                                    </div>
-                                </div>
+                                                                {/* Image avec zoom */}
+                                                                <Zoom>
+                                                                    <img
+                                                                        src={`/storage/${img.path}`}
+                                                                        alt={`Image ${i}`}
+                                                                        style={{
+                                                                            width: "150px",
+                                                                            height: "150px",
+                                                                            objectFit:
+                                                                                "cover",
+                                                                            borderRadius:
+                                                                                "10px",
+                                                                            cursor: "zoom-in",
+                                                                            boxShadow:
+                                                                                "0 2px 8px rgba(0,0,0,0.2)",
+                                                                        }}
+                                                                    />
+                                                                </Zoom>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
+                                    )}
 
                                 {/* {dossier &&
                                     dossier.pdfs &&
@@ -824,11 +791,13 @@ export default function ModalContratPret({ creditId, onClose }) {
                                     <fieldset className="border p-2">
                                         <legend
                                             className="float-none w-auto p-0"
-                                            style={{ fontSize: "15px" }}
+                                            style={{
+                                                fontSize: "15px",
+                                                color: "steelblue",
+                                            }}
                                         >
-                                            <h6 className="text-bold unclear-text">
-                                                Ajouter un fichier & photo
-                                                activité
+                                            <h6 className="text">
+                                                Ajouter un fichier Excel ou PDF
                                             </h6>
                                         </legend>
                                         <table>
@@ -892,7 +861,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                                 </form>
                             </div>
 
-                            <div className="col-md-9">
+                            <div className="col-md-5">
                                 <form>
                                     <fieldset className="border p-2">
                                         <legend
@@ -900,7 +869,39 @@ export default function ModalContratPret({ creditId, onClose }) {
                                             style={{ fontSize: "15px" }}
                                         >
                                             <h6 className="text-bold unclear-text">
-                                                Ajouter photo du membre
+                                                <select
+                                                    type="text"
+                                                    className="input-style"
+                                                    style={{
+                                                        width: "auto",
+                                                        color: "steelblue",
+                                                    }}
+                                                    name="type_image"
+                                                    id="type_image"
+                                                    onChange={(e) => {
+                                                        settype_image(
+                                                            e.target.value
+                                                        );
+                                                    }}
+                                                    value={type_image}
+                                                >
+                                                    <option value="">
+                                                        Sélectionnez le type
+                                                        d'image
+                                                    </option>
+                                                    <option value="im">
+                                                        Image membre
+                                                    </option>
+                                                    <option value="ia">
+                                                        Image activité
+                                                    </option>
+                                                    <option value="it">
+                                                        Image titre
+                                                    </option>
+                                                    <option value="ig">
+                                                        Image garantie
+                                                    </option>
+                                                </select>
                                             </h6>
                                         </legend>
                                         <div
@@ -1057,9 +1058,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                                     </fieldset>
                                     {images.length > 0 && (
                                         <button
-                                            onClick={
-                                                handleSubmitAddFileImageMembre
-                                            }
+                                            onClick={handleSubmitAddFileImage}
                                             className="btn btn-success mt-2"
                                             style={{
                                                 borderRadius: "25px",
@@ -1069,6 +1068,43 @@ export default function ModalContratPret({ creditId, onClose }) {
                                             Enregistrer
                                         </button>
                                     )}
+                                </form>
+                            </div>
+                            <div className="col-md-3">
+                                <form>
+                                    <fieldset className="border p-2">
+                                        <legend
+                                            className="float-none w-auto p-0"
+                                            style={{ fontSize: "15px" }}
+                                        >
+                                            <h6 className="text-bold unclear-text">
+                                                GPS
+                                            </h6>
+                                        </legend>
+                                        <div className="mt-3">
+                                            <button
+                                                onClick={getGPS}
+                                                className="btn btn-primary"
+                                            >
+                                                📍 Récupérer ma position
+                                            </button>
+
+                                            {location && (
+                                                <div className="alert alert-success mt-2">
+                                                    Latitude:{" "}
+                                                    {location.latitude},
+                                                    Longitude:{" "}
+                                                    {location.longitude}
+                                                </div>
+                                            )}
+
+                                            {error && (
+                                                <div className="alert alert-danger mt-2">
+                                                    {error}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </fieldset>
                                 </form>
                             </div>
                         </div>

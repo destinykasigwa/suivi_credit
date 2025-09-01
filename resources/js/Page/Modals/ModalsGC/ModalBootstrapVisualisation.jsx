@@ -5,6 +5,7 @@ import "../../../styles/style.css";
 import axios from "axios";
 import ValidationFile from "../../GC/Reports/ValidationFile";
 import Swal from "sweetalert2";
+import ModalVisualisationGPS from "../ModalVisualisationGPS";
 import {
     FaDownload,
     FaUserCircle,
@@ -59,6 +60,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [contenu, setContenu] = useState("");
     const endOfCommentsRef = useRef(null);
     const [replyTo, setReplyTo] = useState(null);
+    const [dossierIdSelected, setDossierIdSelected] = useState(null);
 
     const handleReply = (comment) => {
         setReplyTo(comment);
@@ -329,6 +331,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             // si on est en train de répondre à un commentaire
             if (replyTo) {
                 payload.parent_id = replyTo.id; // ⚡ c’est le commentaire auquel on répond
+                payload.user_id = replyTo.user?.id;
             }
 
             // envoyer la requête
@@ -542,6 +545,21 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     ? dossier.commentaires
                                                           .length
                                                     : 0} */}
+                                            </button>
+                                        </h5>
+                                        <h5>
+                                            <button
+                                                className="btn btn-outline-primary d-flex align-items-center gap-2 ml-1"
+                                                type="button"
+                                                data-toggle="modal"
+                                                data-target="#modalVisualisationGPS"
+                                                onClick={() =>
+                                                    setDossierIdSelected(
+                                                        dossierId
+                                                    )
+                                                }
+                                            >
+                                                GPS 📍
                                             </button>
                                         </h5>
                                     </div>
@@ -1872,6 +1890,12 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     </div>
                 </div>
             </div>
+            {dossierIdSelected && (
+                <ModalVisualisationGPS
+                    dossierId={dossierIdSelected}
+                    onClose={() => setDossierIdSelected(null)}
+                />
+            )}
         </>
     );
 }
@@ -1903,7 +1927,9 @@ const CommentaireItem = ({
                 showConfirmButton: false,
             });
 
-            onDeleteComment(); // rafraîchit la liste
+            onDeleteComment(id); // rafraîchit la liste
+
+            //onDeleteComment();
         } else {
             Swal.fire("Erreur", res.data.msg, "error");
             setIsLoadingBar(false);
@@ -2030,6 +2056,7 @@ const CommentaireItem = ({
                                     handleReply={handleReply}
                                     level={level + 1}
                                     currentUserId={currentUserId} // <-- on passe en prop
+                                    onDeleteComment={onDeleteComment} // 🔑 propagation vers les enfants
                                 />
                             ))}
                         </ul>

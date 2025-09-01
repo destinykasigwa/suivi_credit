@@ -606,8 +606,8 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('eco/pages/montage-credit/addnew', [AGestionCreditController::class, 'store']);
     Route::get('/gestion_credit/pages/validation-credit', [AGestionCreditController::class, 'ValidatioCreditHomePage'])->name('gestion_credit.pages.validation-credit');
     Route::get('montage-credit/validation/rapport', [AGestionCreditController::class, 'getCreditValidation']);
-    Route::get(
-        "montage_credit/page/validation/credit/reference/{ref}",
+    Route::post(
+        "montage_credit/page/validation/credit/reference",
         [AGestionCreditController::class, 'getSearchedCredit']
     );
 
@@ -632,8 +632,8 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
 
 
 
-    Route::get(
-        "montage_credit/page/credit/decaisse/reference/{ref}",
+    Route::post(
+        "montage_credit/page/credit/decaisse/reference",
         [AGestionCreditController::class, 'getSearchedCreditDecaisse']
     );
 
@@ -663,4 +663,9 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::delete('gestion_credit/pages/files/credit/image/activite/{id}', [AGestionCreditController::class, 'deleteImageActivite']);
 
     Route::delete('gestion_credit/pages/files/credit/timeline/signature/delete/{id}', [AGestionCreditController::class, 'deleteSignature']);
+
+
+    Route::post('gestion_credit/files/get-gps', [AGestionCreditController::class, 'addGPS']);
+
+    Route::get('gestion_credit/pages/get-gps/map/{dossierId}', [AGestionCreditController::class, 'getGPS']);
 });

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Commentaire;
 use App\Models\Credits;
-use App\Models\CreditsImages;
 use App\Models\Signature;
+use App\Models\Commentaire;
 use Illuminate\Http\Request;
+use App\Models\CreditsImages;
+use App\Services\SendNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -14,9 +15,11 @@ use Illuminate\Support\Facades\Validator;
 class AGestionCreditController extends Controller
 {
     //
+    protected $sendNotification;
     public function __construct()
     {
         $this->middleware("auth");
+        $this->sendNotification = app(SendNotification::class);
     }
 
     public function AMontangeCreditHomePage()
@@ -56,6 +59,8 @@ class AGestionCreditController extends Controller
             'duree_credit' => 'required|string',
             'intervale_jrs' => 'required|string',
             'taux_interet' => 'required|string',
+            'objetCredit' => 'required|string',
+
             // 'type_garantie' => 'required|string',
             // 'valeur_comptable' => 'required|string',
             // 'num_titre' => 'required|string',
@@ -71,47 +76,47 @@ class AGestionCreditController extends Controller
                 'validate_error' => $validator->messages()
             ]);
         }
-        if ($request->hasFile('images')) {
-            $credit = Credits::create([
-                'NumCompte' => $request->NumCompte,
-                'NomCompte' => $request->NomCompte,
-                'produit_credit' => $request->produit_credit,
-                'type_credit' => $request->type_credit,
-                'type_credit' => $request->type_credit,
-                'recouvreur' => $request->recouvreur,
-                'montant_demande' => $request->montant_demande,
-                'date_demande' => $request->date_demande,
-                'frequence_mensualite' => $request->frequence_mensualite,
-                'nombre_echeance' => $request->nombre_echeance,
-                'NumDossier' => $request->NumDossier,
-                'gestionnaire' => $request->gestionnaire,
-                'source_fond' => $request->source_fond,
-                'monnaie' => $request->monnaie,
-                'duree_credit' => $request->duree_credit,
-                'intervale_jrs' => $request->intervale_jrs,
-                'taux_interet' => $request->taux_interet,
-                'type_garantie' => $request->type_garantie,
-                'valeur_comptable' => $request->valeur_comptable,
-                'num_titre' => $request->num_titre,
-                'valeur_garantie' => $request->valeur_garantie,
-                'date_sortie_titre' => $request->date_sortie_titre,
-                'date_expiration_titre' => $request->date_expiration_titre,
-                // 'description_titre' => $request->description_titre,
-                'nombre_membre_groupe' => $request->nombre_membre_groupe,
-                'nombre_homme_groupe' => $request->nombre_homme_groupe,
-                'nombre_femme_groupe' => $request->nombre_femme_groupe,
-                'objet_credit' => $request->objetCredit,
+
+        $credit = Credits::create([
+            'NumCompte' => $request->NumCompte,
+            'NomCompte' => $request->NomCompte,
+            'produit_credit' => $request->produit_credit,
+            'type_credit' => $request->type_credit,
+            'type_credit' => $request->type_credit,
+            'recouvreur' => $request->recouvreur,
+            'montant_demande' => $request->montant_demande,
+            'date_demande' => $request->date_demande,
+            'frequence_mensualite' => $request->frequence_mensualite,
+            'nombre_echeance' => $request->nombre_echeance,
+            'NumDossier' => $request->NumDossier,
+            'gestionnaire' => $request->gestionnaire,
+            'source_fond' => $request->source_fond,
+            'monnaie' => $request->monnaie,
+            'duree_credit' => $request->duree_credit,
+            'intervale_jrs' => $request->intervale_jrs,
+            'taux_interet' => $request->taux_interet,
+            'type_garantie' => $request->type_garantie,
+            'valeur_comptable' => $request->valeur_comptable,
+            'num_titre' => $request->num_titre,
+            'valeur_garantie' => $request->valeur_garantie,
+            'date_sortie_titre' => $request->date_sortie_titre,
+            'date_expiration_titre' => $request->date_expiration_titre,
+            // 'description_titre' => $request->description_titre,
+            'nombre_membre_groupe' => $request->nombre_membre_groupe,
+            'nombre_homme_groupe' => $request->nombre_homme_groupe,
+            'nombre_femme_groupe' => $request->nombre_femme_groupe,
+            'objet_credit' => $request->objetCredit,
+        ]);
+
+        if (isset($request->description_titre)) {
+            $idCredit = Credits::latest()->first()->id_credit;
+            Commentaire::create([
+                'credit_id' => $idCredit,
+                'user_id' => auth()->id(),
+                'contenu' => $request->description_titre,
             ]);
-
-            if (isset($request->description_titre)) {
-                $idCredit = Credits::latest()->first()->id_credit;
-                Commentaire::create([
-                    'credit_id' => $idCredit,
-                    'user_id' => auth()->id(),
-                    'contenu' => $request->description_titre,
-                ]);
-            }
-
+        }
+        if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 // Conserver le nom original mais ajouter un timestamp devant
                 $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
@@ -131,13 +136,14 @@ class AGestionCreditController extends Controller
                     ]);
                 }
             }
-        } else {
-            return response()->json([
-                'status' => 0,
-                'msg' => 'Aucune image séléctionnée',
-                // 'credit' => $credit->load('images'),
-            ]);
         }
+        //  else {
+        //     return response()->json([
+        //         'status' => 0,
+        //         'msg' => 'Aucune image séléctionnée',
+        //         // 'credit' => $credit->load('images'),
+        //     ]);
+        // }
 
         return response()->json([
             'status' => 1,
@@ -167,59 +173,150 @@ class AGestionCreditController extends Controller
         ]);
     }
 
-    public function getSearchedCredit($ref)
+    public function getSearchedCredit(Request $request)
     {
 
-        $credits = DB::table('credits')
-            ->where(function ($query) use ($ref) {
-                $query->where('statutDossier', '!=', 'Décaissé')
-                    ->where(function ($q) use ($ref) {
-                        $q->where('NumCompte', $ref)
-                            ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                    });
-            })
-            ->limit(10)
-            ->get();
+        if ($request->type_recherche == "AC") {
+            $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('statutDossier', '!=', 'Décaissé')
+                        ->where(function ($q) use ($ref) {
+                            $q->where('gestionnaire', $ref);
+                            // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                        });
+                })
+                ->limit(10)
+                ->get();
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
+        } else if ($request->type_recherche == "type_credit") {
+            $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('statutDossier', '!=', 'Décaissé')
+                        ->where(function ($q) use ($ref) {
+                            $q->where('type_credit', $ref);
+                            // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                        });
+                })
+                ->limit(10)
+                ->get();
 
-
-
-        // Ajout des images pour chaque crédit trouvé
-        foreach ($credits as $credit) {
-            $credit->images = DB::table('credits_images')
-                ->where('credits_id', $credit->id_credit)
-                ->pluck('path'); // Retourne un tableau simple
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
+        } else {
+            $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('statutDossier', '!=', 'Décaissé')
+                        ->where(function ($q) use ($ref) {
+                            $q->where('NumCompte', $ref)
+                                ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                        });
+                })
+                ->limit(10)
+                ->get();
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
         }
-        return response()->json([
-            "status" => 1,
-            "data" => $credits
-        ]);
     }
 
 
-    public function getSearchedCreditDecaisse($ref)
+    public function getSearchedCreditDecaisse(Request $request)
     {
 
-        $credits = DB::table('credits')
-            ->where(function ($query) use ($ref) {
-                $query->where('NumCompte', $ref)
-                    ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-            })
-            ->where("statutDossier", "Décaissé")
-            ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-            ->limit(10)
-            ->get();
+        if ($request->type_recherche == "AC") {
+            $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('gestionnaire', $ref);
+                    // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                })
+                ->where("statutDossier", "Décaissé")
+                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+                ->limit(10)
+                ->get();
 
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
+        } else if ($request->type_recherche == "type_credit") {
+            $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('type_credit', $ref);
+                    // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                })
+                ->where("statutDossier", "Décaissé")
+                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+                ->limit(10)
+                ->get();
 
-        // Ajout des images pour chaque crédit trouvé
-        foreach ($credits as $credit) {
-            $credit->images = DB::table('credits_images')
-                ->where('credits_id', $credit->id_credit)
-                ->pluck('path'); // Retourne un tableau simple
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
+        } else {
+            $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('gestionnaire', $ref)
+                        ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                })
+                ->where("statutDossier", "Décaissé")
+                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+                ->limit(10)
+                ->get();
+
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
         }
-        return response()->json([
-            "status" => 1,
-            "data" => $credits
-        ]);
     }
 
     public function getCreditToDelete($id)
@@ -264,18 +361,24 @@ class AGestionCreditController extends Controller
         //     ->where('credits_id', $id)
         //     ->where('file_state', "ia")
         //     ->pluck('id', 'path');
+        // $fichiers = DB::table('credits_images')
+        //     ->where('credits_id', $id)
+        //     ->where('file_state', "ia")
+        //     ->select('id', 'path')
+        //     ->get();
         $fichiers = DB::table('credits_images')
             ->where('credits_id', $id)
-            ->where('file_state', "ia")
-            ->select('id', 'path')
+            ->select('id', 'path', 'file_state')
             ->get();
 
+
+
         // Récupère les images de l'activité du membre
-        $imageMembres = DB::table('credits_images')
-            ->where('credits_id', $id)
-            ->where('file_state', "im")
-            ->select('id', 'path')
-            ->get();
+        // $imageMembres = DB::table('credits_images')
+        //     ->where('credits_id', $id)
+        //     //->where('file_state', "im")
+        //     ->select('id', 'path')
+        //     ->get();
         //dd($imageActivite);
 
         // Sépare images et pdfs
@@ -322,7 +425,7 @@ class AGestionCreditController extends Controller
         $dossierArray['lastSignature'] = $lastSignature;
         $dossierArray['commentaires'] = $commentaires;
         $dossierArray['current_user'] = auth()->user();
-        $dossierArray['imageMembre'] = $imageMembres;
+        // $dossierArray['imageMembre'] = $imageMembres;
 
 
 
@@ -656,6 +759,10 @@ class AGestionCreditController extends Controller
                 'contenu' => $request->contenu,
                 'parent_id' => $request->parent_id,
             ]);
+            if ($request->user_id) {
+                $this->sendNotification->SendNotificationWhenReplyAcomment($request->user_id, $request->getDossierId);
+            }
+
             return response()->json([
                 "status" => 1,
                 "msg" => "Commentaire posté avec fixé"
@@ -724,10 +831,27 @@ class AGestionCreditController extends Controller
                 // Conserver le nom original mais ajouter un timestamp devant
                 $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
                 $path = $image->storeAs('credits/images-membre', $filename, 'public'); // Stocke dans storage/app/public/credits/images-membre
-                $credit->images()->create([
-                    'file_state' => "im",
-                    'path' => $path
-                ]);
+                if ($request->type_image == "im") {
+                    $credit->images()->create([
+                        'file_state' => "im",
+                        'path' => $path
+                    ]);
+                } else if ($request->type_image == "ia") {
+                    $credit->images()->create([
+                        'file_state' => "ia",
+                        'path' => $path
+                    ]);
+                } else if ($request->type_image == "it") {
+                    $credit->images()->create([
+                        'file_state' => "it",
+                        'path' => $path
+                    ]);
+                } else if ($request->type_image == "ig") {
+                    $credit->images()->create([
+                        'file_state' => "ig",
+                        'path' => $path
+                    ]);
+                }
             }
         } else {
             return response()->json([
@@ -775,6 +899,28 @@ class AGestionCreditController extends Controller
         return response()->json([
             'status' => 1,
             'msg' => 'Image supprimée avec succès',
+        ]);
+    }
+
+    public function addGPS(Request $request)
+    {
+
+        Credits::where("id_credit", $request->creditId)->update([
+            "latitude" => $request->latitude,
+            "longitude" => $request->longitude,
+        ]);
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Le lacolisation a été bien enregistrée',
+        ]);
+    }
+
+    public function getGPS($dossierId)
+    {
+        $data = Credits::where("id_credit", $dossierId)->first();
+        return response()->json([
+            'status' => 1,
+            'data' => $data
         ]);
     }
 }

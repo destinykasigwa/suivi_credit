@@ -10,7 +10,9 @@ use App\Models\SMSBanking;
 use App\Models\Portefeuille;
 use App\Models\Transactions;
 use App\Mail\TransactionsEmail;
+use App\Models\Credits;
 use App\Models\TauxEtDateSystem;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -747,7 +749,6 @@ class SendNotification
     }
 
     //PERMET D'ENVOYER UNE NOTIFACTION DE RAPPEL DE REMBOURSEMENT
-
     public function RappelRemboursementCredit()
     {
         // Date du jour
@@ -835,6 +836,44 @@ class SendNotification
             }
         } else {
             info("not okk");
+        }
+    }
+
+    //SEND NOTIFICAION WHEN REPLY THE MESSAGE 
+
+    public function SendNotificationWhenReplyAcomment($idUser, $idCredit)
+    {
+        $user = User::where("id", "=", $idUser)->first();
+        if ($user and $user->phone_number != null) {
+            try {
+
+                $credit = Credits::where("id_credit", $idCredit)->first();
+                $message = $user->NomCompte . "Vous avez recu une reponse au dossier de credit de " . $credit->NomCompte .
+                    " que vous avez commente";
+
+                $receiver_number = $user->phone_number;
+                $response = $this->africaTalking->sendSms($receiver_number, $message);
+                //Log::info(json_encode($response));
+                if ($response['status'] == 'success') {
+                    // Traiter le succès, par exemple, loguer ou notifier l'utilisateur
+                    SendedSMS::create([
+                        "numPhone" => $receiver_number,
+                        "messageStatus" => 1,
+                        "paidStatus" => 0,
+                        "dateEnvoie" => date("Y-m-d"),
+                    ]);
+                } else {
+                    // Traiter l'échec, par exemple, loguer l'erreur
+                    SendedSMS::create([
+                        "numPhone" => $receiver_number,
+                        "messageStatus" => 0,
+                        "paidStatus" => 0,
+                        "dateEnvoie" => date("Y-m-d"),
+                    ]);
+                }
+            } catch (\Throwable $th) {
+                throw $th;
+            }
         }
     }
 }

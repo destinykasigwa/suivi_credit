@@ -41,6 +41,8 @@ class Credits extends Model
         'nombre_femme_groupe',
         'objet_credit',
         'statutDossier',
+        'latitude',
+        'longitude',
 
     ];
 

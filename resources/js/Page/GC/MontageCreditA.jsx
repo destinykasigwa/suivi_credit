@@ -1327,7 +1327,7 @@ const MontageCreditA = () => {
                                                         htmlFor="description_titre"
                                                         className="label-style"
                                                     >
-                                                        Description
+                                                        Commentaire
                                                     </label>
                                                 </td>
                                                 <td>
@@ -1359,7 +1359,7 @@ const MontageCreditA = () => {
                                 style={{ fontSize: "15px" }}
                             >
                                 <h6 className="text-bold unclear-text">
-                                    Images activités & titres
+                                    Images activités
                                 </h6>
                             </legend>
 
@@ -1511,14 +1511,14 @@ const MontageCreditA = () => {
                                     <tr>
                                         <td></td>
                                         <td>
-                                            {images.length > 0 && (
-                                                <button
-                                                    onClick={handleSubmit}
-                                                    className="btn btn-primary rounded-10 mt-1"
-                                                >
-                                                    Enregistrer
-                                                </button>
-                                            )}
+                                            {/* {images.length > 0 && ( */}
+                                            <button
+                                                onClick={handleSubmit}
+                                                className="btn btn-primary rounded-10 mt-1"
+                                            >
+                                                Enregistrer
+                                            </button>
+                                            {/* )} */}
                                         </td>
                                     </tr>
                                 </div>
