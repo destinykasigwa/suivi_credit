@@ -711,12 +711,14 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                 </label>{" "}
                                                             </td>
                                                             <td>
-                                                                <input
+                                                                <select
                                                                     type="text"
                                                                     className="input-style"
                                                                     style={{
-                                                                        width: "150px",
+                                                                        width: "140px",
                                                                     }}
+                                                                    name="produit_credit"
+                                                                    id="produit_credit"
                                                                     value={
                                                                         produit_credit
                                                                     }
@@ -729,7 +731,65 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 .value
                                                                         )
                                                                     }
-                                                                />
+                                                                >
+                                                                    <option
+                                                                        value={
+                                                                            produit_credit
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            produit_credit
+                                                                        }
+                                                                    </option>
+                                                                    <option value="Crédit aux MPME">
+                                                                        Crédit
+                                                                        aux MPME
+                                                                    </option>
+                                                                    <option value="Crédit à la consommation">
+                                                                        Crédit à
+                                                                        la
+                                                                        consommation
+                                                                    </option>
+                                                                    <option value="Crédit à l'habitat">
+                                                                        Crédit à
+                                                                        l'habitat
+                                                                    </option>
+                                                                    <option value="Crédit Groupe Solidaire">
+                                                                        Crédit
+                                                                        Groupe
+                                                                        Solidaire
+                                                                    </option>
+                                                                    <option value="Crédit Salaire">
+                                                                        Crédit
+                                                                        Salaire
+                                                                    </option>
+                                                                    <option value="Crédit Staff">
+                                                                        Crédit
+                                                                        Staff
+                                                                    </option>
+                                                                    <option value="Crédit Express">
+                                                                        Crédit
+                                                                        Express
+                                                                    </option>
+                                                                    <option value="Crédit Agro-Pastoral">
+                                                                        Crédit
+                                                                        Agro-Pastoral
+                                                                    </option>
+                                                                    <option value="Crédit MWANGAZA">
+                                                                        Crédit
+                                                                        MWANGAZA
+                                                                    </option>
+                                                                    <option value="Crédit JIKO BORA">
+                                                                        Crédit
+                                                                        JIKO
+                                                                        BORA
+                                                                    </option>
+                                                                    <option value="Crédits TUFAIDIKE WOTE">
+                                                                        Crédits
+                                                                        TUFAIDIKE
+                                                                        WOTE
+                                                                    </option>
+                                                                </select>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -740,9 +800,14 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                 </label>{" "}
                                                             </td>
                                                             <td>
-                                                                <input
+                                                                <select
                                                                     type="text"
                                                                     className="input-style"
+                                                                    style={{
+                                                                        width: "150px",
+                                                                    }}
+                                                                    name="type_credit"
+                                                                    id="type_credit"
                                                                     value={
                                                                         type_credit
                                                                     }
@@ -755,7 +820,150 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 .value
                                                                         )
                                                                     }
-                                                                />
+                                                                >
+                                                                    <option
+                                                                        value={
+                                                                            type_credit
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            type_credit
+                                                                        }
+                                                                    </option>
+                                                                    <option value="Crédit Express à CT">
+                                                                        Crédit
+                                                                        Express
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédits à la consommation à CT">
+                                                                        Crédits
+                                                                        à la
+                                                                        consommation
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédit aux MPME à CT ">
+                                                                        Crédit
+                                                                        aux MPME
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédit Staff à MT ">
+                                                                        Crédit
+                                                                        Staff à
+                                                                        MT
+                                                                    </option>
+                                                                    <option value="Crédit aux Groupes Solidaires USD ">
+                                                                        Crédit
+                                                                        aux
+                                                                        Groupes
+                                                                        Solidaires
+                                                                        USD
+                                                                    </option>
+                                                                    <option value="Crédit Salaire à CT ">
+                                                                        Crédit
+                                                                        Salaire
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédit à l'habitat CT ">
+                                                                        Crédit à
+                                                                        l'habitat
+                                                                        CT
+                                                                    </option>
+                                                                    <option value="Crédits à la consommation à MT ">
+                                                                        Crédits
+                                                                        à la
+                                                                        consommation
+                                                                        à MT
+                                                                    </option>
+                                                                    <option value="Crédit aux MPME à MT ">
+                                                                        Crédit
+                                                                        aux MPME
+                                                                        à MT
+                                                                    </option>
+                                                                    <option value="Crédit aux MPME à CT en FC  ">
+                                                                        Crédit
+                                                                        aux MPME
+                                                                        à CT en
+                                                                        FC
+                                                                    </option>
+                                                                    <option value="Crédit aux MPME à CT en FC   ">
+                                                                        Crédit
+                                                                        aux MPME
+                                                                        à CT en
+                                                                        FC
+                                                                    </option>
+                                                                    <option value="Crédit aux Groupes Solidaires FC   ">
+                                                                        Crédit
+                                                                        aux
+                                                                        Groupes
+                                                                        Solidaires
+                                                                        FC
+                                                                    </option>
+                                                                    <option value="Crédit Agro-Pastoral à CT   ">
+                                                                        Crédit
+                                                                        Agro-Pastoral
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédit Agro-Pastoral à CT   ">
+                                                                        Crédit
+                                                                        Agro-Pastoral
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédit Agro-Pastoral à CT   ">
+                                                                        Crédit
+                                                                        Agro-Pastoral
+                                                                        à CT
+                                                                    </option>
+                                                                    <option value="Crédit MWANGAZA   ">
+                                                                        Crédit
+                                                                        MWANGAZA
+                                                                    </option>
+                                                                    <option value="Crédit Salaire à MT en FC   ">
+                                                                        Crédit
+                                                                        Salaire
+                                                                        à MT en
+                                                                        FC
+                                                                    </option>
+                                                                    <option value="Crédits JIKO BORA Menage (CT)   ">
+                                                                        Crédits
+                                                                        JIKO
+                                                                        BORA
+                                                                        Menage
+                                                                        (CT)
+                                                                    </option>
+                                                                    <option value="Crédits JIKO BORA Grand Cons  (CT)   ">
+                                                                        Crédits
+                                                                        JIKO
+                                                                        BORA
+                                                                        Grand
+                                                                        Cons
+                                                                        (CT)
+                                                                    </option>
+                                                                    <option value="Crédits TUFAIDIKE WOTE en USD   ">
+                                                                        Crédits
+                                                                        TUFAIDIKE
+                                                                        WOTE en
+                                                                        USD
+                                                                    </option>
+                                                                    <option value="Crédits TUFAIDIKE WOTE en FC   ">
+                                                                        Crédits
+                                                                        TUFAIDIKE
+                                                                        WOTE en
+                                                                        FC
+                                                                    </option>
+                                                                    <option value="Crédit aux salariés domiciliés à MT   ">
+                                                                        Crédit
+                                                                        aux
+                                                                        salariés
+                                                                        domiciliés
+                                                                        à MT
+                                                                    </option>
+                                                                    <option value="Crédit aux MPME à MT en FC    ">
+                                                                        Crédit
+                                                                        aux MPME
+                                                                        à MT en
+                                                                        FC
+                                                                    </option>
+                                                                </select>
                                                             </td>
                                                         </tr>
                                                         <tr>

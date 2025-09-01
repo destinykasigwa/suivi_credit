@@ -849,6 +849,7 @@ class SendNotification
 
                 $credit = Credits::where("id_credit", $idCredit)->first();
                 $message = $user->NomCompte . "Vous avez recu une reponse au dossier de credit de " . $credit->NomCompte .
+                    " NumCompte " . $credit->NumCompte .
                     " que vous avez commente";
 
                 $receiver_number = $user->phone_number;
