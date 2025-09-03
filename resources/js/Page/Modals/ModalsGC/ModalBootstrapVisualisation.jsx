@@ -297,18 +297,25 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             // 1. Ouvrir en prévisualisation
             window.open(fileUrl, "_blank");
 
-            // 2. Télécharger le fichier
+            // 2. Générer le nom du fichier
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, "0");
+            const month = String(today.getMonth() + 1).padStart(2, "0");
+            const year = today.getFullYear();
+            const formattedDate = `${day}${month}${year}`; // ex: 02092025
+
+            // Récupérer le NomCompte depuis ton state
+            const nomClient = NomCompte || "Client";
+
+            const fileName = `${formattedDate}_FICHE_SUIVI_CREDIT_DE_${nomClient}.pdf`;
+
+            // 3. Télécharger le fichier avec le nom personnalisé
             const link = document.createElement("a");
             link.href = fileUrl;
-            link.download = filePath.split("/").pop(); // juste le nom du fichier
+            link.download = fileName;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-            // 3. Rediriger vers la page de signature
-            // setTimeout(() => {
-            //     window.location.href = `/signature/${dossier.id}`;
-            // }, 1000);
         }
     };
 
