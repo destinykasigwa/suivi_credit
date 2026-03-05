@@ -59,7 +59,7 @@ class AGestionCreditController extends Controller
             'duree_credit' => 'required|string',
             'intervale_jrs' => 'required|string',
             'taux_interet' => 'required|string',
-            'objetCredit' => 'required|string',
+            'objet_credit' => 'required|string',
 
             // 'type_garantie' => 'required|string',
             // 'valeur_comptable' => 'required|string',
@@ -105,7 +105,7 @@ class AGestionCreditController extends Controller
             'nombre_membre_groupe' => $request->nombre_membre_groupe,
             'nombre_homme_groupe' => $request->nombre_homme_groupe,
             'nombre_femme_groupe' => $request->nombre_femme_groupe,
-            'objet_credit' => $request->objetCredit,
+            'objet_credit' => $request->objet_credit,
         ]);
 
         if (isset($request->description_titre)) {
@@ -825,47 +825,69 @@ class AGestionCreditController extends Controller
 
     public function addImageMembre(Request $request)
     {
-        if ($request->hasFile('images')) {
-            $credit = Credits::findOrFail($request->creditId);
-            foreach ($request->file('images') as $image) {
-                // Conserver le nom original mais ajouter un timestamp devant
-                $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
-                $path = $image->storeAs('credits/images-membre', $filename, 'public'); // Stocke dans storage/app/public/credits/images-membre
-                if ($request->type_image == "im") {
-                    $credit->images()->create([
-                        'file_state' => "im",
-                        'path' => $path
-                    ]);
-                } else if ($request->type_image == "ia") {
-                    $credit->images()->create([
-                        'file_state' => "ia",
-                        'path' => $path
-                    ]);
-                } else if ($request->type_image == "it") {
-                    $credit->images()->create([
-                        'file_state' => "it",
-                        'path' => $path
-                    ]);
-                } else if ($request->type_image == "ig") {
-                    $credit->images()->create([
-                        'file_state' => "ig",
-                        'path' => $path
-                    ]);
+        if ($request->filled('type_image')) {
+            if ($request->hasFile('images')) {
+                $credit = Credits::findOrFail($request->creditId);
+                foreach ($request->file('images') as $image) {
+                    // Conserver le nom original mais ajouter un timestamp devant
+                    $filename = date('Ymd_His') . '_' . $image->getClientOriginalName();
+                    $path = $image->storeAs('credits/images-membre', $filename, 'public'); // Stocke dans storage/app/public/credits/images-membre
+                    if ($request->type_image == "im") {
+                        $credit->images()->create([
+                            'file_state' => "im",
+                            'path' => $path
+                        ]);
+                        return response()->json([
+                            'status' => 1,
+                            'msg' => 'Image enregistrée avec succès',
+                            'credit' => $credit->load('images'),
+                        ]);
+                    } else if ($request->type_image == "ia") {
+                        $credit->images()->create([
+                            'file_state' => "ia",
+                            'path' => $path
+                        ]);
+                        return response()->json([
+                            'status' => 1,
+                            'msg' => 'Image enregistrée avec succès',
+                            'credit' => $credit->load('images'),
+                        ]);
+                    } else if ($request->type_image == "it") {
+                        $credit->images()->create([
+                            'file_state' => "it",
+                            'path' => $path
+                        ]);
+                        return response()->json([
+                            'status' => 1,
+                            'msg' => 'Image enregistrée avec succès',
+                            'credit' => $credit->load('images'),
+                        ]);
+                    } else if ($request->type_image == "ig") {
+                        $credit->images()->create([
+                            'file_state' => "ig",
+                            'path' => $path
+                        ]);
+                        return response()->json([
+                            'status' => 1,
+                            'msg' => 'Image enregistrée avec succès',
+                            'credit' => $credit->load('images'),
+                        ]);
+                    }
                 }
+            } else {
+                return response()->json([
+                    'status' => 0,
+                    'msg' => 'Aucune image séléctionnée',
+                    // 'credit' => $credit->load('images'),
+                ]);
             }
         } else {
             return response()->json([
                 'status' => 0,
-                'msg' => 'Aucune image séléctionnée',
-                // 'credit' => $credit->load('images'),
+                'msg' => "Vous devez sélectionnez le type d'image ...",
+
             ]);
         }
-
-        return response()->json([
-            'status' => 1,
-            'msg' => 'Crédit enregistré avec succès',
-            'credit' => $credit->load('images'),
-        ]);
     }
 
     //PERMET DE SUPPRIMER UNE IMAGE 

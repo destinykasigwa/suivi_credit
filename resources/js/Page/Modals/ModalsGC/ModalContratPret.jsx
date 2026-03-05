@@ -16,7 +16,7 @@ export default function ModalContratPret({ creditId, onClose }) {
     const [images, setImages] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileType, setFileType] = useState(null); // "pdf" ou "excel"
-    const [type_image, settype_image] = useState();
+    const [type_image, settype_image] = useState("");
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
     const [location, setLocation] = useState(null);
     const [error, setError] = useState(null);

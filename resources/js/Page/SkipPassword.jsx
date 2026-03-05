@@ -15,7 +15,7 @@ const SkipPassword = () => {
         e.preventDefault();
         const res = await axios.post("/auth/login/change-password/skip", user);
         if (res.data.status == 1) {
-            navigate("/eco/home");
+            navigate("/gestion_credit/home");
             window.location.reload();
         } else if (res.data.status == 0) {
             Swal.fire({
