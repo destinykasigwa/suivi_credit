@@ -609,7 +609,7 @@ class AGestionCreditController extends Controller
                     $file->move(public_path('credit'), $filename);
                     $checkStatus->images()->create([
                         'file_state' => 'ia',
-                        'path' => "credit/" . $filename
+                        'path' => "credits/" . $filename
                     ]);
                 } else {
                     $checkStatus->images()->create([

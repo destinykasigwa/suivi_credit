@@ -4,21 +4,114 @@ $dateSaisie = DB::select('SELECT DateSystem FROM taux_et_date_systems ORDER BY i
 $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"')[0];
 ?>
 
-</main>
-<!-- Footer -->
-
-<div class="container-fluid footer bg-teal text-white">
+<!-- Footer avec effets modernes -->
+<footer class="footer mt-auto" style="background: linear-gradient(135deg, #1a2632 0%, #0f1419 100%); border-top: 3px solid #20c997; position: relative; overflow: hidden;">
+  
+  <!-- Effet de vague décorative -->
+  <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #20c997, #ffc107, #20c997); animation: shimmer 2s infinite;"></div>
+  
+  <div class="container-fluid">
     <div class="row">
-        <div class="col-12 text-center py-3">
-            <p>
-                <strong>Designed by Destin KASIGWA</strong> ::
+      <div class="col-12 py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+          
+          <!-- Logo footer -->
+          <div class="text-center text-md-start">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #20c997 0%, #198764 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-chart-line" style="color: white; font-size: 18px;"></i>
+              </div>
+              <div>
+                <strong class="text-white" style="font-size: 16px;">AKIBA YETU</strong>
+                <small class="text-muted d-block" style="font-size: 10px;">Gestion de crédit</small>
+              </div>
+            </div>
+          </div>
 
-                <strong>Utilisateur connecté : {{ $userInfo->name }} | Profile : {{ $userInfo->role }} </strong>
-            </p>
+          <!-- Informations centrales -->
+          <div class="text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-user-circle" style="color: #20c997;"></i>
+                <span class="text-white">{{ $userInfo->name }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-tag" style="color: #20c997;"></i>
+                <span class="text-white">{{ $userInfo->role }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-calendar" style="color: #20c997;"></i>
+                <span class="text-white">
+                  {{ isset($dateSaisie) ? date('d/m/Y', strtotime($dateSaisie->DateSystem)) : date('d/m/Y') }}
+                </span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-code" style="color: #20c997;"></i>
+                <span class="text-white">Destin KASIGWA</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton retour haut -->
+          <div class="text-center text-md-end">
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+                    style="background: rgba(32, 201, 151, 0.15); border: none; border-radius: 30px; padding: 8px 16px; color: #20c997; transition: all 0.2s ease; cursor: pointer;"
+                    onmouseenter="this.style.backgroundColor='rgba(32, 201, 151, 0.3)'; this.style.transform='translateY(-2px)'"
+                    onmouseleave="this.style.backgroundColor='rgba(32, 201, 151, 0.15)'; this.style.transform='translateY(0)'">
+              <i class="fas fa-arrow-up me-1"></i>
+              Haut de page
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-</div>
+
+    <div class="row">
+      <div class="col-12 text-center pb-3">
+        <small class="text-muted" style="font-size: 11px;">
+          <i class="fas fa-copyright me-1"></i> {{ date('Y') }} Akiba Yetu - Tous droits réservés
+        </small>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  } */
+  
+  .footer {
+    transition: all 0.3s ease;
+  }
+  
+  .footer:hover {
+    box-shadow: 0 -8px 24px rgba(32, 201, 151, 0.15);
+  }
+  
+  /* Animation pour les icônes */
+  .footer .d-flex i {
+    transition: all 0.2s ease;
+  }
+  
+  .footer .d-flex:hover i {
+    transform: scale(1.1);
+    color: #ffc107 !important;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .footer .d-flex {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .footer .text-center {
+      width: 100%;
+    }
+  }
+</style>
 
 
 

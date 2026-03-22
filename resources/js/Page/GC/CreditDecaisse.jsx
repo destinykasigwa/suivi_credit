@@ -19,6 +19,7 @@ const CreditDecaisse = () => {
     const [fetchSearchedCredit, setFetchSearchedCredit] = useState();
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
     const [type_recherche, settype_recherche] = useState();
+      const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         // Place automatiquement le curseur dans le champ à l'ouverture de la page
@@ -67,6 +68,117 @@ const CreditDecaisse = () => {
             });
         }
     };
+      
+    let itemsPerPage = 5;
+       const renderPagination = () => {
+        
+        const totalPages = Math.ceil(fetchData?.length / itemsPerPage) || 1;
+        const maxVisiblePages = 5; // Nombre maximum de pages visibles
+        const halfVisible = Math.floor(maxVisiblePages / 2);
+
+        let startPage = Math.max(1, currentPage - halfVisible);
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        const pages = [];
+
+        // Ajouter les points de suspension au début
+        if (startPage > 1) {
+            pages.push(
+                <li key="start-ellipsis" className="page-item disabled">
+                    <span
+                        className="page-link"
+                        style={{
+                            borderRadius: "8px",
+                            border: "1px solid #dee2e6",
+                        }}
+                    >
+                        ...
+                    </span>
+                </li>,
+            );
+        }
+
+        // Générer les numéros de pages
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(
+                <li
+                    key={i}
+                    className={`page-item ${currentPage === i ? "active" : ""}`}
+                >
+                    <button
+                        onClick={() => goToPage(i)}
+                        className="page-link"
+                        style={{
+                            borderRadius: "8px",
+                            backgroundColor:
+                                currentPage === i ? "#0d6efd" : "white",
+                            color: currentPage === i ? "white" : "#0d6efd",
+                            border: "1px solid #dee2e6",
+                            padding: "6px 12px",
+                            fontSize: "13px",
+                            fontWeight: currentPage === i ? "600" : "400",
+                            transition: "all 0.2s ease",
+                            minWidth: "36px",
+                        }}
+                        onMouseEnter={(e) => {
+                            if (currentPage !== i) {
+                                e.currentTarget.style.backgroundColor =
+                                    "#e7f1ff";
+                                e.currentTarget.style.transform =
+                                    "translateY(-1px)";
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (currentPage !== i) {
+                                e.currentTarget.style.backgroundColor = "white";
+                                e.currentTarget.style.transform =
+                                    "translateY(0)";
+                            }
+                        }}
+                    >
+                        {i}
+                    </button>
+                </li>,
+            );
+        }
+
+        // Ajouter les points de suspension à la fin
+        if (endPage < totalPages) {
+            pages.push(
+                <li key="end-ellipsis" className="page-item disabled">
+                    <span
+                        className="page-link"
+                        style={{
+                            borderRadius: "8px",
+                            border: "1px solid #dee2e6",
+                        }}
+                    >
+                        ...
+                    </span>
+                </li>,
+            );
+        }
+
+        return pages;
+    };
+    const goToNextPage = () => {
+        setCurrentPage((prevPage) =>
+            Math.min(
+                prevPage + 1,
+                Math.ceil(fetchData && fetchData.length / itemsPerPage),
+            ),
+        );
+    };
+
+    const goToPrevPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+    };
+
+   
 
     // const handleDeleteCredit = async (id) => {
     //     let confirmation;
@@ -118,436 +230,715 @@ const CreditDecaisse = () => {
 
     return (
         <>
-            <div className="container-fluid" style={{ marginTop: "10px" }}>
-                <div className="row">
-                    <div className="col-md-12 card rounded-10 p-1">
-                        <div
-                            style={{
-                                background: "teal",
-                                borderRadius: "10px",
-                                height: "10",
-                                padding: "2px",
-                                color: "white",
-                            }}
-                        >
-                            <h5 className="text-bold p-1">Crédits décaissés</h5>
-                        </div>{" "}
-                    </div>
+          <div className="container-fluid px-0" style={{ marginTop: "10px" }}>
+  {/* En-tête de la section */}
+  <div className="row mb-3">
+    <div className="col-md-12">
+      <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div
+          style={{
+            background: "teal",
+            padding: "12px 20px",
+          }}
+        >
+          <h5 className="fw-semibold mb-0" style={{ color: "white", letterSpacing: "0.3px" }}>
+            <i className="fas fa-money-bill-wave me-2"></i>
+            Crédits décaissés
+          </h5>
+          <small className="text-white-50" style={{ fontSize: "12px" }}>
+            Liste des crédits déjà décaissés
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Contenu principal */}
+  <div className="row">
+    <div className="col-md-12">
+      <div className="card border-0 shadow-sm rounded-3">
+        <div className="card-body p-3">
+          {/* Barre de recherche */}
+          <div className="col-md-6 mb-3 ms-auto">
+            <div className="card border-0 bg-light rounded-3">
+              <div className="card-body p-2">
+                <div className="d-flex gap-2 align-items-center">
+                  {/* Sélecteur de type de recherche */}
+                  <div className="flex-shrink-0" style={{ minWidth: "160px" }}>
+                    <select
+                      type="text"
+                      className="form-select form-select-sm border-0"
+                      style={{
+                        backgroundColor: "white",
+                        color: "#0d6efd",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        borderRadius: "8px",
+                        padding: "8px 12px",
+                      }}
+                      name="type_recherche"
+                      id="type_recherche"
+                      onChange={(e) => {
+                        settype_recherche(e.target.value);
+                      }}
+                      value={type_recherche}
+                    >
+                      <option value="">🔍 Type de recherche</option>
+                      <option value="AC">👤 Agent crédit</option>
+                      <option value="type_credit">📊 Type crédit</option>
+                    </select>
+                  </div>
+
+                  {/* Champ de recherche dynamique */}
+                  <div className="flex-grow-1">
+                    {type_recherche === "AC" ? (
+                      <select
+                        className="form-select form-select-sm border-0"
+                        style={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                          padding: "8px 12px",
+                          fontWeight: "500",
+                          color: "#495057",
+                          cursor: "pointer",
+                        }}
+                        name="searchRefOperation"
+                        value={searchRefCredit}
+                        onChange={(e) => {
+                          setsearchRefCredit(e.target.value);
+                        }}
+                      >
+                        <option value="">👥 Sélectionnez un agent crédit</option>
+                        <option value="ALAME KUZANWA WILLY">👤 ALAME KUZANWA WILLY</option>
+                        <option value="AKILI SANGARA JULIEN">👤 AKILI SANGARA JULIEN</option>
+                        <option value="MAPENDO RUTH">👤 MAPENDO RUTH</option>
+                        <option value="LAVIE MATEMBERA">👤 LAVIE MATEMBERA</option>
+                        <option value="KANKINSINGI NGADU">👤 KANKINSINGI NGADU</option>
+                        <option value="NEEMA MULINGA GRACE">👤 NEEMA MULINGA GRACE</option>
+                        <option value="WIVINE ALISA">👤 WIVINE ALISA</option>
+                        <option value="MOSES KATEMBO">👤 MOSES KATEMBO</option>
+                        <option value="SAFARI KALEKERA">👤 SAFARI KALEKERA</option>
+                      </select>
+                    ) : type_recherche === "type_credit" ? (
+                      <select
+                        className="form-select form-select-sm border-0"
+                        style={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                          padding: "8px 12px",
+                          fontWeight: "500",
+                          color: "#495057",
+                          cursor: "pointer",
+                        }}
+                        name="searchRefOperation"
+                        value={searchRefCredit}
+                        onChange={(e) => {
+                          setsearchRefCredit(e.target.value);
+                        }}
+                      >
+                        <option value="">📋 Sélectionnez un type de crédit</option>
+                        <option value="Crédit Express à CT">⚡ Crédit Express à CT</option>
+                        <option value="Crédits à la consommation à CT">🛒 Crédits à la consommation à CT</option>
+                        <option value="Crédit aux MPME à CT ">🏢 Crédit aux MPME à CT</option>
+                        <option value="Crédit Staff à MT ">👔 Crédit Staff à MT</option>
+                        <option value="Crédit aux Groupes Solidaires USD ">👥 Crédit aux Groupes Solidaires USD</option>
+                        <option value="Crédit Salaire à CT ">💰 Crédit Salaire à CT</option>
+                        <option value="Crédit à l'habitat CT ">🏠 Crédit à l'habitat CT</option>
+                        <option value="Crédits à la consommation à MT ">🛒 Crédits à la consommation à MT</option>
+                        <option value="Crédit aux MPME à MT ">🏢 Crédit aux MPME à MT</option>
+                        <option value="Crédit aux MPME à CT en FC  ">🏢 Crédit aux MPME à CT en FC</option>
+                        <option value="Crédit aux Groupes Solidaires FC   ">👥 Crédit aux Groupes Solidaires FC</option>
+                        <option value="Crédit Agro-Pastoral à CT   ">🌾 Crédit Agro-Pastoral à CT</option>
+                        <option value="Crédit MWANGAZA   ">⭐ Crédit MWANGAZA</option>
+                        <option value="Crédit Salaire à MT en FC   ">💰 Crédit Salaire à MT en FC</option>
+                        <option value="Crédits JIKO BORA Menage (CT)   ">🏠 Crédits JIKO BORA Menage (CT)</option>
+                        <option value="Crédits JIKO BORA Grand Cons  (CT)   ">🛍️ Crédits JIKO BORA Grand Cons (CT)</option>
+                        <option value="Crédits TUFAIDIKE WOTE en USD   ">🤝 Crédits TUFAIDIKE WOTE en USD</option>
+                        <option value="Crédits TUFAIDIKE WOTE en FC   ">🤝 Crédits TUFAIDIKE WOTE en FC</option>
+                        <option value="Crédit aux salariés domiciliés à MT   ">👨‍💼 Crédit aux salariés domiciliés à MT</option>
+                        <option value="Crédit aux MPME à MT en FC    ">🏢 Crédit aux MPME à MT en FC</option>
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        className="form-control form-control-sm border-0"
+                        style={{
+                          backgroundColor: "white",
+                          borderRadius: "8px",
+                          padding: "8px 12px",
+                          fontWeight: "500",
+                          color: "#495057",
+                        }}
+                        placeholder="🔍 Rechercher par numéro de compte, nom, etc..."
+                        name="searchRefOperation"
+                        value={searchRefCredit}
+                        onChange={(e) => {
+                          setsearchRefCredit(e.target.value);
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Bouton de recherche */}
+                  <div className="flex-shrink-0">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      style={{
+                        borderRadius: "8px",
+                        padding: "8px 20px",
+                        fontWeight: "500",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        transition: "all 0.2s ease",
+                        background: "linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%)",
+                        border: "none",
+                      }}
+                      onClick={() => {
+                        handleSeachCredit(searchRefCredit);
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(13,110,253,0.3)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          <span>Recherche...</span>
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-search"></i>
+                          <span>Rechercher</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div className="row mt-3 card rounded-0 p-3">
-                    <div className="col-md-12">
-                        <div className="col-md-6 float-end mb-1">
-                            <div className="input-group input-group-sm">
-                                <select
-                                    type="text"
-                                    className="input-style"
-                                    style={{
-                                        width: "auto",
-                                        color: "steelblue",
-                                    }}
-                                    name="type_recherche"
-                                    id="type_recherche"
-                                    onChange={(e) => {
-                                        settype_recherche(e.target.value);
-                                    }}
-                                    value={type_recherche}
+          {/* Tableau des crédits décaissés */}
+          <div className="table-responsive rounded-3">
+            <table className="table table-hover align-middle mb-0">
+              <thead className="table-light">
+                <tr style={{ backgroundColor: "#f8f9fa", borderBottom: "2px solid #dee2e6" }}>
+                  <th className="py-3 fw-semibold" style={{ fontSize: "0.85rem", color: "#495057" }}>
+                    Num Compte
+                  </th>
+                  <th className="py-3 fw-semibold" style={{ fontSize: "0.85rem", color: "#495057" }}>
+                    Nom Compte
+                  </th>
+                  <th className="py-3 fw-semibold" style={{ fontSize: "0.85rem", color: "#495057" }}>
+                    Num Dossier
+                  </th>
+                  <th className="py-3 fw-semibold" style={{ fontSize: "0.85rem", color: "#495057" }}>
+                    Date décaissement
+                  </th>
+                  <th className="py-3 fw-semibold text-center" style={{ fontSize: "0.85rem", color: "#495057" }}>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {!fetchSearchedCredit && fetchData && fetchData.length > 0
+                  ? fetchData.map((credit, index) => (
+                      <tr key={index} className="border-bottom" style={{ transition: "background-color 0.2s ease" }}>
+                        <td className="py-3" style={{ fontWeight: "500", color: "#2c3e50" }}>
+                          {credit.NumCompte}
+                        </td>
+                        <td className="py-3">
+                          {credit.NomCompte}
+                        </td>
+                        <td className="py-3">
+                          <span className="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill" style={{ fontWeight: "500" }}>
+                            {credit.NumDossier}
+                          </span>
+                        </td>
+                        <td className="py-3 text-muted" style={{ fontSize: "0.9rem" }}>
+                          <i className="fas fa-calendar-alt me-1 text-muted"></i>
+                          {dateParser(credit.date_demande)}
+                        </td>
+                        <td className="py-3 text-center">
+                          <div className="d-flex gap-2 justify-content-center">
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-primary"
+                              data-toggle="modal"
+                              data-target="#modalVisualisationDossier"
+                              onClick={() => setDossierIdSelected(credit.id_credit)}
+                              style={{
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(13,110,253,0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <i className="fas fa-eye"></i>
+                              <span>Visualiser</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-success"
+                              data-toggle="modal"
+                              data-target="#modalTimeLine"
+                              onClick={() => setDossierIdSelected(credit.id_credit)}
+                              style={{
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(25,135,84,0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <MdTimeline size={16} />
+                              <span>Timeline</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-info"
+                              data-toggle="modal"
+                              data-target="#modalContratPret"
+                              onClick={() => setDossierIdSelected(credit.id_credit)}
+                              style={{
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(13,202,240,0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <i className="fa fa-file"></i>
+                              <span>Fichiers</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  : fetchSearchedCredit && fetchSearchedCredit.length > 0
+                  ? fetchSearchedCredit.map((res, index) => (
+                      <tr key={index} className="border-bottom" style={{ transition: "background-color 0.2s ease" }}>
+                        <td className="py-3" style={{ fontWeight: "500", color: "#2c3e50" }}>
+                          {res.NumCompte}
+                        </td>
+                        <td className="py-3">
+                          {res.NomCompte}
+                        </td>
+                        <td className="py-3">
+                          <span className="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill" style={{ fontWeight: "500" }}>
+                            {res.NumDossier}
+                          </span>
+                        </td>
+                        <td className="py-3 text-muted" style={{ fontSize: "0.9rem" }}>
+                          <i className="fas fa-calendar-alt me-1 text-muted"></i>
+                          {dateParser(res.date_demande)}
+                        </td>
+                        <td className="py-3 text-center">
+                          <div className="d-flex gap-2 justify-content-center">
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-primary"
+                              data-toggle="modal"
+                              data-target="#modalVisualisationDossier"
+                              onClick={() => setDossierIdSelected(res.id_credit)}
+                              style={{
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(13,110,253,0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <i className="fas fa-eye"></i>
+                              <span>Visualiser</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-success"
+                              data-toggle="modal"
+                              data-target="#modalTimeLine"
+                              onClick={() => setDossierIdSelected(res.id_credit)}
+                              style={{
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(25,135,84,0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <MdTimeline size={16} />
+                              <span>Timeline</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-info"
+                              data-toggle="modal"
+                              data-target="#modalContratPret"
+                              onClick={() => setDossierIdSelected(res.id_credit)}
+                              style={{
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(13,202,240,0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <i className="fa fa-file"></i>
+                              <span>Fichiers</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  : (
+                      <tr>
+                        <td colSpan="5" className="text-center py-5">
+                          <div className="d-flex flex-column align-items-center">
+                            <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p className="text-muted mb-0">Aucun crédit décaissé trouvé</p>
+                            <small className="text-muted">Essayez de modifier votre recherche</small>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <div className="d-flex justify-content-center align-items-center mt-4 pt-2">
+                            <nav aria-label="Navigation par pages">
+                                <ul
+                                    className="pagination pagination-sm mb-0"
+                                    style={{ gap: "4px" }}
                                 >
-                                    <option value="">Type de recherche</option>
-                                    <option value="AC">Agent crédit</option>
+                                    {/* Bouton Première page */}
+                                    <li
+                                        className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                                    >
+                                        <button
+                                            className="page-link"
+                                            onClick={() => goToPage(1)}
+                                            disabled={currentPage === 1}
+                                            style={{
+                                                borderRadius: "8px",
+                                                color: "#0d6efd",
+                                                border: "1px solid #dee2e6",
+                                                padding: "6px 12px",
+                                                fontSize: "13px",
+                                                transition: "all 0.2s ease",
+                                                backgroundColor: "white",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (currentPage !== 1) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.color =
+                                                        "white";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(-1px)";
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (currentPage !== 1) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "white";
+                                                    e.currentTarget.style.color =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(0)";
+                                                }
+                                            }}
+                                        >
+                                            <i className="fas fa-angle-double-left me-1"></i>
+                                            Premier
+                                        </button>
+                                    </li>
 
-                                    <option value="type_credit">
-                                        Type crédit
-                                    </option>
-                                </select>
-                                {type_recherche == "AC" ? (
-                                    <select
-                                        type="text"
-                                        style={{
-                                            borderRadius: "0px",
-                                        }}
-                                        // ref={textInput}
-                                        className="form-control font-weight-bold"
-                                        name="searchRefOperation"
-                                        value={searchRefCredit}
-                                        onChange={(e) => {
-                                            setsearchRefCredit(e.target.value);
-                                        }}
+                                    {/* Bouton Précédent */}
+                                    <li
+                                        className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
                                     >
-                                        <option value="">Sélectionnez</option>
-                                        <option value="ALAME KUZANWA WILLY">
-                                            ALAME KUZANWA WILLY
-                                        </option>
-                                        <option value="AKILI SANGARA JULIEN">
-                                            AKILI SANGARA JULIEN
-                                        </option>
-                                        <option value="MAPENDO RUTH">
-                                            MAPENDO RUTH
-                                        </option>
-                                        <option value="LAVIE MATEMBERA">
-                                            LAVIE MATEMBERA
-                                        </option>
-                                        <option value="KANKINSINGI NGADU">
-                                            KANKINSINGI NGADU
-                                        </option>
-                                        <option value="NEEMA MULINGA GRACE">
-                                            NEEMA MULINGA GRACE
-                                        </option>
-                                        <option value="WIVINE ALISA">
-                                            WIVINE ALISA
-                                        </option>
-                                        <option value="MOSES KATEMBO">
-                                            MOSES KATEMBO
-                                        </option>
-                                        <option value="SAFARI KALEKERA">
-                                            SAFARI KALEKERA
-                                        </option>
-                                    </select>
-                                ) : type_recherche == "type_credit" ? (
-                                    <select
-                                        type="text"
-                                        style={{
-                                            borderRadius: "0px",
-                                        }}
-                                        // ref={textInput}
-                                        className="form-control font-weight-bold"
-                                        // placeholder="Rechercher par type crédit"
-                                        name="searchRefOperation"
-                                        value={searchRefCredit}
-                                        onChange={(e) => {
-                                            setsearchRefCredit(e.target.value);
-                                        }}
+                                        <button
+                                            className="page-link"
+                                            onClick={goToPrevPage}
+                                            disabled={currentPage === 1}
+                                            style={{
+                                                borderRadius: "8px",
+                                                color: "#0d6efd",
+                                                border: "1px solid #dee2e6",
+                                                padding: "6px 12px",
+                                                fontSize: "13px",
+                                                transition: "all 0.2s ease",
+                                                backgroundColor: "white",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (currentPage !== 1) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.color =
+                                                        "white";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(-1px)";
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (currentPage !== 1) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "white";
+                                                    e.currentTarget.style.color =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(0)";
+                                                }
+                                            }}
+                                        >
+                                            <i className="fas fa-chevron-left me-1"></i>
+                                            Précédent
+                                        </button>
+                                    </li>
+
+                                    {/* Numéros de pages */}
+                                    {renderPagination()}
+
+                                    {/* Bouton Suivant */}
+                                    <li
+                                        className={`page-item ${
+                                            currentPage ===
+                                                Math.ceil(
+                                                    fetchData?.length /
+                                                        itemsPerPage,
+                                                ) || fetchData?.length === 0
+                                                ? "disabled"
+                                                : ""
+                                        }`}
                                     >
-                                        <option value="">Sélectionnez</option>
-                                        <option value="Crédit Express à CT">
-                                            Crédit Express à CT
-                                        </option>
-                                        <option value="Crédits à la consommation à CT">
-                                            Crédits à la consommation à CT
-                                        </option>
-                                        <option value="Crédit aux MPME à CT ">
-                                            Crédit aux MPME à CT
-                                        </option>
-                                        <option value="Crédit Staff à MT ">
-                                            Crédit Staff à MT
-                                        </option>
-                                        <option value="Crédit aux Groupes Solidaires USD ">
-                                            Crédit aux Groupes Solidaires USD
-                                        </option>
-                                        <option value="Crédit Salaire à CT ">
-                                            Crédit Salaire à CT
-                                        </option>
-                                        <option value="Crédit à l'habitat CT ">
-                                            Crédit à l'habitat CT
-                                        </option>
-                                        <option value="Crédits à la consommation à MT ">
-                                            Crédits à la consommation à MT
-                                        </option>
-                                        <option value="Crédit aux MPME à MT ">
-                                            Crédit aux MPME à MT
-                                        </option>
-                                        <option value="Crédit aux MPME à CT en FC  ">
-                                            Crédit aux MPME à CT en FC
-                                        </option>
-                                        <option value="Crédit aux MPME à CT en FC   ">
-                                            Crédit aux MPME à CT en FC
-                                        </option>
-                                        <option value="Crédit aux Groupes Solidaires FC   ">
-                                            Crédit aux Groupes Solidaires FC
-                                        </option>
-                                        <option value="Crédit Agro-Pastoral à CT   ">
-                                            Crédit Agro-Pastoral à CT
-                                        </option>
-                                        <option value="Crédit Agro-Pastoral à CT   ">
-                                            Crédit Agro-Pastoral à CT
-                                        </option>
-                                        <option value="Crédit Agro-Pastoral à CT   ">
-                                            Crédit Agro-Pastoral à CT
-                                        </option>
-                                        <option value="Crédit MWANGAZA   ">
-                                            Crédit MWANGAZA
-                                        </option>
-                                        <option value="Crédit Salaire à MT en FC   ">
-                                            Crédit Salaire à MT en FC
-                                        </option>
-                                        <option value="Crédits JIKO BORA Menage (CT)   ">
-                                            Crédits JIKO BORA Menage (CT)
-                                        </option>
-                                        <option value="Crédits JIKO BORA Grand Cons  (CT)   ">
-                                            Crédits JIKO BORA Grand Cons (CT)
-                                        </option>
-                                        <option value="Crédits TUFAIDIKE WOTE en USD   ">
-                                            Crédits TUFAIDIKE WOTE en USD
-                                        </option>
-                                        <option value="Crédits TUFAIDIKE WOTE en FC   ">
-                                            Crédits TUFAIDIKE WOTE en FC
-                                        </option>
-                                        <option value="Crédit aux salariés domiciliés à MT   ">
-                                            Crédit aux salariés domiciliés à MT
-                                        </option>
-                                        <option value="Crédit aux MPME à MT en FC    ">
-                                            Crédit aux MPME à MT en FC
-                                        </option>
-                                    </select>
-                                ) : (
-                                    <input
-                                        type="text"
-                                        style={{
-                                            borderRadius: "0px",
-                                        }}
-                                        // ref={textInput}
-                                        className="form-control font-weight-bold"
-                                        placeholder="Rechercher..."
-                                        name="searchRefOperation"
-                                        value={searchRefCredit}
-                                        onChange={(e) => {
-                                            setsearchRefCredit(e.target.value);
-                                        }}
-                                    />
-                                )}
-                                <td>
-                                    <button
-                                        type="button"
-                                        style={{
-                                            borderRadius: "0px",
-                                            width: "100%",
-                                            height: "auto",
-                                            fontSize: "12px",
-                                        }}
-                                        className="btn btn-primary"
-                                        onClick={() => {
-                                            handleSeachCredit(searchRefCredit);
-                                        }}
+                                        <button
+                                            className="page-link"
+                                            onClick={goToNextPage}
+                                            disabled={
+                                                currentPage ===
+                                                    Math.ceil(
+                                                        fetchData?.length /
+                                                            itemsPerPage,
+                                                    ) || fetchData?.length === 0
+                                            }
+                                            style={{
+                                                borderRadius: "8px",
+                                                color: "#0d6efd",
+                                                border: "1px solid #dee2e6",
+                                                padding: "6px 12px",
+                                                fontSize: "13px",
+                                                transition: "all 0.2s ease",
+                                                backgroundColor: "white",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (
+                                                    currentPage !==
+                                                        Math.ceil(
+                                                            fetchData?.length /
+                                                                itemsPerPage,
+                                                        ) &&
+                                                    fetchData?.length !== 0
+                                                ) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.color =
+                                                        "white";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(-1px)";
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (
+                                                    currentPage !==
+                                                        Math.ceil(
+                                                            fetchData?.length /
+                                                                itemsPerPage,
+                                                        ) &&
+                                                    fetchData?.length !== 0
+                                                ) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "white";
+                                                    e.currentTarget.style.color =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(0)";
+                                                }
+                                            }}
+                                        >
+                                            Suivant
+                                            <i className="fas fa-chevron-right ms-1"></i>
+                                        </button>
+                                    </li>
+
+                                    {/* Bouton Dernière page */}
+                                    <li
+                                        className={`page-item ${
+                                            currentPage ===
+                                                Math.ceil(
+                                                    fetchData?.length /
+                                                        itemsPerPage,
+                                                ) || fetchData?.length === 0
+                                                ? "disabled"
+                                                : ""
+                                        }`}
                                     >
-                                        <i
-                                            className={`${
-                                                loading
-                                                    ? "spinner-border spinner-border-sm"
-                                                    : " fas fa-search"
-                                            }`}
-                                        ></i>
-                                    </button>
-                                </td>{" "}
-                            </div>
+                                        <button
+                                            className="page-link"
+                                            onClick={() =>
+                                                goToPage(
+                                                    Math.ceil(
+                                                        fetchData?.length /
+                                                            itemsPerPage,
+                                                    ),
+                                                )
+                                            }
+                                            disabled={
+                                                currentPage ===
+                                                    Math.ceil(
+                                                        fetchData?.length /
+                                                            itemsPerPage,
+                                                    ) || fetchData?.length === 0
+                                            }
+                                            style={{
+                                                borderRadius: "8px",
+                                                color: "#0d6efd",
+                                                border: "1px solid #dee2e6",
+                                                padding: "6px 12px",
+                                                fontSize: "13px",
+                                                transition: "all 0.2s ease",
+                                                backgroundColor: "white",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (
+                                                    currentPage !==
+                                                        Math.ceil(
+                                                            fetchData?.length /
+                                                                itemsPerPage,
+                                                        ) &&
+                                                    fetchData?.length !== 0
+                                                ) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.color =
+                                                        "white";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(-1px)";
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (
+                                                    currentPage !==
+                                                        Math.ceil(
+                                                            fetchData?.length /
+                                                                itemsPerPage,
+                                                        ) &&
+                                                    fetchData?.length !== 0
+                                                ) {
+                                                    e.currentTarget.style.backgroundColor =
+                                                        "white";
+                                                    e.currentTarget.style.color =
+                                                        "#0d6efd";
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(0)";
+                                                }
+                                            }}
+                                        >
+                                            Dernier
+                                            <i className="fas fa-angle-double-right ms-1"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
 
-                        <table className="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>NumCompte</th>
-                                    <th>NomCompte</th>
-                                    <th>NumDossier</th>
-                                    <th>Date</th>
-                                    <th
-                                        style={{
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {!fetchSearchedCredit && fetchData
-                                    ? fetchData.map((credit, index) => {
-                                          return (
-                                              <tr key={index}>
-                                                  <td>{credit.NumCompte}</td>
-                                                  <td>{credit.NomCompte}</td>
-                                                  <td>{credit.NumDossier}</td>
-                                                  <td>
-                                                      {dateParser(
-                                                          credit.date_demande
-                                                      )}
-                                                  </td>
-                                                  <td
-                                                      style={{
-                                                          textAlign: "center",
-                                                      }}
-                                                  >
-                                                      <div
-                                                          className="btn-group"
-                                                          role="group"
-                                                      >
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-primary"
-                                                              data-toggle="modal"
-                                                              data-target="#modalVisualisationDossier"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      credit.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              Visualiser{" "}
-                                                              <i className="fas fa-eye"></i>
-                                                          </button>
+  {/* Modals */}
+  {dossierIdSelected && (
+    <ModalBootstrapVisualisation
+      dossierId={dossierIdSelected}
+      onClose={() => setDossierIdSelected(null)}
+    />
+  )}
 
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-success"
-                                                              data-toggle="modal"
-                                                              data-target="#modalTimeLine"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      credit.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              <MdTimeline />
-                                                              TimeLine{" "}
-                                                              {/* <i className="fas fa-pen"></i> */}
-                                                          </button>
-
-                                                          {/* <button
-                                                              type="button"
-                                                              className="btn btn-danger"
-                                                              onClick={() => {
-                                                                  handleDeleteCredit(
-                                                                      credit.id_credit
-                                                                  );
-                                                              }}
-                                                          >
-                                                              Supprimer{" "}
-                                                              <i
-                                                                  class="fa fa-trash"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                          </button> */}
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-info"
-                                                              data-toggle="modal"
-                                                              data-target="#modalContratPret"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      credit.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              Fichiers{" "}
-                                                              <i
-                                                                  class="fa fa-file"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                          </button>
-                                                      </div>
-                                                  </td>
-                                              </tr>
-                                          );
-                                      })
-                                    : fetchSearchedCredit &&
-                                      fetchSearchedCredit.map((res, index) => {
-                                          return (
-                                              <tr key={index}>
-                                                  <td>{res.NumCompte}</td>
-                                                  <td>{res.NomCompte}</td>
-                                                  <td>{res.NumDossier}</td>
-                                                  <td>
-                                                      {dateParser(
-                                                          res.date_demande
-                                                      )}
-                                                  </td>
-                                                  <td
-                                                      style={{
-                                                          textAlign: "center",
-                                                      }}
-                                                  >
-                                                      <div
-                                                          className="btn-group"
-                                                          role="group"
-                                                      >
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-primary"
-                                                              data-toggle="modal"
-                                                              data-target="#modalVisualisationDossier"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      res.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              Visualiser{" "}
-                                                              <i className="fas fa-eye"></i>
-                                                          </button>
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-success"
-                                                              data-toggle="modal"
-                                                              data-target="#modalTimeLine"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      res.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              <MdTimeline />
-                                                              TimeLine{" "}
-                                                              {/* <i className="fas fa-pen"></i> */}
-                                                          </button>
-                                                          {/* <button
-                                                              type="button"
-                                                              className="btn btn-danger"
-                                                              onClick={() => {
-                                                                  handleDeleteCredit(
-                                                                      credit.id_credit
-                                                                  );
-                                                              }}
-                                                          >
-                                                              Supprimer{" "}
-                                                              <i
-                                                                  class="fa fa-trash"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                          </button> */}
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-info"
-                                                              data-toggle="modal"
-                                                              data-target="#modalContratPret"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      res.id_credit
-                                                                  )
-                                                              }
-                                                          >
-                                                              Fichiers{" "}
-                                                              <i
-                                                                  class="fa fa-file"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                          </button>
-                                                      </div>
-                                                  </td>
-                                              </tr>
-                                          );
-                                      })}
-                            </tbody>
-                        </table>
-                        {dossierIdSelected && (
-                            <ModalBootstrapVisualisation
-                                dossierId={dossierIdSelected}
-                                onClose={() => setDossierIdSelected(null)}
-                            />
-                        )}
-
-                        {dossierIdSelected && (
-                            <CreditTimeline
-                                creditId={dossierIdSelected}
-                                onClose={() => setDossierIdSelected(null)}
-                            />
-                        )}
-                        {dossierIdSelected && (
-                            <ModalContratPret
-                                creditId={dossierIdSelected}
-                                onClose={() => setDossierIdSelected(null)}
-                            />
-                        )}
-                    </div>
-                </div>
-            </div>
+  {dossierIdSelected && (
+    <CreditTimeline
+      creditId={dossierIdSelected}
+      onClose={() => setDossierIdSelected(null)}
+    />
+  )}
+  
+  {dossierIdSelected && (
+    <ModalContratPret
+      creditId={dossierIdSelected}
+      onClose={() => setDossierIdSelected(null)}
+    />
+  )}
+</div>
         </>
     );
 };

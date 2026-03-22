@@ -84,231 +84,236 @@ export default function ModalTitreCredit({ onClose }) {
     }, {});
 
     return (
-        <div
-            className="modal fade"
-            tabIndex="-1"
-            aria-hidden="true"
-            // ref={modalRef}
-            id="modalVisualisationTitre"
-        >
-            <div className="modal-dialog modal-xl">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <div className="row">
-                            <div className="col-md-12 card rounded-10 p-1">
-                                <div
-                                    style={{
-                                        color: "black",
-                                        display: "flex", // Utilisation de Flexbox
-                                        justifyContent: "space-between", // Distribution des éléments aux extrémités
-                                        alignItems: "center", // Alignement vertical des éléments
-                                    }}
-                                >
-                                    <h5
-                                        className="text-bold p-1"
-                                        style={{ margin: 0 }}
-                                    >
-                                        <i className="fas fa-file"></i> Fichiers
-                                        Titres
-                                    </h5>
-
-                                    <h5
-                                        className="text-bold p-1"
-                                        style={{ margin: 0 }}
-                                    >
-                                        <table>
-                                            <tr>
-                                                <td>
-                                                    <input
-                                                        type="text"
-                                                        style={{
-                                                            borderRadius: "0px",
-                                                        }}
-                                                        // ref={textInput}
-                                                        className="form-control font-weight-bold"
-                                                        placeholder="Rechercher par Nom"
-                                                        name="searchRefOperation"
-                                                        value={searchRefCredit}
-                                                        onChange={(e) => {
-                                                            setsearchRefCredit(
-                                                                e.target.value
-                                                            );
-                                                        }}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        type="button"
-                                                        style={{
-                                                            borderRadius: "0px",
-                                                            width: "100%",
-                                                            height: "auto",
-                                                            fontSize: "12px",
-                                                            padding: "10px",
-                                                        }}
-                                                        className="btn btn-primary"
-                                                        onClick={() => {
-                                                            handleSeachCredit(
-                                                                searchRefCredit
-                                                            );
-                                                        }}
-                                                    >
-                                                        <i
-                                                            className={`${
-                                                                loading
-                                                                    ? "spinner-border spinner-border-sm"
-                                                                    : " fas fa-search"
-                                                            }`}
-                                                        ></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="close"
-                            data-dismiss="modal"
-                            aria-label="Close"
-                            onClick={onClose}
-                        >
-                            {" "}
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div className="modal-body">
-                        <div className="row">
-                            <div className="col-md-12">
-                                {!dossier && <p>Chargement...</p>}
-                                {groupedImages &&
-                                    Object.keys(groupedImages).map(
-                                        (state, idx) => (
-                                            <div key={idx} className="mb-4">
-                                                {/* Titre en fonction du type */}
-                                                <h6>
-                                                    {state === "ia"
-                                                        ? "Titres en image"
-                                                        : state === "im"
-                                                        ? "Titres en image"
-                                                        : state === "it"
-                                                        ? "Titres en image"
-                                                        : state === "ig"
-                                                        ? "Titres en image"
-                                                        : ""}
-                                                </h6>
-
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        flexWrap: "wrap",
-                                                        gap: "10px",
-                                                    }}
-                                                >
-                                                    {groupedImages[state].map(
-                                                        (img, i) => (
-                                                            <div
-                                                                key={i}
-                                                                style={{
-                                                                    position:
-                                                                        "relative",
-                                                                    display:
-                                                                        "inline-block",
-                                                                    margin: "8px",
-                                                                }}
-                                                            >
-                                                                {/* Image avec zoom */}
-                                                                <Zoom>
-                                                                    <img
-                                                                        src={`/storage/${img.path}`}
-                                                                        alt={`Image ${i}`}
-                                                                        style={{
-                                                                            width: "150px",
-                                                                            height: "150px",
-                                                                            objectFit:
-                                                                                "cover",
-                                                                            borderRadius:
-                                                                                "10px",
-                                                                            cursor: "zoom-in",
-                                                                            boxShadow:
-                                                                                "0 2px 8px rgba(0,0,0,0.2)",
-                                                                        }}
-                                                                    />
-                                                                </Zoom>
-                                                            </div>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )
-                                    )}
-
-                                <div>
-                                    {/* Boutons pour les PDF */}
-                                    {dossier &&
-                                        dossier.pdfs &&
-                                        dossier.pdfs.length > 0 && (
-                                            <div className="mt-3">
-                                                <h6>Titre en PDF :</h6>
-                                                {dossier.pdfs.map((pdf, i) => (
-                                                    <>
-                                                        <span
-                                                            style={{
-                                                                border: "1px solid #dcdcdc",
-                                                                padding: "10px",
-                                                            }}
-                                                        >
-                                                            <button
-                                                                key={pdf.id}
-                                                                className="btn btn-outline-secondary btn-sm me-2"
-                                                                data-toggle="tooltip"
-                                                                title="Visualiser"
-                                                                onClick={() =>
-                                                                    handleViewFile(
-                                                                        pdf.path,
-                                                                        "pdf"
-                                                                    )
-                                                                }
-                                                            >
-                                                                {getFileName(
-                                                                    pdf.path
-                                                                )}
-                                                            </button>
-                                                        </span>
-                                                    </>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                    {/* Modal / visualisation du fichier */}
-                                    {selectedFile && (
-                                        <div className="mt-3">
-                                            <button
-                                                className="btn btn-danger btn-sm mb-2"
-                                                onClick={handleCloseFile}
-                                            >
-                                                Fermer
-                                            </button>
-
-                                            {fileType === "pdf" && (
-                                                <iframe
-                                                    title="PDF Viewer"
-                                                    width="100%"
-                                                    height="600px"
-                                                    src={`/storage/${selectedFile}`}
-                                                ></iframe>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div
+  className="modal fade"
+  tabIndex="-1"
+  aria-hidden="true"
+  id="modalVisualisationTitre"
+>
+  <div className="modal-dialog modal-xl">
+    <div className="modal-content border-0 shadow-lg rounded-3">
+      {/* Header modernisé */}
+      <div className="modal-header bg-gradient-primary text-white rounded-top-3" style={{ background: "linear-gradient(135deg, #20c997 0%, #198764 100%)", borderBottom: "none", padding: "1rem 1.5rem" }}>
+        <div className="d-flex justify-content-between align-items-center w-100">
+          <div className="d-flex align-items-center gap-3">
+            <div style={{ width: "48px", height: "48px", background: "rgba(255,255,255,0.15)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <i className="fas fa-file-alt fa-2x"></i>
             </div>
+            <div>
+              <h5 className="fw-semibold mb-0 text-white">
+                Gestion des titres
+              </h5>
+              <small className="text-white-50">
+                Documents et images des titres
+              </small>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn-close btn-close-white"
+            data-dismiss="modal"
+            aria-label="Close"
+            onClick={onClose}
+          ></button>
         </div>
+      </div>
+
+      <div className="modal-body p-4" style={{ maxHeight: "80vh", overflowY: "auto" }}>
+        <div className="row">
+          <div className="col-md-12">
+            {/* Barre de recherche améliorée */}
+            <div className="card border-0 bg-light rounded-3 mb-4">
+              <div className="card-body p-3">
+                <div className="d-flex gap-2 align-items-center">
+                  <div className="flex-grow-1">
+                    <div className="position-relative">
+                      <i className="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style={{ fontSize: "12px" }}></i>
+                      <input
+                        type="text"
+                        style={{ borderRadius: "10px", padding: "10px 12px 10px 35px" }}
+                        className="form-control border-0"
+                        placeholder="Rechercher par nom de document..."
+                        name="searchRefOperation"
+                        value={searchRefCredit}
+                        onChange={(e) => {
+                          setsearchRefCredit(e.target.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      style={{ borderRadius: "10px", padding: "10px 24px" }}
+                      className="btn btn-teal d-flex align-items-center gap-2"
+                      onClick={() => {
+                        handleSeachCredit(searchRefCredit);
+                      }}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      ) : (
+                        <i className="fas fa-search"></i>
+                      )}
+                      <span>Rechercher</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Chargement */}
+            {!dossier && (
+              <div className="text-center py-5">
+                <div className="spinner-border text-teal" role="status" style={{ width: "3rem", height: "3rem" }}>
+                  <span className="visually-hidden">Chargement...</span>
+                </div>
+                <p className="mt-3 text-muted">Chargement des titres...</p>
+              </div>
+            )}
+
+            {/* Section Images des titres */}
+            {groupedImages && Object.keys(groupedImages).length > 0 && (
+              <div className="mb-4">
+                {Object.keys(groupedImages).map((state, idx) => (
+                  <div key={idx} className="mb-4">
+                    <div className="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                      <div className="bg-teal rounded-circle p-2" style={{ backgroundColor: "#20c997" }}>
+                        <i className="fas fa-image text-white fa-sm"></i>
+                      </div>
+                      <h6 className="fw-semibold mb-0" style={{ fontSize: "1rem" }}>
+                        <i className="fas fa-certificate me-2"></i>
+                        Titres en image
+                      </h6>
+                      <span className="badge bg-secondary rounded-pill ms-2">
+                        {groupedImages[state].length}
+                      </span>
+                    </div>
+
+                    <div className="d-flex flex-wrap gap-3">
+                      {groupedImages[state].map((img, i) => (
+                        <div key={i} className="position-relative" style={{ width: "180px" }}>
+                          <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
+                            <div className="position-relative">
+                              <Zoom>
+                                <img
+                                  src={`/storage/${img.path}`}
+                                  alt={`Titre ${i}`}
+                                  className="w-100"
+                                  style={{ height: "180px", objectFit: "cover", cursor: "zoom-in" }}
+                                />
+                              </Zoom>
+                              <div className="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1 text-center" style={{ fontSize: "10px" }}>
+                                <i className="fas fa-file-image me-1"></i>
+                                Image titre
+                              </div>
+                            </div>
+                            <div className="card-body p-2 text-center bg-light">
+                              <small className="text-muted text-truncate d-block">
+                                {img.path.split("/").pop()}
+                              </small>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Section PDF des titres */}
+            {dossier && dossier.pdfs && dossier.pdfs.length > 0 && (
+              <div className="mt-4">
+                <div className="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                  <div className="bg-danger rounded-circle p-2" style={{ backgroundColor: "#dc3545" }}>
+                    <i className="fas fa-file-pdf text-white fa-sm"></i>
+                  </div>
+                  <h6 className="fw-semibold mb-0" style={{ fontSize: "1rem" }}>
+                    <i className="fas fa-file-pdf me-2"></i>
+                    Titres en PDF
+                  </h6>
+                  <span className="badge bg-danger rounded-pill ms-2">
+                    {dossier.pdfs.length}
+                  </span>
+                </div>
+
+                <div className="row g-3">
+                  {dossier.pdfs.map((pdf, i) => (
+                    <div key={pdf.id || i} className="col-md-4 col-lg-3">
+                      <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
+                        <div className="card-body p-3 text-center">
+                          <div className="mb-3">
+                            <div style={{ width: "60px", height: "60px", background: "linear-gradient(135deg, #dc3545 0%, #b02a37 100%)", borderRadius: "12px", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                              <i className="fas fa-file-pdf fa-2x text-white"></i>
+                            </div>
+                          </div>
+                          <h6 className="fw-semibold small mb-2 text-truncate" title={getFileName(pdf.path)}>
+                            {getFileName(pdf.path)}
+                          </h6>
+                          <button
+                            className="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
+                            onClick={() => handleViewFile(pdf.path, "pdf")}
+                            style={{ borderRadius: "8px" }}
+                          >
+                            <i className="fas fa-eye"></i>
+                            <span>Visualiser</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Message si aucun document */}
+            {dossier && (!groupedImages || Object.keys(groupedImages).length === 0) && (!dossier.pdfs || dossier.pdfs.length === 0) && (
+              <div className="text-center py-5">
+                <i className="fas fa-folder-open fa-4x text-muted mb-3"></i>
+                <p className="text-muted mb-0">Aucun titre disponible pour ce dossier</p>
+                <small className="text-muted">Aucune image ou document PDF trouvé</small>
+              </div>
+            )}
+
+            {/* Visualisation du fichier sélectionné */}
+            {selectedFile && (
+              <div className="mt-4">
+                <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
+                  <div className="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                    <h6 className="fw-semibold mb-0">
+                      <i className="fas fa-eye me-2"></i>
+                      Aperçu du document
+                    </h6>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      style={{ borderRadius: "20px" }}
+                      onClick={handleCloseFile}
+                    >
+                      <i className="fas fa-times me-1"></i>
+                      Fermer
+                    </button>
+                  </div>
+                  <div className="card-body p-0">
+                    {fileType === "pdf" && (
+                      <iframe
+                        title="PDF Viewer"
+                        width="100%"
+                        height="600px"
+                        src={`/storage/${selectedFile}`}
+                        style={{ border: "none" }}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
     );
 }

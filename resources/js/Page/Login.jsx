@@ -36,7 +36,7 @@ const LoginForm = () => {
             } catch (error) {
                 console.error(
                     "Erreur lors de la vérification de l'expiration de la session :",
-                    error
+                    error,
                 );
                 // Gérer les erreurs de requête ici
             }
@@ -161,228 +161,601 @@ const LoginForm = () => {
     const isDisabled = user.name.trim() === "" || user.password.trim() === "";
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid p-0">
             {expiredPassword == false ? (
-                <div className="row">
+                <div className="row g-0 min-vh-100">
+                    {/* Colonne gauche - Formulaire de connexion */}
                     <div
-                        className="col-md-6  rounded-0"
+                        className="col-md-6 d-flex align-items-center justify-content-center"
                         style={{
-                            height: "100vh",
-                            background: "#dcdcdc",
-                            border: "25px solid #fff",
-                            margin: "0px",
+                            background:
+                                "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+                            position: "relative",
+                            overflow: "hidden",
                         }}
                     >
-                        <div style={{ marginTop: "120px" }}>
-                            <div className={styles.register_section_warp}>
-                                <div className={styles.register_section_right}>
-                                    <form
-                                        className={styles.form}
-                                        onSubmit={handleSubmit}
-                                    >
-                                        <p style={{ textAlign: "center" }}>
-                                            <h5>
-                                                {" "}
-                                                <strong>
-                                                    {" "}
-                                                    Bienvenue sur la plate forme
-                                                </strong>{" "}
-                                                <br />
-                                                de traitement de dossier de
-                                                crédit
-                                            </h5>
-                                        </p>
-                                        <div className={styles.name}>
-                                            <input
-                                                className={styles.input_form}
-                                                type="text"
-                                                name="name"
-                                                value={user.name}
-                                                onChange={(e) =>
-                                                    setUser((p) => ({
-                                                        ...p,
-                                                        name: e.target.value,
-                                                    }))
-                                                }
-                                            />
-                                            <input
-                                                type="hidden"
-                                                value={user.SkipNow}
-                                            />
-                                            <span className="text-danger">
-                                                {error.name}
-                                            </span>
-                                            <label
-                                                className={styles.label_form}
-                                            >
-                                                Nom d'utilisateur
-                                            </label>
-                                        </div>
+                        {/* Effet de fond décoratif */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: "-50%",
+                                right: "-20%",
+                                width: "80%",
+                                height: "150%",
+                                background:
+                                    "radial-gradient(circle, rgba(32,201,151,0.03) 0%, transparent 70%)",
+                                borderRadius: "50%",
+                            }}
+                        ></div>
 
-                                        <div className="password">
-                                            <input
-                                                className={styles.input_form}
-                                                type="password"
-                                                name="password"
-                                                value={user.password}
-                                                onChange={(e) =>
-                                                    setUser((p) => ({
-                                                        ...p,
-                                                        password:
-                                                            e.target.value,
-                                                    }))
-                                                }
-                                                // required
-                                                // autoComplete="off"
-                                                // placeholder="Xbshsd$##@31!"
-                                            />
-                                            <span className="text-danger">
-                                                {error.password}
-                                            </span>
-                                            <label
-                                                className={styles.label_form}
-                                            >
-                                                Mot de passe
-                                            </label>
-                                        </div>
-                                        <button
-                                            type="submit"
-                                            disabled={isDisabled}
-                                            className={`w-full py-2 rounded text-white ${
-                                                isDisabled
-                                                    ? "bg-gray-400 cursor-not-allowed"
-                                                    : "bg-blue-600"
-                                            }`}
-                                        >
-                                            Connexion
-                                        </button>
-                                        <a
+                        <div
+                            className="w-100 px-4 px-md-5"
+                            style={{ maxWidth: "500px", zIndex: 1 }}
+                        >
+                            <div className="text-center mb-4">
+                                <div
+                                    className="d-inline-flex align-items-center justify-content-center mb-3"
+                                    style={{
+                                        width: "70px",
+                                        height: "70px",
+                                        background:
+                                            "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                                        borderRadius: "18px",
+                                        boxShadow:
+                                            "0 8px 20px rgba(32,201,151,0.3)",
+                                    }}
+                                >
+                                    <i
+                                        className="fas fa-chart-line"
+                                        style={{
+                                            fontSize: "32px",
+                                            color: "white",
+                                        }}
+                                    ></i>
+                                </div>
+                                <h2
+                                    className="fw-bold mb-2"
+                                    style={{ color: "#2c3e50" }}
+                                >
+                                    Bienvenue
+                                </h2>
+                                <p className="text-muted mb-0">
+                                    Plateforme de traitement de dossier de
+                                    crédit
+                                </p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="mt-4">
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small text-muted">
+                                        Nom d'utilisateur
+                                    </label>
+                                    <div className="position-relative">
+                                        <i
+                                            className="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3"
                                             style={{
-                                                textDecoration: "none",
-                                                textAlign: "center",
+                                                color: "#adb5bd",
+                                                fontSize: "14px",
                                             }}
-                                            href="/auth/forget-password"
-                                        >
-                                            J'ai oublié mon mot de passe
-                                        </a>
-                                    </form>
+                                        ></i>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={user.name}
+                                            onChange={(e) =>
+                                                setUser((p) => ({
+                                                    ...p,
+                                                    name: e.target.value,
+                                                }))
+                                            }
+                                            className="form-control form-control-lg ps-5"
+                                            style={{
+                                                borderRadius: "12px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "white",
+                                                padding: "12px 16px 12px 40px",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                            placeholder="Entrez votre nom d'utilisateur"
+                                        />
+                                    </div>
+                                    {error.name && (
+                                        <small className="text-danger d-block mt-1">
+                                            {error.name}
+                                        </small>
+                                    )}
+                                </div>
+
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small text-muted">
+                                        Mot de passe
+                                    </label>
+                                    <div className="position-relative">
+                                        <i
+                                            className="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3"
+                                            style={{
+                                                color: "#adb5bd",
+                                                fontSize: "14px",
+                                            }}
+                                        ></i>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            value={user.password}
+                                            onChange={(e) =>
+                                                setUser((p) => ({
+                                                    ...p,
+                                                    password: e.target.value,
+                                                }))
+                                            }
+                                            className="form-control form-control-lg ps-5"
+                                            style={{
+                                                borderRadius: "12px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "white",
+                                                padding: "12px 16px 12px 40px",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                            placeholder="Entrez votre mot de passe"
+                                        />
+                                    </div>
+                                    {error.password && (
+                                        <small className="text-danger d-block mt-1">
+                                            {error.password}
+                                        </small>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isDisabled}
+                                    className="btn w-100 py-3 fw-semibold"
+                                    style={{
+                                        background: isDisabled
+                                            ? "#adb5bd"
+                                            : "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                                        color: "white",
+                                        borderRadius: "12px",
+                                        border: "none",
+                                        transition: "all 0.2s ease",
+                                        cursor: isDisabled
+                                            ? "not-allowed"
+                                            : "pointer",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (!isDisabled) {
+                                            e.currentTarget.style.transform =
+                                                "translateY(-2px)";
+                                            e.currentTarget.style.boxShadow =
+                                                "0 6px 16px rgba(32,201,151,0.4)";
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!isDisabled) {
+                                            e.currentTarget.style.transform =
+                                                "translateY(0)";
+                                            e.currentTarget.style.boxShadow =
+                                                "none";
+                                        }
+                                    }}
+                                >
+                                    {/* {isDisabled ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            Connexion...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-sign-in-alt me-2"></i>
+                                            Se connecter
+                                        </>
+                                    )} */}
+                                     <>
+                                            <i className="fas fa-sign-in-alt me-2"></i>
+                                            Se connecter
+                                        </>
+                                </button>
+
+                                <div className="text-center mt-4">
+                                    <a
+                                        href="/auth/forget-password"
+                                        className="text-decoration-none small"
+                                        style={{
+                                            color: "#20c997",
+                                            transition: "color 0.2s ease",
+                                        }}
+                                        onMouseEnter={(e) =>
+                                            (e.currentTarget.style.color =
+                                                "#198764")
+                                        }
+                                        onMouseLeave={(e) =>
+                                            (e.currentTarget.style.color =
+                                                "#20c997")
+                                        }
+                                    >
+                                        <i className="fas fa-key me-1"></i>
+                                        J'ai oublié mon mot de passe
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    {/* Colonne droite - Image et informations */}
+                    <div
+                        className="col-md-6 d-none d-md-flex align-items-center justify-content-center"
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                            position: "relative",
+                            overflow: "hidden",
+                        }}
+                    >
+                        {/* Effet de fond décoratif */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: "-30%",
+                                left: "-20%",
+                                width: "120%",
+                                height: "160%",
+                                background:
+                                    "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+                                borderRadius: "50%",
+                            }}
+                        ></div>
+
+                        <div className="text-center p-5" style={{ zIndex: 1 }}>
+                            <div className="mb-4">
+                                <div
+                                    style={{
+                                        width: "100px",
+                                        height: "100px",
+                                        background: "rgba(255,255,255,0.15)",
+                                        borderRadius: "30px",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        backdropFilter: "blur(10px)",
+                                    }}
+                                >
+                                    <i
+                                        className="fas fa-hand-holding-usd"
+                                        style={{
+                                            fontSize: "48px",
+                                            color: "white",
+                                        }}
+                                    ></i>
                                 </div>
                             </div>
-                        </div>
-                        <br />
-                    </div>
-                    <div
-                        className="col-md-6 card rounded-0"
-                        style={{
-                            height: "100vh",
-                            margin: "0px",
-                        }}
-                    >
-                        <div className="container text-center my-4">
-                            <img
-                                src="/images/credit-image.jpg"
-                                alt="Crédit"
-                                className="img-fluid"
-                                style={{ maxWidth: "570px", width: "100%" }}
-                            />
+                            <h3 className="text-white fw-bold mb-3">
+                                Gestion de crédit simplifiée
+                            </h3>
+                            <p className="text-white-50 mb-4">
+                                Accédez à votre espace de travail pour gérer
+                                efficacement les dossiers de crédit
+                            </p>
+                            <div className="d-flex gap-3 justify-content-center">
+                                <div className="text-center">
+                                    {/* <div className="text-white fw-bold h4">
+                                        100+
+                                    </div>
+                                    <small className="text-white-50">
+                                        Dossiers traités
+                                    </small> */}
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-white fw-bold h4">
+                                        24/7
+                                    </div>
+                                    <small className="text-white-50">
+                                        Support disponible
+                                    </small>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-white fw-bold h4">
+                                        Sécurisé
+                                    </div>
+                                    <small className="text-white-50">
+                                        Données protégées
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="col-md-6 card">
-                    <div>
-                        <div className={styles.register_section_warp}>
-                            <div className={styles.register_section_right}>
-                                <h2>Changement du mot de passe !</h2>
-
-                                <form
-                                    className={styles.form}
-                                    onSubmit={handleSubmitChangePassword}
-                                >
-                                    <div className={styles.name}>
-                                        <input
-                                            className={styles.input_form}
-                                            type="password"
-                                            name="Previouspassword"
-                                            value={user.Previouspassword}
-                                            onChange={(e) =>
-                                                setUser((p) => ({
-                                                    ...p,
-                                                    Previouspassword:
-                                                        e.target.value,
-                                                }))
-                                            }
-                                            // required
-                                            // placeholder=""
-                                            // autoComplete="off"
-                                        />
-                                        <span className="text-danger">
-                                            {error.Previouspassword}
-                                        </span>
-                                        <label className={styles.label_form}>
-                                            Ancien mot de passe
-                                        </label>
-                                    </div>
-
-                                    <div className="password">
-                                        <input
-                                            className={styles.input_form}
-                                            type="password"
-                                            name="newPassword"
-                                            value={user.newPassword}
-                                            onChange={(e) =>
-                                                setUser((p) => ({
-                                                    ...p,
-                                                    newPassword: e.target.value,
-                                                }))
-                                            }
-                                        />
-                                        <span className="text-danger">
-                                            {error.newPassword}
-                                        </span>
-                                        <label className={styles.label_form}>
-                                            Nouveau Mot de passe
-                                        </label>
-                                    </div>
-
-                                    <div className="password">
-                                        <input
-                                            className={styles.input_form}
-                                            type="password"
-                                            name="confirmNewPassword"
-                                            value={user.confirmNewPassword}
-                                            onChange={(e) =>
-                                                setUser((p) => ({
-                                                    ...p,
-                                                    confirmNewPassword:
-                                                        e.target.value,
-                                                }))
-                                            }
-                                        />
-                                        <span className="text-danger">
-                                            {error.confirmNewPassword}
-                                        </span>
-                                        <label className={styles.label_form}>
-                                            Confirmer votre mot de passe
-                                        </label>
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        className={styles.button_effect}
+                /* Formulaire de changement de mot de passe */
+                <div className="row g-0 min-vh-100">
+                    <div className="col-md-6 offset-md-3 d-flex align-items-center justify-content-center py-5">
+                        <div
+                            className="w-100 px-4"
+                            style={{ maxWidth: "500px" }}
+                        >
+                            <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+                                <div className="card-header bg-white border-0 pt-5 pb-0 text-center">
+                                    <div
+                                        className="d-inline-flex align-items-center justify-content-center mb-3"
+                                        style={{
+                                            width: "60px",
+                                            height: "60px",
+                                            background:
+                                                "linear-gradient(135deg, #ffc107 0%, #ffb347 100%)",
+                                            borderRadius: "16px",
+                                            boxShadow:
+                                                "0 4px 12px rgba(255,193,7,0.3)",
+                                        }}
                                     >
-                                        Connexion
-                                    </button>
-                                    <a
-                                        style={{ textDecoration: "none" }}
-                                        href="/auth/forget-password"
-                                    >
-                                        J'ai oublié mon mot de passe
-                                    </a>
-                                </form>
+                                        <i
+                                            className="fas fa-key"
+                                            style={{
+                                                fontSize: "28px",
+                                                color: "white",
+                                            }}
+                                        ></i>
+                                    </div>
+                                    <h3 className="fw-bold mb-1">
+                                        Changement du mot de passe
+                                    </h3>
+                                    <p className="text-muted small">
+                                        Pour des raisons de sécurité, veuillez
+                                        changer votre mot de passe
+                                    </p>
+                                </div>
+
+                                <div className="card-body p-4">
+                                    <form onSubmit={handleSubmitChangePassword}>
+                                        <div className="mb-4">
+                                            <label className="form-label fw-semibold small text-muted">
+                                                Ancien mot de passe
+                                            </label>
+                                            <div className="position-relative">
+                                                <i
+                                                    className="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3"
+                                                    style={{
+                                                        color: "#adb5bd",
+                                                        fontSize: "14px",
+                                                    }}
+                                                ></i>
+                                                <input
+                                                    type="password"
+                                                    name="Previouspassword"
+                                                    value={
+                                                        user.Previouspassword
+                                                    }
+                                                    onChange={(e) =>
+                                                        setUser((p) => ({
+                                                            ...p,
+                                                            Previouspassword:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                    className="form-control form-control-lg ps-5"
+                                                    style={{
+                                                        borderRadius: "12px",
+                                                        border: "1px solid #e9ecef",
+                                                        backgroundColor:
+                                                            "#f8f9fa",
+                                                        padding:
+                                                            "12px 16px 12px 40px",
+                                                        transition:
+                                                            "all 0.2s ease",
+                                                    }}
+                                                    onFocus={(e) => {
+                                                        e.currentTarget.style.borderColor =
+                                                            "#ffc107";
+                                                        e.currentTarget.style.backgroundColor =
+                                                            "white";
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        e.currentTarget.style.borderColor =
+                                                            "#e9ecef";
+                                                        e.currentTarget.style.backgroundColor =
+                                                            "#f8f9fa";
+                                                    }}
+                                                    placeholder="Entrez votre ancien mot de passe"
+                                                />
+                                            </div>
+                                            {error.Previouspassword && (
+                                                <small className="text-danger d-block mt-1">
+                                                    {error.Previouspassword}
+                                                </small>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="form-label fw-semibold small text-muted">
+                                                Nouveau mot de passe
+                                            </label>
+                                            <div className="position-relative">
+                                                <i
+                                                    className="fas fa-key position-absolute top-50 start-0 translate-middle-y ms-3"
+                                                    style={{
+                                                        color: "#adb5bd",
+                                                        fontSize: "14px",
+                                                    }}
+                                                ></i>
+                                                <input
+                                                    type="password"
+                                                    name="newPassword"
+                                                    value={user.newPassword}
+                                                    onChange={(e) =>
+                                                        setUser((p) => ({
+                                                            ...p,
+                                                            newPassword:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                    className="form-control form-control-lg ps-5"
+                                                    style={{
+                                                        borderRadius: "12px",
+                                                        border: "1px solid #e9ecef",
+                                                        backgroundColor:
+                                                            "#f8f9fa",
+                                                        padding:
+                                                            "12px 16px 12px 40px",
+                                                        transition:
+                                                            "all 0.2s ease",
+                                                    }}
+                                                    onFocus={(e) => {
+                                                        e.currentTarget.style.borderColor =
+                                                            "#ffc107";
+                                                        e.currentTarget.style.backgroundColor =
+                                                            "white";
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        e.currentTarget.style.borderColor =
+                                                            "#e9ecef";
+                                                        e.currentTarget.style.backgroundColor =
+                                                            "#f8f9fa";
+                                                    }}
+                                                    placeholder="Entrez votre nouveau mot de passe"
+                                                />
+                                            </div>
+                                            {error.newPassword && (
+                                                <small className="text-danger d-block mt-1">
+                                                    {error.newPassword}
+                                                </small>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="form-label fw-semibold small text-muted">
+                                                Confirmer le mot de passe
+                                            </label>
+                                            <div className="position-relative">
+                                                <i
+                                                    className="fas fa-check-circle position-absolute top-50 start-0 translate-middle-y ms-3"
+                                                    style={{
+                                                        color: "#adb5bd",
+                                                        fontSize: "14px",
+                                                    }}
+                                                ></i>
+                                                <input
+                                                    type="password"
+                                                    name="confirmNewPassword"
+                                                    value={
+                                                        user.confirmNewPassword
+                                                    }
+                                                    onChange={(e) =>
+                                                        setUser((p) => ({
+                                                            ...p,
+                                                            confirmNewPassword:
+                                                                e.target.value,
+                                                        }))
+                                                    }
+                                                    className="form-control form-control-lg ps-5"
+                                                    style={{
+                                                        borderRadius: "12px",
+                                                        border: "1px solid #e9ecef",
+                                                        backgroundColor:
+                                                            "#f8f9fa",
+                                                        padding:
+                                                            "12px 16px 12px 40px",
+                                                        transition:
+                                                            "all 0.2s ease",
+                                                    }}
+                                                    onFocus={(e) => {
+                                                        e.currentTarget.style.borderColor =
+                                                            "#ffc107";
+                                                        e.currentTarget.style.backgroundColor =
+                                                            "white";
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        e.currentTarget.style.borderColor =
+                                                            "#e9ecef";
+                                                        e.currentTarget.style.backgroundColor =
+                                                            "#f8f9fa";
+                                                    }}
+                                                    placeholder="Confirmez votre nouveau mot de passe"
+                                                />
+                                            </div>
+                                            {error.confirmNewPassword && (
+                                                <small className="text-danger d-block mt-1">
+                                                    {error.confirmNewPassword}
+                                                </small>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            className="btn w-100 py-3 fw-semibold"
+                                            style={{
+                                                background:
+                                                    "linear-gradient(135deg, #ffc107 0%, #ffb347 100%)",
+                                                color: "white",
+                                                borderRadius: "12px",
+                                                border: "none",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform =
+                                                    "translateY(-2px)";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 6px 16px rgba(255,193,7,0.4)";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform =
+                                                    "translateY(0)";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                        >
+                                            <i className="fas fa-save me-2"></i>
+                                            Changer le mot de passe
+                                        </button>
+
+                                        <div className="text-center mt-4">
+                                            <a
+                                                href="/auth/forget-password"
+                                                className="text-decoration-none small"
+                                                style={{
+                                                    color: "#ffc107",
+                                                    transition:
+                                                        "color 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.color =
+                                                        "#ffb347")
+                                                }
+                                                onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.color =
+                                                        "#ffc107")
+                                                }
+                                            >
+                                                <i className="fas fa-question-circle me-1"></i>
+                                                J'ai oublié mon mot de passe
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <br />
                 </div>
             )}
         </div>

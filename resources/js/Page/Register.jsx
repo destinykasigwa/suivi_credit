@@ -55,143 +55,341 @@ const RegisterForm = () => {
 
     return (
         <div
-            className="h-100 d-flex align-items-center justify-content-center"
-            style={{ marginTop: "100px" }}
+            className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3"
+            style={{
+                background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+            }}
         >
-            <div className="col-md-6 card">
-                <div>
-                    <div className={styles.register_section_warp}>
-                        <div className={styles.register_section_right}>
-                            <h2>Register !</h2>
-
-                            {/* {error.length!=0 ?
-                error.map((err)=>{
-                  return(
-                    <ul className="bg-danger" style={{marginLeft:"50px",marginRight:"200px"}}>
-                      <li>
-                     {err.validate_error}
-                     </li>
-                    </ul>
-                  )
-                })
-               
-               :""} */}
-
-                            <form
-                                className={styles.form}
-                                onSubmit={handleSubmit}
+            <div className="row w-100 justify-content-center">
+                <div className="col-md-6 col-lg-5">
+                    <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        {/* En-tête avec gradient */}
+                        <div className="card-header bg-white border-0 pt-4 pb-0 text-center">
+                            <div
+                                className="d-inline-flex align-items-center justify-content-center mb-3"
+                                style={{
+                                    width: "70px",
+                                    height: "70px",
+                                    background:
+                                        "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                                    borderRadius: "18px",
+                                    boxShadow:
+                                        "0 8px 20px rgba(32,201,151,0.3)",
+                                }}
                             >
-                                <div className={styles.userName}>
-                                    <input
-                                        className={styles.input_form}
-                                        type="text"
-                                        name="userName"
-                                        value={user.userName}
-                                        onChange={(e) =>
-                                            setUser((p) => ({
-                                                ...p,
-                                                userName: e.target.value,
-                                            }))
-                                        }
-                                        // required
-                                        // placeholder=""
-                                        // autoComplete="off"
-                                    />
-                                    <span className="text-danger">
-                                        {error.userName}
-                                    </span>
-                                    <label className={styles.label_form}>
+                                <i
+                                    className="fas fa-user-plus"
+                                    style={{ fontSize: "32px", color: "white" }}
+                                ></i>
+                            </div>
+                            <h2
+                                className="fw-bold mb-2"
+                                style={{ color: "#2c3e50" }}
+                            >
+                                Créer un compte
+                            </h2>
+                            <p className="text-muted small mb-3">
+                                Inscrivez-vous pour accéder à la plateforme
+                            </p>
+                        </div>
+
+                        {/* Corps du formulaire */}
+                        <div className="card-body p-4">
+                            <form onSubmit={handleSubmit}>
+                                {/* Nom d'utilisateur */}
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small text-muted">
                                         Nom d'utilisateur
                                     </label>
+                                    <div className="position-relative">
+                                        <i
+                                            className="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3"
+                                            style={{
+                                                color: "#adb5bd",
+                                                fontSize: "14px",
+                                            }}
+                                        ></i>
+                                        <input
+                                            type="text"
+                                            name="userName"
+                                            value={user.userName}
+                                            onChange={(e) =>
+                                                setUser((p) => ({
+                                                    ...p,
+                                                    userName: e.target.value,
+                                                }))
+                                            }
+                                            className="form-control form-control-lg ps-5"
+                                            style={{
+                                                borderRadius: "12px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "#f8f9fa",
+                                                padding: "12px 16px 12px 40px",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "white";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "#f8f9fa";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                            placeholder="Entrez votre nom d'utilisateur"
+                                        />
+                                    </div>
+                                    {error.userName && (
+                                        <small className="text-danger d-block mt-1">
+                                            {error.userName}
+                                        </small>
+                                    )}
                                 </div>
-                                <div className="email">
-                                    <input
-                                        className={styles.input_form}
-                                        type="email"
-                                        name="email"
-                                        value={user.email}
-                                        onChange={(e) =>
-                                            setUser((p) => ({
-                                                ...p,
-                                                email: e.target.value,
-                                            }))
-                                        }
-                                        // required
-                                        // placeholder="Jhondeo@gamil.com"
-                                        // autoComplete="off"
-                                    />
-                                    <span className="text-danger">
-                                        {error.email}
-                                    </span>
-                                    <label className={styles.label_form}>
-                                        Email
+
+                                {/* Email */}
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small text-muted">
+                                        Adresse email
                                     </label>
+                                    <div className="position-relative">
+                                        <i
+                                            className="fas fa-envelope position-absolute top-50 start-0 translate-middle-y ms-3"
+                                            style={{
+                                                color: "#adb5bd",
+                                                fontSize: "14px",
+                                            }}
+                                        ></i>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={user.email}
+                                            onChange={(e) =>
+                                                setUser((p) => ({
+                                                    ...p,
+                                                    email: e.target.value,
+                                                }))
+                                            }
+                                            className="form-control form-control-lg ps-5"
+                                            style={{
+                                                borderRadius: "12px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "#f8f9fa",
+                                                padding: "12px 16px 12px 40px",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "white";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "#f8f9fa";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                            placeholder="exemple@email.com"
+                                        />
+                                    </div>
+                                    {error.email && (
+                                        <small className="text-danger d-block mt-1">
+                                            {error.email}
+                                        </small>
+                                    )}
                                 </div>
-                                <div className="password">
-                                    <input
-                                        className={styles.input_form}
-                                        type="password"
-                                        name="password"
-                                        value={user.password}
-                                        onChange={(e) =>
-                                            setUser((p) => ({
-                                                ...p,
-                                                password: e.target.value,
-                                            }))
-                                        }
-                                        // required
-                                        // autoComplete="off"
-                                        // placeholder="Xbshsd$##@31!"
-                                    />
-                                    <span className="text-danger">
-                                        {error.password}
-                                    </span>
-                                    <label className={styles.label_form}>
+
+                                {/* Mot de passe */}
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small text-muted">
                                         Mot de passe
                                     </label>
+                                    <div className="position-relative">
+                                        <i
+                                            className="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3"
+                                            style={{
+                                                color: "#adb5bd",
+                                                fontSize: "14px",
+                                            }}
+                                        ></i>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            value={user.password}
+                                            onChange={(e) =>
+                                                setUser((p) => ({
+                                                    ...p,
+                                                    password: e.target.value,
+                                                }))
+                                            }
+                                            className="form-control form-control-lg ps-5"
+                                            style={{
+                                                borderRadius: "12px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "#f8f9fa",
+                                                padding: "12px 16px 12px 40px",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "white";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "#f8f9fa";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                    {error.password && (
+                                        <small className="text-danger d-block mt-1">
+                                            {error.password}
+                                        </small>
+                                    )}
                                 </div>
-                                <div className="confirmpassword">
-                                    <input
-                                        className={styles.input_form}
-                                        type="password"
-                                        name="confirmpassword"
-                                        value={user.confirmpassword}
-                                        onChange={(e) =>
-                                            setUser((p) => ({
-                                                ...p,
-                                                confirmpassword: e.target.value,
-                                            }))
-                                        }
-                                        // required
-                                        // placeholder="+380639752361"
-                                        // autoComplete="off"
-                                    />
-                                    <span className="text-danger">
-                                        {error.confirmpassword}
-                                    </span>
-                                    <label className={styles.label_form}>
-                                        Confirmez mot de passe
+
+                                {/* Confirmation mot de passe */}
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small text-muted">
+                                        Confirmer le mot de passe
                                     </label>
+                                    <div className="position-relative">
+                                        <i
+                                            className="fas fa-check-circle position-absolute top-50 start-0 translate-middle-y ms-3"
+                                            style={{
+                                                color: "#adb5bd",
+                                                fontSize: "14px",
+                                            }}
+                                        ></i>
+                                        <input
+                                            type="password"
+                                            name="confirmpassword"
+                                            value={user.confirmpassword}
+                                            onChange={(e) =>
+                                                setUser((p) => ({
+                                                    ...p,
+                                                    confirmpassword:
+                                                        e.target.value,
+                                                }))
+                                            }
+                                            className="form-control form-control-lg ps-5"
+                                            style={{
+                                                borderRadius: "12px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "#f8f9fa",
+                                                padding: "12px 16px 12px 40px",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "white";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.backgroundColor =
+                                                    "#f8f9fa";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                            placeholder="Confirmez votre mot de passe"
+                                        />
+                                    </div>
+                                    {error.confirmpassword && (
+                                        <small className="text-danger d-block mt-1">
+                                            {error.confirmpassword}
+                                        </small>
+                                    )}
                                 </div>
-                                {/* <div className="error">
-                  addUserResults.isError? addUserResults.error.data: ''
-                </div> */}{" "}
+
+                                {/* Bouton d'inscription */}
                                 <button
                                     type="submit"
-                                    className={styles.button_effect}
+                                    className="btn w-100 py-3 fw-semibold"
+                                    style={{
+                                        background:
+                                            "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                                        color: "white",
+                                        borderRadius: "12px",
+                                        border: "none",
+                                        transition: "all 0.2s ease",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform =
+                                            "translateY(-2px)";
+                                        e.currentTarget.style.boxShadow =
+                                            "0 6px 16px rgba(32,201,151,0.4)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform =
+                                            "translateY(0)";
+                                        e.currentTarget.style.boxShadow =
+                                            "none";
+                                    }}
                                 >
-                                    Submit
+                                    <i className="fas fa-user-plus me-2"></i>
+                                    S'inscrire
                                 </button>
-                                {/* <p className={styles.login_desc}>
-                  Have An Account Please Log In
-                </p> */}
+
+                                {/* Lien vers connexion */}
+                                <div className="text-center mt-4">
+                                    <p className="small text-muted mb-0">
+                                        Vous avez déjà un compte ?
+                                        <a
+                                            href="{{ route('auth.login') }}"
+                                            className="text-decoration-none ms-1 fw-semibold"
+                                            style={{
+                                                color: "#20c997",
+                                                transition: "color 0.2s ease",
+                                            }}
+                                            onMouseEnter={(e) =>
+                                                (e.currentTarget.style.color =
+                                                    "#198764")
+                                            }
+                                            onMouseLeave={(e) =>
+                                                (e.currentTarget.style.color =
+                                                    "#20c997")
+                                            }
+                                        >
+                                            Se connecter
+                                        </a>
+                                    </p>
+                                </div>
                             </form>
-                            <br />
-                            <br />
+                        </div>
+
+                        {/* Footer de la carte */}
+                        <div className="card-footer bg-white border-0 pb-4 text-center">
+                            <small className="text-muted">
+                                <i className="fas fa-shield-alt me-1"></i>
+                                Vos informations sont sécurisées
+                            </small>
                         </div>
                     </div>
                 </div>
-                <br />
             </div>
         </div>
     );

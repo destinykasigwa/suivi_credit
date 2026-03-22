@@ -107,33 +107,25 @@
                 <a style="pointer-events: none" href="" class="nav-link">{{ auth()->user()->name }}</a>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="fas fa-th-large"></i>
-                    {{-- <span class="badge badge-warning navbar-badge">15</span> --}}
-                </a>
-                <div class="dropdown-menu dropdown-menu-md dropdown-menu-right" style="background: teal">
-                    {{-- <span class="dropdown-item dropdown-header"></span> --}}
-                    {{-- <div class="dropdown-divider"></div> --}}
-                    @if (!auth()->user())
-                        <a href="{{ route('auth.login') }}" class="dropdown-item">
-                            Login
-                        </a>
-                        <div class="dropdown-divider"></div>
-                    @endif
-
-                    {{-- <a href="{{ route('auth.register') }}" class="dropdown-item">
-                        Register
-                    </a>
-                    <div class="dropdown-divider"></div> --}}
-                    <a style="cursor: pointer" class="login_link dropdown-item"
-                        onclick="document.getElementById('logout-form').submit()">
-                        Déconnexion <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        <form action="{{ route('auth/logout') }}" method="POST" id="logout-form">@csrf
-                        </form>
-                    </a>
-                </div>
-
-            </li>
+  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" style="color: white; transition: all 0.2s ease; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 4px;">
+    <i class="fas fa-th-large fa-lg"></i>
+    <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+  </a>
+  <div class="dropdown-menu dropdown-menu-md dropdown-menu-right" style="background: white; border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-top: 8px; padding: 8px 0; min-width: 180px;">
+    @if (!auth()->user())
+      <a href="{{ route('auth.login') }}" class="dropdown-item d-flex align-items-center gap-2" style="padding: 10px 20px; transition: all 0.2s ease;">
+        <i class="fas fa-sign-in-alt" style="color: #20c997; width: 20px;"></i>
+        <span>Connexion</span>
+      </a>
+      <div class="dropdown-divider" style="margin: 4px 0;"></div>
+    @endif
+    <a style="cursor: pointer;" class="dropdown-item d-flex align-items-center gap-2" onclick="document.getElementById('logout-form').submit()">
+      <i class="fas fa-sign-out-alt" style="color: #dc3545; width: 20px;"></i>
+      <span style="color: #dc3545;">Déconnexion</span>
+      <form action="{{ route('auth/logout') }}" method="POST" id="logout-form">@csrf</form>
+    </a>
+  </div>
+</li>
             {{-- <li class="nav-item">
                 <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                     <i class="fas fa-expand-arrows-alt"></i>

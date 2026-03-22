@@ -3,7 +3,7 @@
 <div class="content-wrapper content" style="background: #fff; ">
     {{-- background-image: url('{{ asset('images/bg3.jpeg') }}');background-repeat: no-repeat;
 background-size: 100% 100%; --}}
-    <section class="content">
+    <section class="content" style="flex: 1;">
         <div class="wrapper">
             <div class="row" id="dashboadCreditA">
 

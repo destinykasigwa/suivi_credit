@@ -99,7 +99,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             return () => {
                 offcanvasEl.removeEventListener(
                     "shown.bs.offcanvas",
-                    handleShown
+                    handleShown,
                 );
             };
         }
@@ -212,7 +212,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     nombre_femme_groupe,
                     objetCredit,
                     idDossier: getDossierId,
-                }
+                },
             );
             if (res.data.status == 1) {
                 setIsLoadingBar(false);
@@ -253,7 +253,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 },
                 onUploadProgress: (progressEvent) => {
                     const percentCompleted = Math.round(
-                        (progressEvent.loaded * 100) / progressEvent.total
+                        (progressEvent.loaded * 100) / progressEvent.total,
                     );
                     setProgress(percentCompleted);
                 },
@@ -344,7 +344,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             // envoyer la requête
             const res = await axios.post(
                 "/gestion_credit/page/credit/commentaire/new",
-                payload
+                payload,
             );
 
             if (res.data.status == 1) {
@@ -413,1695 +413,2548 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 className="modal fade"
                 tabIndex="-1"
                 aria-hidden="true"
-                // ref={modalRef}
                 id="modalVisualisationDossier"
             >
                 <div className="modal-dialog modal-xl">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <div className="row">
-                                <div className="col-md-12 card rounded-10 p-1">
-                                    <div
-                                        style={{
-                                            color: "black",
-                                            display: "flex", // Utilisation de Flexbox
-                                            justifyContent: "space-between", // Distribution des éléments aux extrémités
-                                            alignItems: "center", // Alignement vertical des éléments
-                                        }}
-                                    >
-                                        <h5
-                                            className="text-bold p-1"
-                                            style={{ margin: 0 }}
-                                        >
-                                            Détails du dossier
-                                            <strong> {NumDossier}</strong>{" "}
-                                            {" | "}
-                                            <label className="label-style">
-                                                Statut
-                                            </label>
-                                            {statutDossier == "Décaissé" ? (
-                                                <select
-                                                    type="text"
-                                                    className="input-style"
-                                                    style={{
-                                                        width: "100px",
-                                                    }}
-                                                    value={statutDossier}
-                                                    onChange={(e) =>
-                                                        setstatutDossier(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    disabled
-                                                >
-                                                    <option
-                                                        value={statutDossier}
-                                                    >
-                                                        {statutDossier}
-                                                    </option>
-
-                                                    <option value="Refusé">
-                                                        Refusé
-                                                    </option>
-                                                    <option value="Encours">
-                                                        Encours
-                                                    </option>
-                                                    <option value="Décaissé">
-                                                        Décaissé
-                                                    </option>
-                                                </select>
-                                            ) : (
-                                                <select
-                                                    type="text"
-                                                    className="input-style"
-                                                    style={{
-                                                        width: "100px",
-                                                    }}
-                                                    value={statutDossier}
-                                                    onChange={(e) =>
-                                                        setstatutDossier(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                >
-                                                    <option
-                                                        value={statutDossier}
-                                                    >
-                                                        {statutDossier}
-                                                    </option>
-
-                                                    <option value="Refusé">
-                                                        Refusé
-                                                    </option>
-                                                    <option value="Encours">
-                                                        Encours
-                                                    </option>
-                                                    <option value="Décaissé">
-                                                        Décaissé
-                                                    </option>
-                                                </select>
-                                            )}
-                                        </h5>
-                                        <h5
-                                            className="text-bold p-1"
-                                            style={{ margin: 0 }}
-                                        >
-                                            {dossier &&
-                                                dossier.signatures &&
-                                                dossier.signatures.length >
-                                                    0 && (
-                                                    <div
-                                                        className="col-md-12"
+                    <div className="modal-content border-0 shadow-lg rounded-3">
+                        {/* Header modernisé */}
+                        <div
+                            className="modal-header bg-gradient-primary text-white rounded-top-3"
+                            style={{
+                                background:
+                                    "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                                borderBottom: "none",
+                                padding: "1rem 1.5rem",
+                            }}
+                        >
+                            <div className="w-100">
+                                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div className="d-flex align-items-center gap-3 flex-wrap">
+                                        <i className="fas fa-folder-open fa-2x"></i>
+                                        <div>
+                                            <h5 className="fw-semibold mb-0 text-white">
+                                                Détails du dossier{" "}
+                                                <strong className="text-white-50">
+                                                    {NumDossier}
+                                                </strong>
+                                            </h5>
+                                            <div className="d-flex align-items-center gap-2 mt-1">
+                                                <span className="text-white-50 small">
+                                                    Statut :
+                                                </span>
+                                                {statutDossier == "Décaissé" ? (
+                                                    <select
+                                                        type="text"
+                                                        className="form-select form-select-sm bg-white bg-opacity-25 text-white border-0"
                                                         style={{
-                                                            border: "2px solid #dcdcdc",
-                                                            padding: "10px",
-                                                            height: "70px",
+                                                            width: "120px",
+                                                            fontWeight: "500",
+                                                            cursor: "pointer",
                                                         }}
+                                                        value={statutDossier}
+                                                        onChange={(e) =>
+                                                            setstatutDossier(
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        disabled
                                                     >
-                                                        <button
-                                                            onClick={
-                                                                handleSignatureClick
+                                                        <option
+                                                            value={
+                                                                statutDossier
                                                             }
-                                                            className="btn btn-primary d-flex align-items-center gap-2"
-                                                            style={{
-                                                                borderRadius:
-                                                                    "25px",
-                                                                padding:
-                                                                    "8px 16px",
-                                                            }}
+                                                            className="text-dark"
                                                         >
-                                                            <FaDownload />
-                                                            Télécharger la fiche
-                                                            et signer
-                                                        </button>
-                                                    </div>
+                                                            {statutDossier}
+                                                        </option>
+                                                        <option value="Refusé">
+                                                            Refusé
+                                                        </option>
+                                                        <option value="Encours">
+                                                            Encours
+                                                        </option>
+                                                        <option value="Décaissé">
+                                                            Décaissé
+                                                        </option>
+                                                    </select>
+                                                ) : (
+                                                    <select
+                                                        type="text"
+                                                        className="form-select form-select-sm bg-white bg-opacity-25 text-white border-0"
+                                                        style={{
+                                                            width: "120px",
+                                                            fontWeight: "500",
+                                                            cursor: "pointer",
+                                                        }}
+                                                        value={statutDossier}
+                                                        onChange={(e) =>
+                                                            setstatutDossier(
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                    >
+                                                        <option
+                                                            value={
+                                                                statutDossier
+                                                            }
+                                                            className="text-dark"
+                                                        >
+                                                            {statutDossier}
+                                                        </option>
+                                                        <option value="Refusé">
+                                                            Refusé
+                                                        </option>
+                                                        <option value="Encours">
+                                                            Encours
+                                                        </option>
+                                                        <option value="Décaissé">
+                                                            Décaissé
+                                                        </option>
+                                                    </select>
                                                 )}
-                                        </h5>
-                                        <h5>
-                                            <button
-                                                className="btn btn-outline-primary d-flex align-items-center gap-2"
-                                                type="button"
-                                                data-bs-toggle="offcanvas"
-                                                data-bs-target="#offcanvasCommentaires"
-                                                aria-controls="offcanvasCommentaires"
-                                            >
-                                                Commentaires
-                                                <FaCommentDots />
-                                                {nbCommentaires}
-                                                {/* {dossier && dossier.commentaires
-                                                    ? dossier.commentaires
-                                                          .length
-                                                    : 0} */}
-                                            </button>
-                                        </h5>
-                                        <h5>
-                                            <button
-                                                className="btn btn-outline-primary d-flex align-items-center gap-2 ml-1"
-                                                type="button"
-                                                data-toggle="modal"
-                                                data-target="#modalVisualisationGPS"
-                                                onClick={() =>
-                                                    setDossierIdSelected(
-                                                        dossierId
-                                                    )
-                                                }
-                                            >
-                                                GPS 📍
-                                            </button>
-                                        </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="d-flex gap-2 flex-wrap">
+                                        {dossier &&
+                                            dossier.signatures &&
+                                            dossier.signatures.length > 0 && (
+                                                <button
+                                                    onClick={
+                                                        handleSignatureClick
+                                                    }
+                                                    className="btn btn-light btn-sm d-flex align-items-center gap-2"
+                                                    style={{
+                                                        borderRadius: "20px",
+                                                        padding: "6px 16px",
+                                                    }}
+                                                >
+                                                    <FaDownload />
+                                                    Télécharger & signer
+                                                </button>
+                                            )}
+
+                                        <button
+                                            className="btn btn-light btn-sm d-flex align-items-center gap-2"
+                                            type="button"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasCommentaires"
+                                            aria-controls="offcanvasCommentaires"
+                                            style={{
+                                                borderRadius: "20px",
+                                                padding: "6px 16px",
+                                            }}
+                                        >
+                                            <FaCommentDots />
+                                            Commentaires{" "}
+                                            {nbCommentaires > 0 && (
+                                                <span className="badge bg-primary ms-1">
+                                                    {nbCommentaires}
+                                                </span>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            className="btn btn-light btn-sm d-flex align-items-center gap-2"
+                                            type="button"
+                                            data-toggle="modal"
+                                            data-target="#modalVisualisationGPS"
+                                            onClick={() =>
+                                                setDossierIdSelected(dossierId)
+                                            }
+                                            style={{
+                                                borderRadius: "20px",
+                                                padding: "6px 16px",
+                                            }}
+                                        >
+                                            📍 GPS
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
                             <button
                                 type="button"
-                                class="close"
+                                className="btn-close btn-close-white"
                                 data-dismiss="modal"
                                 aria-label="Close"
                                 onClick={onClose}
-                            >
-                                {" "}
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            ></button>
                         </div>
-                        <div className="modal-body">
+
+                        <div
+                            className="modal-body p-4"
+                            style={{ maxHeight: "70vh", overflowY: "auto" }}
+                        >
+                            {/* Loader amélioré */}
                             {isLoadingBar && (
                                 <div
+                                    className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                                     style={{
-                                        position: "fixed",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                                        zIndex: 1000,
-                                        flexDirection: "column",
+                                        backgroundColor: "rgba(0, 0, 0, 0.7)",
+                                        zIndex: 9999,
+                                        backdropFilter: "blur(4px)",
                                     }}
                                 >
-                                    <Bars
-                                        height="80"
-                                        width="80"
-                                        color="#4fa94d"
-                                        ariaLabel="loading"
-                                    />
-                                    <h5
-                                        style={{
-                                            color: "#fff",
-                                            marginTop: "10px",
-                                        }}
+                                    <div
+                                        className="bg-white rounded-4 p-4 text-center shadow-lg"
+                                        style={{ minWidth: "250px" }}
                                     >
-                                        Patientez... {progress}%
-                                    </h5>
+                                        <div
+                                            className="spinner-border text-primary mb-3"
+                                            role="status"
+                                            style={{
+                                                width: "3rem",
+                                                height: "3rem",
+                                            }}
+                                        >
+                                            <span className="visually-hidden">
+                                                Chargement...
+                                            </span>
+                                        </div>
+                                        <h6 className="mb-2">
+                                            Traitement en cours
+                                        </h6>
+                                        <div
+                                            className="progress"
+                                            style={{ height: "8px" }}
+                                        >
+                                            <div
+                                                className="progress-bar progress-bar-striped progress-bar-animated"
+                                                style={{
+                                                    width: `${progress}%`,
+                                                    backgroundColor: "#20c997",
+                                                }}
+                                            ></div>
+                                        </div>
+                                        <p className="text-muted mt-2 mb-0">
+                                            {progress}%
+                                        </p>
+                                    </div>
                                 </div>
                             )}
-                            {!dossier && <p>Chargement...</p>}
+
+                            {!dossier && (
+                                <div className="text-center py-5">
+                                    <div
+                                        className="spinner-border text-teal"
+                                        role="status"
+                                    >
+                                        <span className="visually-hidden">
+                                            Chargement...
+                                        </span>
+                                    </div>
+                                    <p className="mt-3 text-muted">
+                                        Chargement des données...
+                                    </p>
+                                </div>
+                            )}
+
                             {dossier && (
                                 <>
-                                    <div className="row">
-                                        <form>
-                                            <div className="row">
-                                                <div className="col-md-4 card rounded-0">
-                                                    <table>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Num compte :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "100px",
-                                                                    }}
-                                                                    value={
-                                                                        NumCompte
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setNumCompte(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                {" "}
-                                                                <label className="label-style">
-                                                                    Num Dossier
-                                                                    :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "100px",
-                                                                    }}
-                                                                    value={
-                                                                        NumDossier
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setNumDossier(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Nom Compte :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                {" "}
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    value={
-                                                                        NomCompte
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setNomCompte(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Produit de
-                                                                    crédit :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <select
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "140px",
-                                                                    }}
-                                                                    name="produit_credit"
-                                                                    id="produit_credit"
-                                                                    value={
-                                                                        produit_credit
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setproduit_credit(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option
-                                                                        value={
-                                                                            produit_credit
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            produit_credit
-                                                                        }
-                                                                    </option>
-                                                                    <option value="Crédit aux MPME">
-                                                                        Crédit
-                                                                        aux MPME
-                                                                    </option>
-                                                                    <option value="Crédit à la consommation">
-                                                                        Crédit à
-                                                                        la
-                                                                        consommation
-                                                                    </option>
-                                                                    <option value="Crédit à l'habitat">
-                                                                        Crédit à
-                                                                        l'habitat
-                                                                    </option>
-                                                                    <option value="Crédit Groupe Solidaire">
-                                                                        Crédit
-                                                                        Groupe
-                                                                        Solidaire
-                                                                    </option>
-                                                                    <option value="Crédit Salaire">
-                                                                        Crédit
-                                                                        Salaire
-                                                                    </option>
-                                                                    <option value="Crédit Staff">
-                                                                        Crédit
-                                                                        Staff
-                                                                    </option>
-                                                                    <option value="Crédit Express">
-                                                                        Crédit
-                                                                        Express
-                                                                    </option>
-                                                                    <option value="Crédit Agro-Pastoral">
-                                                                        Crédit
-                                                                        Agro-Pastoral
-                                                                    </option>
-                                                                    <option value="Crédit MWANGAZA">
-                                                                        Crédit
-                                                                        MWANGAZA
-                                                                    </option>
-                                                                    <option value="Crédit JIKO BORA">
-                                                                        Crédit
-                                                                        JIKO
-                                                                        BORA
-                                                                    </option>
-                                                                    <option value="Crédits TUFAIDIKE WOTE">
-                                                                        Crédits
-                                                                        TUFAIDIKE
-                                                                        WOTE
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Type crédit
-                                                                    :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <select
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "150px",
-                                                                    }}
-                                                                    name="type_credit"
-                                                                    id="type_credit"
-                                                                    value={
-                                                                        type_credit
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        settype_credit(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option
-                                                                        value={
-                                                                            type_credit
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            type_credit
-                                                                        }
-                                                                    </option>
-                                                                    <option value="Crédit Express à CT">
-                                                                        Crédit
-                                                                        Express
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédits à la consommation à CT">
-                                                                        Crédits
-                                                                        à la
-                                                                        consommation
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédit aux MPME à CT ">
-                                                                        Crédit
-                                                                        aux MPME
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédit Staff à MT ">
-                                                                        Crédit
-                                                                        Staff à
-                                                                        MT
-                                                                    </option>
-                                                                    <option value="Crédit aux Groupes Solidaires USD ">
-                                                                        Crédit
-                                                                        aux
-                                                                        Groupes
-                                                                        Solidaires
-                                                                        USD
-                                                                    </option>
-                                                                    <option value="Crédit Salaire à CT ">
-                                                                        Crédit
-                                                                        Salaire
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédit à l'habitat CT ">
-                                                                        Crédit à
-                                                                        l'habitat
-                                                                        CT
-                                                                    </option>
-                                                                    <option value="Crédits à la consommation à MT ">
-                                                                        Crédits
-                                                                        à la
-                                                                        consommation
-                                                                        à MT
-                                                                    </option>
-                                                                    <option value="Crédit aux MPME à MT ">
-                                                                        Crédit
-                                                                        aux MPME
-                                                                        à MT
-                                                                    </option>
-                                                                    <option value="Crédit aux MPME à CT en FC  ">
-                                                                        Crédit
-                                                                        aux MPME
-                                                                        à CT en
-                                                                        FC
-                                                                    </option>
-                                                                    <option value="Crédit aux MPME à CT en FC   ">
-                                                                        Crédit
-                                                                        aux MPME
-                                                                        à CT en
-                                                                        FC
-                                                                    </option>
-                                                                    <option value="Crédit aux Groupes Solidaires FC   ">
-                                                                        Crédit
-                                                                        aux
-                                                                        Groupes
-                                                                        Solidaires
-                                                                        FC
-                                                                    </option>
-                                                                    <option value="Crédit Agro-Pastoral à CT   ">
-                                                                        Crédit
-                                                                        Agro-Pastoral
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédit Agro-Pastoral à CT   ">
-                                                                        Crédit
-                                                                        Agro-Pastoral
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédit Agro-Pastoral à CT   ">
-                                                                        Crédit
-                                                                        Agro-Pastoral
-                                                                        à CT
-                                                                    </option>
-                                                                    <option value="Crédit MWANGAZA   ">
-                                                                        Crédit
-                                                                        MWANGAZA
-                                                                    </option>
-                                                                    <option value="Crédit Salaire à MT en FC   ">
-                                                                        Crédit
-                                                                        Salaire
-                                                                        à MT en
-                                                                        FC
-                                                                    </option>
-                                                                    <option value="Crédits JIKO BORA Menage (CT)   ">
-                                                                        Crédits
-                                                                        JIKO
-                                                                        BORA
-                                                                        Menage
-                                                                        (CT)
-                                                                    </option>
-                                                                    <option value="Crédits JIKO BORA Grand Cons  (CT)   ">
-                                                                        Crédits
-                                                                        JIKO
-                                                                        BORA
-                                                                        Grand
-                                                                        Cons
-                                                                        (CT)
-                                                                    </option>
-                                                                    <option value="Crédits TUFAIDIKE WOTE en USD   ">
-                                                                        Crédits
-                                                                        TUFAIDIKE
-                                                                        WOTE en
-                                                                        USD
-                                                                    </option>
-                                                                    <option value="Crédits TUFAIDIKE WOTE en FC   ">
-                                                                        Crédits
-                                                                        TUFAIDIKE
-                                                                        WOTE en
-                                                                        FC
-                                                                    </option>
-                                                                    <option value="Crédit aux salariés domiciliés à MT   ">
-                                                                        Crédit
-                                                                        aux
-                                                                        salariés
-                                                                        domiciliés
-                                                                        à MT
-                                                                    </option>
-                                                                    <option value="Crédit aux MPME à MT en FC    ">
-                                                                        Crédit
-                                                                        aux MPME
-                                                                        à MT en
-                                                                        FC
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                {" "}
-                                                                <label className="label-style">
-                                                                    Recouvreur :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <select
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    value={
-                                                                        recouvreur
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setrecouvreur(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option
-                                                                        value={
-                                                                            recouvreur
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            recouvreur
-                                                                        }
-                                                                    </option>
-                                                                    <option value="ALAME KUZANWA WILLY">
-                                                                        ALAME
-                                                                        KUZANWA
-                                                                        WILLY
-                                                                    </option>
-                                                                    <option value="AKILI SANGARA JULIEN">
-                                                                        AKILI
-                                                                        SANGARA
-                                                                        JULIEN
-                                                                    </option>
-                                                                    <option value="MAPENDO RUTH">
-                                                                        MAPENDO
-                                                                        RUTH
-                                                                    </option>
-                                                                    <option value="LAVIE MATEMBERA">
-                                                                        LAVIE
-                                                                        MATEMBERA
-                                                                    </option>
-                                                                    <option value="KANKINSINGI NGADU">
-                                                                        KANKINSINGI
-                                                                        NGADU
-                                                                    </option>
-                                                                    <option value="NEEMA MULINGA GRACE">
-                                                                        NEEMA
-                                                                        MULINGA
-                                                                        GRACE
-                                                                    </option>
-                                                                    <option value="WIVINE ALISA">
-                                                                        WIVINE
-                                                                        ALISA
-                                                                    </option>
-                                                                    <option value="MOSES KATEMBO">
-                                                                        MOSES
-                                                                        KATEMBO
-                                                                    </option>
-                                                                    <option value="SAFARI KALEKERA">
-                                                                        SAFARI
-                                                                        KALEKERA
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Montant
-                                                                    dmnde :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "60px",
-                                                                    }}
-                                                                    value={
-                                                                        montant_demande
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setmontant_demande(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                {" "}
-                                                                <label className="label-style">
-                                                                    Date demande
-                                                                    :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={dateParser(
-                                                                        date_demande
-                                                                    )}
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setdate_demande(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-
-                                                        {produit_credit ===
-                                                            "Crédit Groupe Solidaire" && (
-                                                            <>
+                                    {/* Formulaire d'informations */}
+                                    {/* Formulaire d'informations */}
+                                    <form>
+                                        <div className="row g-3">
+                                            {/* Colonne 1 */}
+                                            <div className="col-md-4">
+                                                <div className="card border-0 shadow-sm rounded-3 h-100">
+                                                    <div className="card-body p-3">
+                                                        <table className="table table-sm table-borderless mb-0">
+                                                            <tbody>
                                                                 <tr>
-                                                                    <td>
-                                                                        <label className="label-style">
-                                                                            Nbre
-                                                                            mbre
-                                                                            grpe
-                                                                            :
-                                                                        </label>{" "}
-                                                                    </td>
-                                                                    <td>
-                                                                        <input
-                                                                            type="text"
-                                                                            className="input-style"
-                                                                            style={{
-                                                                                width: "60px",
-                                                                            }}
-                                                                            value={
-                                                                                nombre_membre_groupe
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                setnombre_membre_groupe(
-                                                                                    e
-                                                                                        .target
-                                                                                        .value
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <label className="label-style">
-                                                                            Nbre
-                                                                            mbre
-                                                                            homme
-                                                                            :
-                                                                        </label>{" "}
-                                                                    </td>
-                                                                    <td>
-                                                                        <input
-                                                                            type="text"
-                                                                            className="input-style"
-                                                                            style={{
-                                                                                width: "60px",
-                                                                            }}
-                                                                            value={
-                                                                                nombre_homme_groupe
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                setnombre_homme_groupe(
-                                                                                    e
-                                                                                        .target
-                                                                                        .value
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </td>
-                                                                </tr>
-                                                            </>
-                                                        )}
-                                                    </table>
-                                                </div>
-                                                <div className="col-md-4 card rounded-0">
-                                                    <table>
-                                                        {produit_credit ===
-                                                            "Crédit Groupe Solidaire" && (
-                                                            <tr>
-                                                                <td>
-                                                                    <label className="label-style">
-                                                                        Nbre
-                                                                        mbre
-                                                                        femme :
-                                                                    </label>{" "}
-                                                                </td>
-                                                                <td>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="input-style"
+                                                                    <td
                                                                         style={{
-                                                                            width: "60px",
+                                                                            width: "40%",
+                                                                            padding:
+                                                                                "6px 8px",
                                                                         }}
-                                                                        value={
-                                                                            nombre_femme_groupe
-                                                                        }
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-hashtag me-1"></i>
+                                                                            Num
+                                                                            compte
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            style={{
+                                                                                backgroundColor:
+                                                                                    "#f8f9fa",
+                                                                            }}
+                                                                            value={
+                                                                                NumCompte
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setNumCompte(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-folder-open me-1"></i>
+                                                                            Num
+                                                                            Dossier
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            style={{
+                                                                                backgroundColor:
+                                                                                    "#f8f9fa",
+                                                                            }}
+                                                                            value={
+                                                                                NumDossier
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setNumDossier(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-user me-1"></i>
+                                                                            Nom
+                                                                            Compte
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            style={{
+                                                                                backgroundColor:
+                                                                                    "#f8f9fa",
+                                                                            }}
+                                                                            value={
+                                                                                NomCompte
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setNomCompte(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-tag me-1"></i>
+                                                                            Produit
+                                                                            de
+                                                                            crédit
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            value={
+                                                                                produit_credit
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setproduit_credit(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    produit_credit
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    produit_credit
+                                                                                }
+                                                                            </option>
+                                                                            <option value="Crédit aux MPME">
+                                                                                Crédit
+                                                                                aux
+                                                                                MPME
+                                                                            </option>
+                                                                            <option value="Crédit à la consommation">
+                                                                                Crédit
+                                                                                à
+                                                                                la
+                                                                                consommation
+                                                                            </option>
+                                                                            <option value="Crédit à l'habitat">
+                                                                                Crédit
+                                                                                à
+                                                                                l'habitat
+                                                                            </option>
+                                                                            <option value="Crédit Groupe Solidaire">
+                                                                                Crédit
+                                                                                Groupe
+                                                                                Solidaire
+                                                                            </option>
+                                                                            <option value="Crédit Salaire">
+                                                                                Crédit
+                                                                                Salaire
+                                                                            </option>
+                                                                            <option value="Crédit Staff">
+                                                                                Crédit
+                                                                                Staff
+                                                                            </option>
+                                                                            <option value="Crédit Express">
+                                                                                Crédit
+                                                                                Express
+                                                                            </option>
+                                                                            <option value="Crédit Agro-Pastoral">
+                                                                                Crédit
+                                                                                Agro-Pastoral
+                                                                            </option>
+                                                                            <option value="Crédit MWANGAZA">
+                                                                                Crédit
+                                                                                MWANGAZA
+                                                                            </option>
+                                                                            <option value="Crédit JIKO BORA">
+                                                                                Crédit
+                                                                                JIKO
+                                                                                BORA
+                                                                            </option>
+                                                                            <option value="Crédits TUFAIDIKE WOTE">
+                                                                                Crédits
+                                                                                TUFAIDIKE
+                                                                                WOTE
+                                                                            </option>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-chart-line me-1"></i>
+                                                                            Type
+                                                                            crédit
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            value={
+                                                                                type_credit
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                settype_credit(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    type_credit
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    type_credit
+                                                                                }
+                                                                            </option>
+                                                                            <option value="Crédit Express à CT">
+                                                                                Crédit
+                                                                                Express
+                                                                                à
+                                                                                CT
+                                                                            </option>
+                                                                            <option value="Crédits à la consommation à CT">
+                                                                                Crédits
+                                                                                à
+                                                                                la
+                                                                                consommation
+                                                                                à
+                                                                                CT
+                                                                            </option>
+                                                                            <option value="Crédit aux MPME à CT ">
+                                                                                Crédit
+                                                                                aux
+                                                                                MPME
+                                                                                à
+                                                                                CT
+                                                                            </option>
+                                                                            <option value="Crédit Staff à MT ">
+                                                                                Crédit
+                                                                                Staff
+                                                                                à
+                                                                                MT
+                                                                            </option>
+                                                                            <option value="Crédit aux Groupes Solidaires USD ">
+                                                                                Crédit
+                                                                                aux
+                                                                                Groupes
+                                                                                Solidaires
+                                                                                USD
+                                                                            </option>
+                                                                            <option value="Crédit Salaire à CT ">
+                                                                                Crédit
+                                                                                Salaire
+                                                                                à
+                                                                                CT
+                                                                            </option>
+                                                                            <option value="Crédit à l'habitat CT ">
+                                                                                Crédit
+                                                                                à
+                                                                                l'habitat
+                                                                                CT
+                                                                            </option>
+                                                                            <option value="Crédits à la consommation à MT ">
+                                                                                Crédits
+                                                                                à
+                                                                                la
+                                                                                consommation
+                                                                                à
+                                                                                MT
+                                                                            </option>
+                                                                            <option value="Crédit aux MPME à MT ">
+                                                                                Crédit
+                                                                                aux
+                                                                                MPME
+                                                                                à
+                                                                                MT
+                                                                            </option>
+                                                                            <option value="Crédit aux MPME à CT en FC  ">
+                                                                                Crédit
+                                                                                aux
+                                                                                MPME
+                                                                                à
+                                                                                CT
+                                                                                en
+                                                                                FC
+                                                                            </option>
+                                                                            <option value="Crédit aux Groupes Solidaires FC   ">
+                                                                                Crédit
+                                                                                aux
+                                                                                Groupes
+                                                                                Solidaires
+                                                                                FC
+                                                                            </option>
+                                                                            <option value="Crédit Agro-Pastoral à CT   ">
+                                                                                Crédit
+                                                                                Agro-Pastoral
+                                                                                à
+                                                                                CT
+                                                                            </option>
+                                                                            <option value="Crédit MWANGAZA   ">
+                                                                                Crédit
+                                                                                MWANGAZA
+                                                                            </option>
+                                                                            <option value="Crédit Salaire à MT en FC   ">
+                                                                                Crédit
+                                                                                Salaire
+                                                                                à
+                                                                                MT
+                                                                                en
+                                                                                FC
+                                                                            </option>
+                                                                            <option value="Crédits JIKO BORA Menage (CT)   ">
+                                                                                Crédits
+                                                                                JIKO
+                                                                                BORA
+                                                                                Menage
+                                                                                (CT)
+                                                                            </option>
+                                                                            <option value="Crédits JIKO BORA Grand Cons  (CT)   ">
+                                                                                Crédits
+                                                                                JIKO
+                                                                                BORA
+                                                                                Grand
+                                                                                Cons
+                                                                                (CT)
+                                                                            </option>
+                                                                            <option value="Crédits TUFAIDIKE WOTE en USD   ">
+                                                                                Crédits
+                                                                                TUFAIDIKE
+                                                                                WOTE
+                                                                                en
+                                                                                USD
+                                                                            </option>
+                                                                            <option value="Crédits TUFAIDIKE WOTE en FC   ">
+                                                                                Crédits
+                                                                                TUFAIDIKE
+                                                                                WOTE
+                                                                                en
+                                                                                FC
+                                                                            </option>
+                                                                            <option value="Crédit aux salariés domiciliés à MT   ">
+                                                                                Crédit
+                                                                                aux
+                                                                                salariés
+                                                                                domiciliés
+                                                                                à
+                                                                                MT
+                                                                            </option>
+                                                                            <option value="Crédit aux MPME à MT en FC    ">
+                                                                                Crédit
+                                                                                aux
+                                                                                MPME
+                                                                                à
+                                                                                MT
+                                                                                en
+                                                                                FC
+                                                                            </option>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-user-tie me-1"></i>
+                                                                            Recouvreur
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            value={
+                                                                                recouvreur
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setrecouvreur(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    recouvreur
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    recouvreur
+                                                                                }
+                                                                            </option>
+                                                                            <option value="ALAME KUZANWA WILLY">
+                                                                                ALAME
+                                                                                KUZANWA
+                                                                                WILLY
+                                                                            </option>
+                                                                            <option value="AKILI SANGARA JULIEN">
+                                                                                AKILI
+                                                                                SANGARA
+                                                                                JULIEN
+                                                                            </option>
+                                                                            <option value="MAPENDO RUTH">
+                                                                                MAPENDO
+                                                                                RUTH
+                                                                            </option>
+                                                                            <option value="LAVIE MATEMBERA">
+                                                                                LAVIE
+                                                                                MATEMBERA
+                                                                            </option>
+                                                                            <option value="KANKINSINGI NGADU">
+                                                                                KANKINSINGI
+                                                                                NGADU
+                                                                            </option>
+                                                                            <option value="NEEMA MULINGA GRACE">
+                                                                                NEEMA
+                                                                                MULINGA
+                                                                                GRACE
+                                                                            </option>
+                                                                            <option value="WIVINE ALISA">
+                                                                                WIVINE
+                                                                                ALISA
+                                                                            </option>
+                                                                            <option value="MOSES KATEMBO">
+                                                                                MOSES
+                                                                                KATEMBO
+                                                                            </option>
+                                                                            <option value="SAFARI KALEKERA">
+                                                                                SAFARI
+                                                                                KALEKERA
+                                                                            </option>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-money-bill-wave me-1"></i>
+                                                                            Montant
+                                                                            demandé
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                montant_demande
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setmontant_demande(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-calendar-alt me-1"></i>
+                                                                            Date
+                                                                            demande
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={dateParser(
+                                                                                date_demande,
+                                                                            )}
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setdate_demande(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+
+                                                                {/* Groupe Solidaire - conditionnel */}
+                                                                {produit_credit ===
+                                                                    "Crédit Groupe Solidaire" && (
+                                                                    <>
+                                                                        <tr>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "6px 8px",
+                                                                                }}
+                                                                            >
+                                                                                <label
+                                                                                    className="fw-semibold small mb-0"
+                                                                                    style={{
+                                                                                        color: "#4682b4",
+                                                                                    }}
+                                                                                >
+                                                                                    <i className="fas fa-users me-1"></i>
+                                                                                    Nbre
+                                                                                    membres
+                                                                                </label>
+                                                                            </td>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "6px 8px",
+                                                                                }}
+                                                                            >
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    value={
+                                                                                        nombre_membre_groupe
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        e,
+                                                                                    ) =>
+                                                                                        setnombre_membre_groupe(
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "6px 8px",
+                                                                                }}
+                                                                            >
+                                                                                <label
+                                                                                    className="fw-semibold small mb-0"
+                                                                                    style={{
+                                                                                        color: "#4682b4",
+                                                                                    }}
+                                                                                >
+                                                                                    <i className="fas fa-mars me-1"></i>
+                                                                                    Nbre
+                                                                                    hommes
+                                                                                </label>
+                                                                            </td>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "6px 8px",
+                                                                                }}
+                                                                            >
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    value={
+                                                                                        nombre_homme_groupe
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        e,
+                                                                                    ) =>
+                                                                                        setnombre_homme_groupe(
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "6px 8px",
+                                                                                }}
+                                                                            >
+                                                                                <label
+                                                                                    className="fw-semibold small mb-0"
+                                                                                    style={{
+                                                                                        color: "#4682b4",
+                                                                                    }}
+                                                                                >
+                                                                                    <i className="fas fa-venus me-1"></i>
+                                                                                    Nbre
+                                                                                    femmes
+                                                                                </label>
+                                                                            </td>
+                                                                            <td
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "6px 8px",
+                                                                                }}
+                                                                            >
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    value={
+                                                                                        nombre_femme_groupe
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        e,
+                                                                                    ) =>
+                                                                                        setnombre_femme_groupe(
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </td>
+                                                                        </tr>
+                                                                    </>
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Colonne 2 */}
+                                            <div className="col-md-4">
+                                                <div className="card border-0 shadow-sm rounded-3 h-100">
+                                                    <div className="card-body p-3">
+                                                        <table className="table table-sm table-borderless mb-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            width: "40%",
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-bullseye me-1"></i>
+                                                                            Objet
+                                                                            crédit
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            value={
+                                                                                objetCredit
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setObjetCredit(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    objetCredit
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    objetCredit
+                                                                                }
+                                                                            </option>
+                                                                            <option value="Frais de scolarité,académique,soins médicaux">
+                                                                                Frais
+                                                                                de
+                                                                                scolarité,académique,soins
+                                                                                médicaux
+                                                                            </option>
+                                                                            <option value="Dot, mariage, anniversaire, baptême, funéraille">
+                                                                                Dot,
+                                                                                mariage,
+                                                                                anniversaire,
+                                                                                baptême,
+                                                                                funéraille
+                                                                            </option>
+                                                                            <option value="Frais de justice, loyer, paiement dette">
+                                                                                Frais
+                                                                                de
+                                                                                justice,
+                                                                                loyer,
+                                                                                paiement
+                                                                                dette
+                                                                            </option>
+                                                                            <option value="Entretien ménage et équipement en mobilier">
+                                                                                Entretien
+                                                                                ménage
+                                                                                et
+                                                                                équipement
+                                                                                en
+                                                                                mobilier
+                                                                            </option>
+                                                                            <option value="Avance sur salaire">
+                                                                                Avance
+                                                                                sur
+                                                                                salaire
+                                                                            </option>
+                                                                            <option value="Achat parcelle bâtie ou bâtie">
+                                                                                Achat
+                                                                                parcelle
+                                                                                bâtie
+                                                                                ou
+                                                                                bâtie
+                                                                            </option>
+                                                                            <option value="Construcion et achat matériel de construction">
+                                                                                Construcion
+                                                                                et
+                                                                                achat
+                                                                                matériel
+                                                                                de
+                                                                                construction
+                                                                            </option>
+                                                                            <option value="Commerce">
+                                                                                Commerce
+                                                                            </option>
+                                                                            <option value="Préfinancement de marché">
+                                                                                Préfinancement
+                                                                                de
+                                                                                marché
+                                                                            </option>
+                                                                            <option value="Amélioration champ, plantation/agriculture">
+                                                                                Amélioration
+                                                                                champ,
+                                                                                plantation/agriculture
+                                                                            </option>
+                                                                            <option value="Achat moto, voiture">
+                                                                                Achat
+                                                                                moto,
+                                                                                voiture
+                                                                            </option>
+                                                                            <option value="Autres">
+                                                                                Autres
+                                                                            </option>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-calendar-week me-1"></i>
+                                                                            Fréquence
+                                                                            mens.
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                frequence_mensualite
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setfrequence_mensualite(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-calculator me-1"></i>
+                                                                            Nbre
+                                                                            Échéance
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                nombre_echeance
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setnombre_echeance(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-user-check me-1"></i>
+                                                                            Gestionnaire
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            value={
+                                                                                gestionnaire
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setgestionnaire(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    gestionnaire
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    gestionnaire
+                                                                                }
+                                                                            </option>
+                                                                            <option value="ALAME KUZANWA WILLY">
+                                                                                ALAME
+                                                                                KUZANWA
+                                                                                WILLY
+                                                                            </option>
+                                                                            <option value="AKILI SANGARA JULIEN">
+                                                                                AKILI
+                                                                                SANGARA
+                                                                                JULIEN
+                                                                            </option>
+                                                                            <option value="MAPENDO RUTH">
+                                                                                MAPENDO
+                                                                                RUTH
+                                                                            </option>
+                                                                            <option value="LAVIE MATEMBERA">
+                                                                                LAVIE
+                                                                                MATEMBERA
+                                                                            </option>
+                                                                            <option value="KANKINSINGI NGADU">
+                                                                                KANKINSINGI
+                                                                                NGADU
+                                                                            </option>
+                                                                            <option value="NEEMA MULINGA GRACE">
+                                                                                NEEMA
+                                                                                MULINGA
+                                                                                GRACE
+                                                                            </option>
+                                                                            <option value="WIVINE ALISA">
+                                                                                WIVINE
+                                                                                ALISA
+                                                                            </option>
+                                                                            <option value="MOSES KATEMBO">
+                                                                                MOSES
+                                                                                KATEMBO
+                                                                            </option>
+                                                                            <option value="SAFARI KALEKERA">
+                                                                                SAFARI
+                                                                                KALEKERA
+                                                                            </option>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-building me-1"></i>
+                                                                            Source
+                                                                            Fonds
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                source_fond
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setsource_fond(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-coins me-1"></i>
+                                                                            Monnaie
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            value={
+                                                                                monnaie
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setmonnaie(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    monnaie
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    monnaie
+                                                                                }
+                                                                            </option>
+                                                                            <option
+                                                                                value={
+                                                                                    monnaie ==
+                                                                                    "CDF"
+                                                                                        ? "USD"
+                                                                                        : "CDF"
+                                                                                }
+                                                                            >
+                                                                                {monnaie ==
+                                                                                "CDF"
+                                                                                    ? "USD"
+                                                                                    : "CDF"}
+                                                                            </option>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-hourglass-half me-1"></i>
+                                                                            Durée
+                                                                            crédit
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                duree_credit
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setduree_credit(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-chart-simple me-1"></i>
+                                                                            Intervalle
+                                                                            jrs
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                intervale_jrs
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setintervale_jrs(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-percent me-1"></i>
+                                                                            Taux
+                                                                            intérêt
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                taux_interet
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                settaux_interet(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Colonne 3 - Garantie */}
+                                            <div className="col-md-4">
+                                                <div className="card border-0 shadow-sm rounded-3 h-100">
+                                                    <div className="card-body p-3">
+                                                        <h6
+                                                            className="fw-semibold mb-2 pb-1"
+                                                            style={{
+                                                                fontSize:
+                                                                    "0.85rem",
+                                                                color: "#4682b4",
+                                                                borderBottom:
+                                                                    "2px solid #4682b4",
+                                                                display:
+                                                                    "inline-block",
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-shield-alt me-2"></i>
+                                                            Garantie du crédit
+                                                        </h6>
+                                                        <table className="table table-sm table-borderless mb-0 mt-2">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            width: "40%",
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-shield me-1"></i>
+                                                                            Type
+                                                                            Garantie
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                type_garantie
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                settype_credit(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-chart-line me-1"></i>
+                                                                            Valeur
+                                                                            comptable
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                valeur_comptable
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setvaleur_comptable(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-hashtag me-1"></i>
+                                                                            Num
+                                                                            titre
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                num_titre
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setnum_titre(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                            Valeur
+                                                                            garantie
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                valeur_garantie
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setvaleur_garantie(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-calendar-plus me-1"></i>
+                                                                            Date
+                                                                            sortie
+                                                                            titre
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                date_sortie_titre
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setdate_sortie_titre(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-calendar-times me-1"></i>
+                                                                            Date
+                                                                            expiration
+                                                                            titre
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            value={
+                                                                                date_expiration_titre
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setdate_expiration_titre(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                            verticalAlign:
+                                                                                "top",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-comment me-1"></i>
+                                                                            Description
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <textarea
+                                                                            className="form-control form-control-sm"
+                                                                            rows="3"
+                                                                            value={
+                                                                                description_titre
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setdescription_titre(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        ></textarea>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        <button
+                                                            onClick={
+                                                                handleSubmitUpadate
+                                                            }
+                                                            className="btn w-100 mt-3"
+                                                            style={{
+                                                                backgroundColor:
+                                                                    "#20c997",
+                                                                color: "white",
+                                                                borderRadius:
+                                                                    "8px",
+                                                                transition:
+                                                                    "all 0.2s ease",
+                                                            }}
+                                                            onMouseEnter={(
+                                                                e,
+                                                            ) => {
+                                                                e.currentTarget.style.backgroundColor =
+                                                                    "#198764";
+                                                                e.currentTarget.style.transform =
+                                                                    "translateY(-1px)";
+                                                            }}
+                                                            onMouseLeave={(
+                                                                e,
+                                                            ) => {
+                                                                e.currentTarget.style.backgroundColor =
+                                                                    "#20c997";
+                                                                e.currentTarget.style.transform =
+                                                                    "translateY(0)";
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-save me-2"></i>
+                                                            Modifier le dossier
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    {/* Section signature améliorée - Sans drag & drop */}
+                                    <div className="card border-0 shadow-sm rounded-3 mt-4 overflow-hidden">
+                                        <div className="card-header bg-white border-0 pt-3 pb-2">
+                                            <div className="d-flex align-items-center gap-2">
+                                                <div
+                                                    style={{
+                                                        width: "32px",
+                                                        height: "32px",
+                                                        backgroundColor:
+                                                            "rgba(32, 201, 151, 0.1)",
+                                                        borderRadius: "10px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent:
+                                                            "center",
+                                                    }}
+                                                >
+                                                    <i
+                                                        className="fas fa-signature text-teal"
+                                                        style={{
+                                                            fontSize: "16px",
+                                                            color: "#20c997",
+                                                        }}
+                                                    ></i>
+                                                </div>
+                                                <h6
+                                                    className="fw-semibold mb-0"
+                                                    style={{
+                                                        fontSize: "0.95rem",
+                                                    }}
+                                                >
+                                                    Joindre votre signature
+                                                </h6>
+                                                <span
+                                                    className="badge bg-teal bg-opacity-10 text-teal ms-2"
+                                                    style={{
+                                                        fontSize: "11px",
+                                                        padding: "4px 8px",
+                                                    }}
+                                                >
+                                                    <i className="fas fa-lock me-1"></i>
+                                                    Sécurisé
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="card-body pt-2">
+                                            <div className="row g-3 align-items-end">
+                                                <div className="col-md-8">
+                                                    {/* Zone de téléchargement simplifiée */}
+                                                    <div
+                                                        style={{
+                                                            border: signature_file
+                                                                ? "2px solid #20c997"
+                                                                : "2px solid #dee2e6",
+                                                            borderRadius:
+                                                                "12px",
+                                                            padding: "16px",
+                                                            backgroundColor:
+                                                                signature_file
+                                                                    ? "rgba(32, 201, 151, 0.05)"
+                                                                    : "#f8f9fa",
+                                                            transition:
+                                                                "all 0.2s ease",
+                                                        }}
+                                                    >
+                                                        {signature_file ? (
+                                                            <div className="d-flex align-items-center justify-content-between gap-3">
+                                                                <div className="d-flex align-items-center gap-3">
+                                                                    <div
+                                                                        style={{
+                                                                            width: "40px",
+                                                                            height: "40px",
+                                                                            backgroundColor:
+                                                                                "#20c997",
+                                                                            borderRadius:
+                                                                                "10px",
+                                                                            display:
+                                                                                "flex",
+                                                                            alignItems:
+                                                                                "center",
+                                                                            justifyContent:
+                                                                                "center",
+                                                                        }}
+                                                                    >
+                                                                        <i className="fas fa-file-pdf text-white"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p
+                                                                            className="mb-0 fw-semibold small"
+                                                                            style={{
+                                                                                color: "#20c997",
+                                                                            }}
+                                                                        >
+                                                                            {
+                                                                                signature_file.name
+                                                                            }
+                                                                        </p>
+                                                                        <small className="text-muted">
+                                                                            {(
+                                                                                signature_file.size /
+                                                                                1024
+                                                                            ).toFixed(
+                                                                                1,
+                                                                            )}{" "}
+                                                                            KB
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setsignature_file(
+                                                                            null,
+                                                                        )
+                                                                    }
+                                                                    className="btn btn-sm btn-outline-danger"
+                                                                    style={{
+                                                                        borderRadius:
+                                                                            "8px",
+                                                                        padding:
+                                                                            "4px 8px",
+                                                                    }}
+                                                                    title="Supprimer"
+                                                                >
+                                                                    <i className="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-center">
+                                                                <i className="fas fa-file-pdf fa-2x text-muted mb-2"></i>
+                                                                <p className="mb-1 fw-semibold small">
+                                                                    Sélectionnez
+                                                                    votre
+                                                                    fichier de
+                                                                    signature
+                                                                </p>
+                                                                <label className="btn btn-outline-primary btn-sm mt-2">
+                                                                    <i className="fas fa-folder-open me-1"></i>
+                                                                    Choisir un
+                                                                    fichier
+                                                                    <input
+                                                                        type="file"
+                                                                        className="d-none"
+                                                                        name="signature_file"
+                                                                        accept="application/pdf"
                                                                         onChange={(
-                                                                            e
+                                                                            e,
                                                                         ) =>
-                                                                            setnombre_femme_groupe(
+                                                                            setsignature_file(
                                                                                 e
                                                                                     .target
-                                                                                    .value
+                                                                                    .files[0],
                                                                             )
                                                                         }
                                                                     />
-                                                                </td>
-                                                            </tr>
-                                                        )}
-
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Objet crédit
-                                                                    :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <select
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    name="objetCredit"
-                                                                    style={{
-                                                                        width: "150px",
-                                                                    }}
-                                                                    value={
-                                                                        objetCredit
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setObjetCredit(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option
-                                                                        value={
-                                                                            objetCredit
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            objetCredit
-                                                                        }
-                                                                    </option>
-                                                                    <option value="Frais de scolarité,académique,soins médicaux">
-                                                                        Frais de
-                                                                        scolarité,académique,soins
-                                                                        médicaux
-                                                                    </option>
-                                                                    <option value="Dot, mariage, anniversaire, baptême, funéraille">
-                                                                        Dot,
-                                                                        mariage,
-                                                                        anniversaire,
-                                                                        baptême,
-                                                                        funéraille
-                                                                    </option>
-                                                                    <option value="Frais de justice, loyer, paiement dette">
-                                                                        Frais de
-                                                                        justice,
-                                                                        loyer,
-                                                                        paiement
-                                                                        dette
-                                                                    </option>
-                                                                    <option value="Entretien ménage et équipement en mobilier">
-                                                                        Entretien
-                                                                        ménage
-                                                                        et
-                                                                        équipement
-                                                                        en
-                                                                        mobilier
-                                                                    </option>
-                                                                    <option value="Avance sur salaire">
-                                                                        Avance
-                                                                        sur
-                                                                        salaire
-                                                                    </option>
-                                                                    <option value="Achat parcelle bâtie ou bâtie">
-                                                                        Achat
-                                                                        parcelle
-                                                                        bâtie ou
-                                                                        bâtie
-                                                                    </option>
-                                                                    <option value="Construcion et achat matériel de construction">
-                                                                        Construcion
-                                                                        et achat
-                                                                        matériel
-                                                                        de
-                                                                        construction
-                                                                    </option>
-                                                                    <option value="Commerce">
-                                                                        Commerce
-                                                                    </option>
-                                                                    <option value="Préfinancement de marché">
-                                                                        Préfinancement
-                                                                        de
-                                                                        marché
-                                                                    </option>
-                                                                    <option value="Amélioration champ, plantation/agriculture">
-                                                                        Amélioration
-                                                                        champ,
-                                                                        plantation/agriculture
-                                                                    </option>
-                                                                    <option value="Achat moto, voiture">
-                                                                        Achat
-                                                                        moto,
-                                                                        voiture
-                                                                    </option>
-                                                                    <option value="Autres">
-                                                                        Autres
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Frequence
-                                                                    mens. :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "100px",
-                                                                    }}
-                                                                    value={
-                                                                        frequence_mensualite
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setfrequence_mensualite(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Nbre Echnce:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "50px",
-                                                                    }}
-                                                                    value={
-                                                                        nombre_echeance
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setnombre_echeance(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Gestionnaire:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <select
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "150px",
-                                                                    }}
-                                                                    value={
-                                                                        gestionnaire
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setgestionnaire(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option
-                                                                        value={
-                                                                            gestionnaire
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            gestionnaire
-                                                                        }
-                                                                    </option>
-                                                                    <option value="ALAME KUZANWA WILLY">
-                                                                        ALAME
-                                                                        KUZANWA
-                                                                        WILLY
-                                                                    </option>
-                                                                    <option value="AKILI SANGARA JULIEN">
-                                                                        AKILI
-                                                                        SANGARA
-                                                                        JULIEN
-                                                                    </option>
-                                                                    <option value="MAPENDO RUTH">
-                                                                        MAPENDO
-                                                                        RUTH
-                                                                    </option>
-                                                                    <option value="LAVIE MATEMBERA">
-                                                                        LAVIE
-                                                                        MATEMBERA
-                                                                    </option>
-                                                                    <option value="KANKINSINGI NGADU">
-                                                                        KANKINSINGI
-                                                                        NGADU
-                                                                    </option>
-                                                                    <option value="NEEMA MULINGA GRACE">
-                                                                        NEEMA
-                                                                        MULINGA
-                                                                        GRACE
-                                                                    </option>
-                                                                    <option value="WIVINE ALISA">
-                                                                        WIVINE
-                                                                        ALISA
-                                                                    </option>
-                                                                    <option value="MOSES KATEMBO">
-                                                                        MOSES
-                                                                        KATEMBO
-                                                                    </option>
-                                                                    <option value="SAFARI KALEKERA">
-                                                                        SAFARI
-                                                                        KALEKERA
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Source
-                                                                    Fonds:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "100px",
-                                                                    }}
-                                                                    value={
-                                                                        source_fond
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setsource_fond(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Monnaie:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <select
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    value={
-                                                                        monnaie
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setmonnaie(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <option
-                                                                        value={
-                                                                            monnaie
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            monnaie
-                                                                        }
-                                                                    </option>
-                                                                    <option
-                                                                        value={
-                                                                            monnaie
-                                                                        }
-                                                                    >
-                                                                        {monnaie ==
-                                                                        "CDF"
-                                                                            ? "USD"
-                                                                            : "CDF"}
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Durée
-                                                                    crédit:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        duree_credit
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setduree_credit(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Intervalle
-                                                                    jrs:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        intervale_jrs
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setintervale_jrs(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Taux
-                                                                    intérêt:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        taux_interet
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        settaux_interet(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                                <div className="col-md-4 card rounded-0">
-                                                    <table>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Type
-                                                                    Garantie:
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        type_garantie
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        settype_credit(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    valeur
-                                                                    compt. :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        valeur_comptable
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setvaleur_comptable(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Num titre :
                                                                 </label>
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        num_titre
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setnum_titre(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Va. garantie
-                                                                    :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "80px",
-                                                                    }}
-                                                                    value={
-                                                                        valeur_garantie
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setvaleur_garantie(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Date sortie
-                                                                    titre
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "120px",
-                                                                    }}
-                                                                    value={
-                                                                        date_sortie_titre
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setdate_sortie_titre(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Date
-                                                                    expiration
-                                                                    titre
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <input
-                                                                    type="text"
-                                                                    className="input-style"
-                                                                    style={{
-                                                                        width: "120px",
-                                                                    }}
-                                                                    value={
-                                                                        date_expiration_titre
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setdate_expiration_titre(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <label className="label-style">
-                                                                    Descrition :
-                                                                </label>{" "}
-                                                            </td>
-                                                            <td>
-                                                                <textarea
-                                                                    className="input-style"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setdescription_titre(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        description_titre
-                                                                    }
-                                                                </textarea>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td></td>
-                                                            <td>
-                                                                <button
-                                                                    onClick={
-                                                                        handleSubmitUpadate
-                                                                    }
-                                                                    className="btn btn-success m-2"
-                                                                    style={{
-                                                                        borderRadius:
-                                                                            "25px",
-                                                                        padding:
-                                                                            "8px 16px",
-                                                                    }}
-                                                                >
-                                                                    Modifier le
-                                                                    dossier
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Indications supplémentaires */}
+                                                    <div className="d-flex gap-3 mt-2">
+                                                        <small className="text-muted d-flex align-items-center gap-1">
+                                                            <i
+                                                                className="fas fa-info-circle"
+                                                                style={{
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                            ></i>
+                                                            Format accepté : PDF
+                                                        </small>
+                                                        <small className="text-muted d-flex align-items-center gap-1">
+                                                            <i
+                                                                className="fas fa-weight-hanging"
+                                                                style={{
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                            ></i>
+                                                            Max 5 MB
+                                                        </small>
+                                                        <small className="text-muted d-flex align-items-center gap-1">
+                                                            <i
+                                                                className="fas fa-shield-alt"
+                                                                style={{
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                            ></i>
+                                                            Document sécurisé
+                                                        </small>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div className="row">
-                                        {/* <div className="col-md-3">
-                                            {dossier.images &&
-                                                dossier.images.length > 0 && (
-                                                    <div>
-                                                        <h6>Images :</h6>
-                                                        <div
+
+                                                <div className="col-md-4">
+                                                    {signature_file ? (
+                                                        <button
+                                                            onClick={
+                                                                handleSubmitAddFile
+                                                            }
+                                                            className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                                                             style={{
-                                                                display: "flex",
-                                                                flexWrap:
-                                                                    "wrap",
-                                                                gap: "10px",
+                                                                borderRadius:
+                                                                    "10px",
+                                                                padding: "10px",
+                                                                fontWeight:
+                                                                    "500",
+                                                                transition:
+                                                                    "all 0.2s ease",
+                                                                backgroundColor:
+                                                                    "#20c997",
+                                                                color: "white",
+                                                                border: "none",
+                                                            }}
+                                                            onMouseEnter={(
+                                                                e,
+                                                            ) => {
+                                                                e.currentTarget.style.backgroundColor =
+                                                                    "#198764";
+                                                                e.currentTarget.style.transform =
+                                                                    "translateY(-1px)";
+                                                            }}
+                                                            onMouseLeave={(
+                                                                e,
+                                                            ) => {
+                                                                e.currentTarget.style.backgroundColor =
+                                                                    "#20c997";
+                                                                e.currentTarget.style.transform =
+                                                                    "translateY(0)";
                                                             }}
                                                         >
-                                                            {dossier.images.map(
-                                                                (img, i) => (
-                                                                    <Zoom
-                                                                        key={i}
-                                                                    >
-                                                                        <img
-                                                                            src={`/storage/${img.path}`}
-                                                                            alt={`Image ${i}`}
-                                                                            style={{
-                                                                                maxWidth:
-                                                                                    "150px",
-                                                                                maxHeight:
-                                                                                    "150px",
-                                                                                objectFit:
-                                                                                    "cover",
-                                                                                borderRadius:
-                                                                                    "8px",
-                                                                                cursor: "zoom-in",
-                                                                                boxShadow:
-                                                                                    "0 0 5px rgba(0,0,0,0.3)",
-                                                                            }}
-                                                                        />
-                                                                    </Zoom>
-                                                                )
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                            <i className="fas fa-paper-plane"></i>
+                                                            <span>
+                                                                Joindre la
+                                                                signature
+                                                            </span>
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            disabled
+                                                            className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                                                            style={{
+                                                                borderRadius:
+                                                                    "10px",
+                                                                padding: "10px",
+                                                                fontWeight:
+                                                                    "500",
+                                                                backgroundColor:
+                                                                    "#e9ecef",
+                                                                color: "#adb5bd",
+                                                                border: "none",
+                                                                cursor: "not-allowed",
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-upload"></i>
+                                                            <span>
+                                                                Sélectionner un
+                                                                fichier
+                                                            </span>
+                                                        </button>
+                                                    )}
 
-                                            {dossier.pdfs &&
-                                                dossier.pdfs.length > 0 && (
-                                                    <div className="mt-3">
-                                                        <h6>Documents PDF :</h6>
-                                                        {dossier.pdfs.map(
-                                                            (pdf, i) => (
-                                                                <a
-                                                                    key={i}
-                                                                    href={`/storage/${pdf.path}`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-secondary btn-sm me-2"
-                                                                >
-                                                                    Voir PDF{" "}
-                                                                    {i + 1}
-                                                                </a>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
-                                        </div> */}
+                                                    {/* Aperçu rapide si fichier sélectionné */}
+                                                    {signature_file && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const url =
+                                                                    URL.createObjectURL(
+                                                                        signature_file,
+                                                                    );
+                                                                window.open(
+                                                                    url,
+                                                                    "_blank",
+                                                                );
+                                                            }}
+                                                            className="btn btn-outline-secondary w-100 mt-2 d-flex align-items-center justify-content-center gap-2"
+                                                            style={{
+                                                                borderRadius:
+                                                                    "10px",
+                                                                padding: "8px",
+                                                                fontSize:
+                                                                    "13px",
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                            <span>
+                                                                Aperçu rapide
+                                                            </span>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                        <div className="col-md-12">
-                                            <form>
-                                                <table>
-                                                    <tr>
-                                                        <td>
-                                                            <label
-                                                                for="images"
-                                                                class="drop-container"
-                                                                id="dropcontainer"
-                                                            >
-                                                                <span class="drop-title">
-                                                                    Drop files
-                                                                    here
-                                                                </span>
-                                                                or
-                                                                <input
-                                                                    type="file"
-                                                                    id="images"
-                                                                    name="signature_file"
-                                                                    accept="application/pdf"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        setsignature_file(
-                                                                            e
-                                                                                .target
-                                                                                .files[0]
-                                                                        )
-                                                                    }
-                                                                    // style={{
-                                                                    //     width: "100%",
-                                                                    // }}
-                                                                />
-                                                            </label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            {" "}
-                                                            {signature_file && (
-                                                                <button
-                                                                    onClick={
-                                                                        handleSubmitAddFile
-                                                                    }
-                                                                    className="btn btn-success mt-2"
-                                                                    style={{
-                                                                        borderRadius:
-                                                                            "25px",
-                                                                        padding:
-                                                                            "8px 16px",
-                                                                    }}
-                                                                >
-                                                                    Joindre le
-                                                                    fichier
-                                                                </button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </form>
+                                            {/* Message d'information */}
+                                            <div
+                                                className="alert alert-info mt-3 mb-0 py-2"
+                                                style={{
+                                                    backgroundColor:
+                                                        "rgba(13, 202, 240, 0.05)",
+                                                    border: "1px solid rgba(13, 202, 240, 0.2)",
+                                                    borderRadius: "10px",
+                                                }}
+                                            >
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <i className="fas fa-info-circle text-info"></i>
+                                                    <small className="text-muted">
+                                                        La signature sera
+                                                        ajoutée au dossier et
+                                                        sera visible par
+                                                        l'équipe de validation.
+                                                    </small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            {getDossierId && (
-                                                <ValidationFile
-                                                    dossierId={getDossierId}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
 
-                            <div>
-                                {/* Bouton pour ouvrir le offcanvas */}
-
-                                {/* Offcanvas Bootstrap */}
-                                <div
-                                    className="offcanvas offcanvas-end shadow "
-                                    tabIndex="-1"
-                                    style={{ width: "600px" }} // largeur en px ou %
-                                    ref={offcanvasRef} // <-- ajout
-                                    id="offcanvasCommentaires"
-                                    aria-labelledby="offcanvasCommentairesLabel"
-                                >
-                                    <div className="offcanvas-header">
-                                        <h5
-                                            className="offcanvas-title d-flex align-items-center gap-2"
-                                            id="offcanvasCommentairesLabel"
-                                        >
-                                            <FaCommentDots /> Commentaires{" "}
-                                            {nbCommentaires}
-                                        </h5>
-                                        <button
-                                            type="button"
-                                            className="btn-close text-reset"
-                                            data-bs-dismiss="offcanvas"
-                                            aria-label="Close"
-                                            // onClick={() =>
-                                            //     setShowCommentaires(false)
-                                            // }
-                                        ></button>
-                                    </div>
-                                    <div className="offcanvas-body">
-                                        {dossier &&
-                                        dossier.commentaires.length > 0 ? (
-                                            <ul className="list-group">
-                                                {dossier.commentaires.map(
-                                                    (commentaire) => (
-                                                        <CommentaireItem
-                                                            key={commentaire.id}
-                                                            commentaire={
-                                                                commentaire
-                                                            }
-                                                            currentUserId={
-                                                                currentUserId
-                                                            } // <-- on passe en prop
-                                                            handleReply={
-                                                                handleReply
-                                                            }
-                                                            onDeleteComment={
-                                                                getDossierCredit
-                                                            } // passe la fonction ici
-                                                        />
-                                                    )
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p className="text-muted text-center mt-3">
-                                                <i className="bi bi-info-circle me-2"></i>
-                                                Aucun commentaire pour ce
-                                                dossier.
-                                            </p>
-                                        )}
-                                        {/* 🔽 marqueur pour scroller jusqu’ici */}
-                                        {/* <div ref={endOfCommentsRef}></div> */}
-                                    </div>
-
-                                    {replyTo && (
-                                        <div
-                                            className="alert alert-info p-2 rounded-0"
-                                            style={{ marginBottom: "-15px" }}
-                                        >
-                                            En réponse à{" "}
-                                            <strong>
-                                                {replyTo.user?.name ||
-                                                    "Utilisateur inconnu"}
-                                            </strong>
-                                            <button
-                                                type="button"
-                                                className="btn-close float-end"
-                                                aria-label="Close"
-                                                onClick={() => setReplyTo(null)}
-                                            ></button>
+                                    {/* Validation File */}
+                                    {getDossierId && (
+                                        <div className="mt-3">
+                                            <ValidationFile
+                                                dossierId={getDossierId}
+                                            />
                                         </div>
                                     )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
 
-                                    <form
-                                        className="mt-3 d-flex gap-2"
-                                        onSubmit={saveComment}
-                                    >
-                                        <div className="input-group">
-                                            <span className="input-group-text">
-                                                <FaPencilAlt />
-                                            </span>
-                                            <input
-                                                type="text"
-                                                ref={inputRef}
-                                                className="form-control"
-                                                placeholder={
-                                                    replyTo
-                                                        ? `Répondre à ${
-                                                              replyTo.user
-                                                                  ?.name ||
-                                                              "Utilisateur"
-                                                          }...`
-                                                        : "Écrire un commentaire..."
-                                                }
-                                                value={contenu}
-                                                onChange={(e) =>
-                                                    setContenu(e.target.value)
-                                                }
-                                            />
-                                            <button
-                                                type="submit"
-                                                className="btn btn-success d-flex align-items-center gap-1 rounded-0"
-                                            >
-                                                <FaPaperPlane /> Envoyer
-                                            </button>
-                                        </div>
-                                    </form>
+                {/* Offcanvas Commentaires */}
+                <div
+                    className="offcanvas offcanvas-end shadow-lg"
+                    tabIndex="-1"
+                    style={{ width: "500px" }}
+                    ref={offcanvasRef}
+                    id="offcanvasCommentaires"
+                    aria-labelledby="offcanvasCommentairesLabel"
+                >
+                    <div
+                        className="offcanvas-header"
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #20c997 0%, #198764 100%)",
+                            padding: "1.2rem 1.5rem",
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1020,
+                            backdropFilter: "blur(10px)",
+                            flexShrink: 0,
+                            borderBottom: "1px solid rgba(255,255,255,0.3)",
+                        }}
+                    >
+                        <div className="d-flex align-items-center w-100">
+                            {/* Avatar avec initiales */}
+                            <div
+                                style={{
+                                    width: "48px",
+                                    height: "48px",
+                                    background: "rgba(255,255,255,0.2)",
+                                    borderRadius: "16px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginRight: "12px",
+                                    position: "relative",
+                                }}
+                            >
+                                <i className="fas fa-comment-dots fa-xl text-white"></i>
+
+                                {/* Badge en direct */}
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        bottom: "-4px",
+                                        right: "-4px",
+                                        width: "16px",
+                                        height: "16px",
+                                        backgroundColor: "#4caf50",
+                                        borderRadius: "50%",
+                                        border: "2px solid #20c997",
+                                        animation: "pulse 2s infinite",
+                                    }}
+                                ></div>
+                            </div>
+
+                            {/* Infos */}
+                            <div className="flex-grow-1">
+                                <h5
+                                    className="fw-bold mb-0 text-white"
+                                    style={{ fontSize: "1.1rem" }}
+                                >
+                                    Discussions
+                                </h5>
+                                <div className="d-flex align-items-center gap-2 mt-1">
+                                    <span className="text-white-50 small">
+                                        <i className="fas fa-users me-1"></i>
+                                        Équipe de crédit
+                                    </span>
+                                    <span className="text-white-50">•</span>
+                                    <span className="text-white-50 small">
+                                        <i className="fas fa-clock me-1"></i>
+                                        En direct
+                                    </span>
                                 </div>
                             </div>
+
+                            {/* Compteur de messages */}
+                            {nbCommentaires > 0 && (
+                                <div
+                                    style={{
+                                        background: "rgba(255,255,255,0.25)",
+                                        borderRadius: "30px",
+                                        padding: "6px 14px",
+                                        marginRight: "12px",
+                                        backdropFilter: "blur(4px)",
+                                    }}
+                                >
+                                    <span
+                                        className="text-white fw-bold"
+                                        style={{ fontSize: "14px" }}
+                                    >
+                                        {nbCommentaires}
+                                    </span>
+                                    <span
+                                        className="text-white-50 ms-1"
+                                        style={{ fontSize: "12px" }}
+                                    >
+                                        msg
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Bouton fermeture */}
+                            <button
+                                type="button"
+                                className="btn-close btn-close-white"
+                                data-bs-dismiss="offcanvas"
+                                aria-label="Close"
+                                style={{
+                                    opacity: 0.8,
+                                    transition: "all 0.2s ease",
+                                    padding: "10px",
+                                    borderRadius: "12px",
+                                    backgroundColor: "rgba(0,0,0,0.1)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.opacity = "1";
+                                    e.currentTarget.style.backgroundColor =
+                                        "rgba(0,0,0,0.2)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.opacity = "0.8";
+                                    e.currentTarget.style.backgroundColor =
+                                        "rgba(0,0,0,0.1)";
+                                }}
+                            ></button>
                         </div>
+                    </div>
+
+                    <style>
+                        {`
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+  `}
+                    </style>
+                    <div
+                        className="offcanvas-body"
+                        style={{
+                            maxHeight: "calc(100vh - 200px)",
+                            overflowY: "auto",
+                        }}
+                    >
+                        {dossier &&
+                        dossier.commentaires &&
+                        dossier.commentaires.length > 0 ? (
+                            <ul className="list-group list-group-flush">
+                                {dossier.commentaires.map((commentaire) => (
+                                    <CommentaireItem
+                                        key={commentaire.id}
+                                        commentaire={commentaire}
+                                        currentUserId={currentUserId}
+                                        handleReply={handleReply}
+                                        onDeleteComment={getDossierCredit}
+                                    />
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="text-center py-5">
+                                <i className="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                                <p className="text-muted">
+                                    Aucun commentaire pour ce dossier
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    {replyTo && (
+                        <div
+                            className="alert alert-info p-2 rounded-0 m-0"
+                            style={{ borderLeft: "4px solid #20c997" }}
+                        >
+                            <i className="fas fa-reply me-1"></i>
+                            En réponse à{" "}
+                            <strong>
+                                {replyTo.user?.name || "Utilisateur inconnu"}
+                            </strong>
+                            <button
+                                type="button"
+                                className="btn-close float-end"
+                                aria-label="Close"
+                                onClick={() => setReplyTo(null)}
+                            ></button>
+                        </div>
+                    )}
+                    {/* Formulaire de commentaire collé en bas avec flexbox */}
+                    <div
+                        style={{
+                            marginTop: "auto",
+                            position: "sticky",
+                            bottom: 0,
+                            backgroundColor: "white",
+                            borderTop: "1px solid #e9ecef",
+                            boxShadow: "0 -2px 10px rgba(0,0,0,0.05)",
+                        }}
+                    >
+                        <form onSubmit={saveComment} className="p-3">
+                            <div className="d-flex gap-2">
+                                <div className="flex-grow-1">
+                                    <div className="position-relative">
+                                        <span className="position-absolute start-0 top-50 translate-middle-y ms-3 text-teal">
+                                            <FaPencilAlt size={14} />
+                                        </span>
+                                        <input
+                                            type="text"
+                                            ref={inputRef}
+                                            className="form-control"
+                                            style={{
+                                                borderRadius: "25px",
+                                                padding: "12px 20px 12px 45px",
+                                                fontSize: "14px",
+                                                border: "1px solid #e9ecef",
+                                                backgroundColor: "#f8f9fa",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            placeholder={
+                                                replyTo
+                                                    ? `✏️ Répondre à ${replyTo.user?.name || "Utilisateur"}...`
+                                                    : "💬 Écrire un commentaire..."
+                                            }
+                                            value={contenu}
+                                            onChange={(e) =>
+                                                setContenu(e.target.value)
+                                            }
+                                            onFocus={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#20c997";
+                                                e.currentTarget.style.boxShadow =
+                                                    "0 0 0 3px rgba(32,201,151,0.1)";
+                                            }}
+                                            onBlur={(e) => {
+                                                e.currentTarget.style.borderColor =
+                                                    "#e9ecef";
+                                                e.currentTarget.style.boxShadow =
+                                                    "none";
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="btn d-flex align-items-center gap-2"
+                                    style={{
+                                        borderRadius: "25px",
+                                        padding: "10px 28px",
+                                        fontWeight: "600",
+                                        transition: "all 0.2s ease",
+                                        backgroundColor: contenu.trim()
+                                            ? "#20c997"
+                                            : "#e9ecef",
+                                        color: contenu.trim()
+                                            ? "white"
+                                            : "#adb5bd",
+                                        border: "none",
+                                        cursor: contenu.trim()
+                                            ? "pointer"
+                                            : "not-allowed",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (contenu.trim()) {
+                                            e.currentTarget.style.backgroundColor =
+                                                "#198764";
+                                            e.currentTarget.style.transform =
+                                                "translateY(-1px)";
+                                            e.currentTarget.style.boxShadow =
+                                                "0 4px 12px rgba(32,201,151,0.3)";
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (contenu.trim()) {
+                                            e.currentTarget.style.backgroundColor =
+                                                "#20c997";
+                                            e.currentTarget.style.transform =
+                                                "translateY(0)";
+                                            e.currentTarget.style.boxShadow =
+                                                "none";
+                                        }
+                                    }}
+                                    disabled={!contenu.trim()}
+                                >
+                                    <FaPaperPlane size={14} />
+                                    <span>Envoyer</span>
+                                </button>
+                            </div>
+
+                            {/* Indicateur de réponse */}
+                            {replyTo && (
+                                <div className="mt-2 small text-muted d-flex align-items-center gap-2">
+                                    <i className="fas fa-reply text-teal"></i>
+                                    <span>
+                                        Réponse à{" "}
+                                        <strong>
+                                            {replyTo.user?.name ||
+                                                "Utilisateur"}
+                                        </strong>
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-link text-danger p-0 ms-auto"
+                                        onClick={() => setReplyTo(null)}
+                                        style={{ textDecoration: "none" }}
+                                    >
+                                        <i className="fas fa-times"></i> Annuler
+                                    </button>
+                                </div>
+                            )}
+                        </form>
                     </div>
                 </div>
             </div>
@@ -2129,7 +2982,7 @@ const CommentaireItem = ({
         // try {
         setIsLoadingBar(true);
         const res = await axios.delete(
-            `/gestion_credit/page/credit/commentaire/${id}`
+            `/gestion_credit/page/credit/commentaire/${id}`,
         );
         if (res.data.status === 1) {
             // Recharger les commentaires après suppression
@@ -2216,11 +3069,11 @@ const CommentaireItem = ({
                     <small className="text-muted">
                         <span>
                             {new Date(
-                                commentaire.created_at
+                                commentaire.created_at,
                             ).toLocaleDateString("fr-FR")}{" "}
                             à{" "}
                             {new Date(
-                                commentaire.created_at
+                                commentaire.created_at,
                             ).toLocaleTimeString("fr-FR", {
                                 hour: "2-digit",
                                 minute: "2-digit",
