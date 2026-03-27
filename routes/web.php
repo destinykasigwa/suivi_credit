@@ -1,29 +1,10 @@
 <?php
 
-use App\Models\AdhesionMembre;
-use App\CustomTasks\ClotureJournee;
-use App\Http\Controllers\EcoHomePage;
-use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
-use App\CustomTasks\ClotureJourneeCopy;
-use App\Http\Controllers\Authentication;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\BulkSMSController;
-use App\Http\Controllers\PostageController;
-use App\Http\Controllers\ReportsController;
-use App\Http\Controllers\SendSMSController;
-use App\Http\Controllers\SessionController;
-use App\Http\Controllers\AdhesionController;
-use App\Http\Controllers\AGestionCreditController;
-use App\Http\Controllers\PDFExportController;
-use App\Http\Controllers\RemboursementManuel;
-use App\Http\Controllers\SMSBankingController;
-use App\Http\Controllers\GestionCreditHomePage;
-use App\Http\Controllers\SuiviCreditController;
-use App\Http\Controllers\UtilisateurController;
-use App\Http\Controllers\ComptesParamController;
-use App\Http\Controllers\TransactionsController;
-use App\Http\Controllers\ClotureJourneeController;
+use App\Models\AdhesionMembre;
+use App\CustomTasks\{ClotureJournee, ClotureJourneeCopy};
+use App\Http\Controllers\{AGestionCreditController, AdhesionController, Authentication, BulkSMSController, ClotureJourneeController, ComptesParamController, EcoHomePage, GestionCreditHomePage, HomeController, PDFExportController, PostageController, RemboursementManuel, ReportsController, SMSBankingController, SendSMSController, SessionController, SuiviCreditController, TransactionsController, UtilisateurController};
+use App\Http\Middleware\Authenticate;
 
 /*
 |--------------------------------------------------------------------------
@@ -606,6 +587,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('eco/pages/montage-credit/addnew', [AGestionCreditController::class, 'store']);
     Route::get('/gestion_credit/pages/validation-credit', [AGestionCreditController::class, 'ValidatioCreditHomePage'])->name('gestion_credit.pages.validation-credit');
     Route::get('montage-credit/validation/rapport', [AGestionCreditController::class, 'getCreditValidation']);
+    Route::get('/gestion_credit/rapport-credit', [AGestionCreditController::class, 'RapportCreditHomePage'])->name('gestion_credit.pages.rapport-credit');
     Route::post(
         "montage_credit/page/validation/credit/reference",
         [AGestionCreditController::class, 'getSearchedCredit']
@@ -674,4 +656,22 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
 
 
     Route::get('montage_credit/page/titre/credit/reference/{ref}', [AGestionCreditController::class, 'getSeachedTitreCredit']);
+
+
+    
+    Route::get('gestion_credit/dossier/montant-propose/{dossierId}', [AGestionCreditController::class, 'getHistorique']);
+    Route::post('gestion_credit/dossier/montant-propose', [AGestionCreditController::class, 'storeProposeMontant']);
+    Route::get('gestion_credit/dossier/montant-propose/last/{dossierId}', [AGestionCreditController::class, 'getLastProposition']);
+    Route::delete('gestion_credit/dossier/montant-propose/{id}', [AGestionCreditController::class, 'destroy']);
+
+
+    Route::post('gestion_credit/dossier/credit-checklists', [AGestionCreditController::class, 'storeCreditChecklist']);
+
+
+     Route::get('gestion_credit/dossier/credit-checklists/{dossierId}', [AGestionCreditController::class, 'getCreditChecklist']);
+    
+
+
+      Route::get('gestion_credit/credits/rapport', [AGestionCreditController::class, 'getRapportCredit']);
+    
 });

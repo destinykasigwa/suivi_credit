@@ -1,6 +1,4 @@
-//import styles from "../styles/RegisterForm.module.css";
 import { useState, useEffect, useRef } from "react";
-// import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
@@ -11,19 +9,27 @@ import { MdTimeline } from "react-icons/md";
 import CreditTimeline from "../Modals/ModalsGC/TimeLine";
 import ModalContratPret from "../Modals/ModalsGC/ModalContratPret";
 import TruncatedName from "./TruncatedName";
+import ModalCheckListSuperviseur from "../Modals/ModalsGC/ModalCheckListSuperviseur";
+import ModalTitreCredit from "../Modals/ModalsGC/ModalTitreCredit";
 
 const ValidationC = () => {
     const inputRef = useRef(null);
     const [loading, setloading] = useState(false);
-    const [fetchData, setFetchData] = useState();
-    const [searchRefCredit, setsearchRefCredit] = useState();
-    const [fetchSearchedCredit, setFetchSearchedCredit] = useState();
+    const [fetchData, setFetchData] = useState([]);
+    const [searchRefCredit, setsearchRefCredit] = useState("");
+    const [fetchSearchedCredit, setFetchSearchedCredit] = useState(null);
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
-    const [type_recherche, settype_recherche] = useState();
+     const [dossierIdSelectedSuperv, setDossierIdSelectedSuperv] = useState(null);
+     const [dossierIdSelectedTitre, setDossierIdSelectedTitre] = useState(null);
+     const [dossierIdSelectedTimeLine, setDossierIdSelectedTimeLine] = useState(null);
+     const [dossierIdSelectedContratPret, setDossierIdSelectedContratPret] = useState(null);
+    const [type_recherche, settype_recherche] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [NumDossier, setNumDossier] = useState(null);
+
+    const itemsPerPage = 5;
 
     useEffect(() => {
-        // Place automatiquement le curseur dans le champ à l'ouverture de la page
         inputRef.current?.focus();
         getDataCredit();
     }, []);
@@ -32,40 +38,60 @@ const ValidationC = () => {
         try {
             const res = await axios.get("/montage-credit/validation/rapport");
 
-            // Vérifie si le tableau existe et contient des données
             if (Array.isArray(res.data.data) && res.data.data.length > 0) {
                 setFetchData(res.data.data);
+                setNumDossier(res.data.data);
             } else {
-                setFetchData([]); // tableau vide si aucune donnée
+                setFetchData([]);
             }
         } catch (error) {
             console.error("Erreur lors du chargement des crédits :", error);
-            setFetchData([]); // en cas d'erreur, tableau vide pour éviter le crash
+            setFetchData([]);
         }
     };
 
-    //PERMET DE RECHERCHER UN DOSSIER DE CREDIT
-
     const handleSeachCredit = async (ref) => {
+        if (!ref) {
+            Swal.fire({
+                title: "Information",
+                text: "Veuillez saisir un critère de recherche",
+                icon: "info",
+                timer: 3000,
+                confirmButtonText: "OK"
+            });
+            return;
+        }
+
         setloading(true);
-        const res = await axios.post(
-            "/montage_credit/page/validation/credit/reference",
-            {
-                ref,
-                type_recherche,
-            },
-        );
-        if (res.data.status == 1) {
-            setloading(false);
-            setFetchSearchedCredit(res.data.data);
-        } else if (res.data.status == 0) {
-            setloading(false);
+        try {
+            const res = await axios.post(
+                "/montage_credit/page/validation/credit/reference",
+                {
+                    ref,
+                    type_recherche,
+                },
+            );
+            if (res.data.status == 1) {
+                setFetchSearchedCredit(res.data.data);
+            } else if (res.data.status == 0) {
+                Swal.fire({
+                    title: "Erreur",
+                    text: res.data.msg,
+                    icon: "error",
+                    button: "OK!",
+                });
+                setFetchSearchedCredit(null);
+            }
+        } catch (error) {
+            console.error("Erreur lors de la recherche :", error);
             Swal.fire({
                 title: "Erreur",
-                text: res.data.msg,
+                text: "Une erreur est survenue lors de la recherche",
                 icon: "error",
-                button: "OK!",
+                confirmButtonText: "OK"
             });
+        } finally {
+            setloading(false);
         }
     };
 
@@ -81,65 +107,81 @@ const ValidationC = () => {
         });
 
         if (confirmation.isConfirmed) {
-            const res = await axios.post(
-                "/gestion_credit/pages/dossier-credit/delete/" + id,
-            );
-            if (res.data.status == 1) {
+            try {
+                const res = await axios.post(
+                    "/gestion_credit/pages/dossier-credit/delete/" + id,
+                );
+                if (res.data.status == 1) {
+                    Swal.fire({
+                        title: "Suppression",
+                        text: res.data.msg,
+                        icon: "success",
+                        timer: 3000,
+                        confirmButtonText: "Okay",
+                    });
+                    getDataCredit();
+                    setFetchSearchedCredit(null);
+                } else {
+                    Swal.fire({
+                        title: "Suppression",
+                        text: res.data.msg,
+                        icon: "error",
+                        timer: 3000,
+                        confirmButtonText: "Okay",
+                    });
+                }
+            } catch (error) {
+                console.error("Erreur lors de la suppression :", error);
                 Swal.fire({
-                    title: "Suppression",
-                    text: res.data.msg,
-                    icon: "success",
-                    timer: 8000,
-                    confirmButtonText: "Okay",
-                });
-                getDataCredit();
-            } else {
-                Swal.fire({
-                    title: "Suppression",
-                    text: res.data.msg,
+                    title: "Erreur",
+                    text: "Une erreur est survenue lors de la suppression",
                     icon: "error",
-                    timer: 8000,
-                    confirmButtonText: "Okay",
+                    confirmButtonText: "OK"
                 });
             }
         }
     };
 
     const dateParser = (num) => {
+        if (!num) return "";
         const options = {
-            // weekday: "long",
             year: "numeric",
             month: "numeric",
             day: "numeric",
         };
-
         let timestamp = Date.parse(num);
-
         let date = new Date(timestamp).toLocaleDateString("fr-FR", options);
-
         return date.toString();
     };
 
-    // const handleVisualiser = (dossier) => {
-    //     setSelectedDossier(dossier);
-    //     setShowModal(true);
-    // };
-
-    // Calculate the index of the first and last item of the current page
-    let itemsPerPage = 5;
-    const totalPages = Math.ceil(fetchData && fetchData.length / itemsPerPage);
-
+    // Calculs pour la pagination
+    const totalPages = Math.ceil(fetchData.length / itemsPerPage) || 1;
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems =
-        fetchData && fetchData.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = fetchData.slice(indexOfFirstItem, indexOfLastItem);
 
-    // const handlePageChange = (pageNumber) => {
-    //     setCurrentPage(pageNumber);
-    // };
+    // Fonctions de navigation
+    const goToPage = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const goToNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const goToPrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    // Rendu de la pagination
     const renderPagination = () => {
-        const totalPages = Math.ceil(fetchData?.length / itemsPerPage) || 1;
-        const maxVisiblePages = 5; // Nombre maximum de pages visibles
+        const maxVisiblePages = 5;
         const halfVisible = Math.floor(maxVisiblePages / 2);
 
         let startPage = Math.max(1, currentPage - halfVisible);
@@ -151,24 +193,16 @@ const ValidationC = () => {
 
         const pages = [];
 
-        // Ajouter les points de suspension au début
+        // Points de suspension au début
         if (startPage > 1) {
             pages.push(
                 <li key="start-ellipsis" className="page-item disabled">
-                    <span
-                        className="page-link"
-                        style={{
-                            borderRadius: "8px",
-                            border: "1px solid #dee2e6",
-                        }}
-                    >
-                        ...
-                    </span>
-                </li>,
+                    <span className="page-link">...</span>
+                </li>
             );
         }
 
-        // Générer les numéros de pages
+        // Numéros de pages
         for (let i = startPage; i <= endPage; i++) {
             pages.push(
                 <li
@@ -180,8 +214,7 @@ const ValidationC = () => {
                         className="page-link"
                         style={{
                             borderRadius: "8px",
-                            backgroundColor:
-                                currentPage === i ? "#0d6efd" : "white",
+                            backgroundColor: currentPage === i ? "#0d6efd" : "white",
                             color: currentPage === i ? "white" : "#0d6efd",
                             border: "1px solid #dee2e6",
                             padding: "6px 12px",
@@ -192,103 +225,49 @@ const ValidationC = () => {
                         }}
                         onMouseEnter={(e) => {
                             if (currentPage !== i) {
-                                e.currentTarget.style.backgroundColor =
-                                    "#e7f1ff";
-                                e.currentTarget.style.transform =
-                                    "translateY(-1px)";
+                                e.currentTarget.style.backgroundColor = "#e7f1ff";
+                                e.currentTarget.style.transform = "translateY(-1px)";
                             }
                         }}
                         onMouseLeave={(e) => {
                             if (currentPage !== i) {
                                 e.currentTarget.style.backgroundColor = "white";
-                                e.currentTarget.style.transform =
-                                    "translateY(0)";
+                                e.currentTarget.style.transform = "translateY(0)";
                             }
                         }}
                     >
                         {i}
                     </button>
-                </li>,
+                </li>
             );
         }
 
-        // Ajouter les points de suspension à la fin
+        // Points de suspension à la fin
         if (endPage < totalPages) {
             pages.push(
                 <li key="end-ellipsis" className="page-item disabled">
-                    <span
-                        className="page-link"
-                        style={{
-                            borderRadius: "8px",
-                            border: "1px solid #dee2e6",
-                        }}
-                    >
-                        ...
-                    </span>
-                </li>,
+                    <span className="page-link">...</span>
+                </li>
             );
         }
 
         return pages;
     };
-    const goToNextPage = () => {
-        setCurrentPage((prevPage) =>
-            Math.min(
-                prevPage + 1,
-                Math.ceil(fetchData && fetchData.length / itemsPerPage),
-            ),
-        );
-    };
 
-    const goToPrevPage = () => {
-        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-    };
-
-    // const paginationStyle = {
-    //     listStyle: "none",
-    //     display: "flex",
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    //     background: "",
-    // };
-
-    // const buttonStylePrevNext = {
-    //     padding: "2px 20px",
-    //     backgroundColor: "steelblue",
-    //     color: "white",
-    //     border: "none",
-    //     borderRadius: "5px",
-    //     cursor: "pointer",
-    //     margin: "0 5px",
-    // };
-    const buttonStyle = {
-        padding: "1px 5px",
-        backgroundColor: "steelblue",
-        color: "white",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        margin: "0 5px",
-    };
-
-    // const selectedButtonStyle = {
-    //     ...buttonStyle,
-    //     backgroundColor: "#FFC107", // Change color for selected button
-    // };
-
+    // Tri des options du select
     document.addEventListener("DOMContentLoaded", function () {
         let select = document.querySelector("#produit_credit_select");
-        let options = Array.from(select.options);
-
-        options.sort((a, b) => a.text.localeCompare(b.text));
-
-        select.innerHTML = "";
-        options.forEach((option) => select.add(option));
+        if (select) {
+            let options = Array.from(select.options);
+            options.sort((a, b) => a.text.localeCompare(b.text));
+            select.innerHTML = "";
+            options.forEach((option) => select.add(option));
+        }
     });
 
     return (
         <>
-            <div className="container-fluid" style={{ marginTop: "10px" }}>
+            <div className="container-fluid" style={{ marginTop: "10px"}}>
                 {/* En-tête de la section */}
                 <div className="row mb-3">
                     <div className="col-md-12">
@@ -353,13 +332,16 @@ const ValidationC = () => {
                                                 value={type_recherche}
                                             >
                                                 <option value="">
-                                                    🔍 Type de recherche
+                                                    🔍 Recherche
                                                 </option>
                                                 <option value="AC">
                                                     👤 Agent crédit
                                                 </option>
                                                 <option value="type_credit">
                                                     📊 Type crédit
+                                                </option>
+                                                <option value="credit_refuse">
+                                                    ❌ Crédits refusés
                                                 </option>
                                             </select>
                                         </div>
@@ -733,17 +715,9 @@ const ValidationC = () => {
                                                           </span>
                                                       )}
                                                   </td>
-                                                  <td className="py-3 text-center">
-                                                      <div
-                                                          className="btn-group gap-2"
-                                                          role="group"
-                                                          style={{
-                                                              display: "flex",
-                                                              justifyContent:
-                                                                  "center",
-                                                              gap: "8px",
-                                                          }}
-                                                      >
+
+                                                  <td className="py-3">
+                                                      <div className="d-flex gap-2 justify-content-center align-items-center">
                                                           <button
                                                               type="button"
                                                               className="btn btn-sm btn-outline-primary"
@@ -764,22 +738,8 @@ const ValidationC = () => {
                                                                   gap: "6px",
                                                                   transition:
                                                                       "all 0.2s ease",
-                                                              }}
-                                                              onMouseEnter={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(-1px)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "0 2px 6px rgba(13,110,253,0.2)";
-                                                              }}
-                                                              onMouseLeave={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(0)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "none";
+                                                                  padding:
+                                                                      "6px 12px",
                                                               }}
                                                           >
                                                               <i className="fas fa-eye"></i>
@@ -790,102 +750,11 @@ const ValidationC = () => {
 
                                                           <button
                                                               type="button"
-                                                              className="btn btn-sm btn-outline-success"
-                                                              data-toggle="modal"
-                                                              data-target="#modalTimeLine"
-                                                              onClick={() =>
-                                                                  setDossierIdSelected(
-                                                                      credit.id_credit,
-                                                                  )
-                                                              }
-                                                              style={{
-                                                                  borderRadius:
-                                                                      "6px",
-                                                                  display:
-                                                                      "inline-flex",
-                                                                  alignItems:
-                                                                      "center",
-                                                                  gap: "6px",
-                                                                  transition:
-                                                                      "all 0.2s ease",
-                                                              }}
-                                                              onMouseEnter={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(-1px)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "0 2px 6px rgba(25,135,84,0.2)";
-                                                              }}
-                                                              onMouseLeave={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(0)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "none";
-                                                              }}
-                                                          >
-                                                              <MdTimeline
-                                                                  size={16}
-                                                              />
-                                                              <span>
-                                                                  Signatures
-                                                              </span>
-                                                          </button>
-
-                                                          <button
-                                                              type="button"
-                                                              className="btn btn-sm btn-outline-danger"
-                                                              onClick={() =>
-                                                                  handleDeleteCredit(
-                                                                      credit.id_credit,
-                                                                  )
-                                                              }
-                                                              style={{
-                                                                  borderRadius:
-                                                                      "6px",
-                                                                  display:
-                                                                      "inline-flex",
-                                                                  alignItems:
-                                                                      "center",
-                                                                  gap: "6px",
-                                                                  transition:
-                                                                      "all 0.2s ease",
-                                                              }}
-                                                              onMouseEnter={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(-1px)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "0 2px 6px rgba(220,53,69,0.2)";
-                                                              }}
-                                                              onMouseLeave={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(0)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "none";
-                                                              }}
-                                                          >
-                                                              <i
-                                                                  className="fa fa-trash"
-                                                                  aria-hidden="true"
-                                                              ></i>
-                                                              <span>
-                                                                  Supprimer
-                                                              </span>
-                                                          </button>
-
-                                                          <button
-                                                              type="button"
                                                               className="btn btn-sm btn-outline-info"
                                                               data-toggle="modal"
                                                               data-target="#modalContratPret"
                                                               onClick={() =>
-                                                                  setDossierIdSelected(
+                                                                  setDossierIdSelectedContratPret(
                                                                       credit.id_credit,
                                                                   )
                                                               }
@@ -899,22 +768,8 @@ const ValidationC = () => {
                                                                   gap: "6px",
                                                                   transition:
                                                                       "all 0.2s ease",
-                                                              }}
-                                                              onMouseEnter={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(-1px)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "0 2px 6px rgba(13,202,240,0.2)";
-                                                              }}
-                                                              onMouseLeave={(
-                                                                  e,
-                                                              ) => {
-                                                                  e.currentTarget.style.transform =
-                                                                      "translateY(0)";
-                                                                  e.currentTarget.style.boxShadow =
-                                                                      "none";
+                                                                  padding:
+                                                                      "6px 12px",
                                                               }}
                                                           >
                                                               <i
@@ -925,6 +780,173 @@ const ValidationC = () => {
                                                                   Fichiers
                                                               </span>
                                                           </button>
+
+                                                          <div className="dropdown d-inline-block">
+                                                              <button
+                                                                  className="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                                  type="button"
+                                                                  data-bs-toggle="dropdown"
+                                                                  aria-expanded="false"
+                                                                  style={{
+                                                                      borderRadius:
+                                                                          "6px",
+                                                                      padding:
+                                                                          "6px 12px",
+                                                                      display:
+                                                                          "inline-flex",
+                                                                      alignItems:
+                                                                          "center",
+                                                                      gap: "6px",
+                                                                      transition:
+                                                                          "all 0.2s ease",
+                                                                  }}
+                                                              >
+                                                                  <i className="fas fa-bars"></i>
+                                                                  <span>
+                                                                      Actions
+                                                                  </span>
+                                                              </button>
+
+                                                              <ul
+                                                                  className="dropdown-menu shadow-lg border-0"
+                                                                  style={{
+                                                                      borderRadius:
+                                                                          "12px",
+                                                                      padding:
+                                                                          "8px 0",
+                                                                      minWidth:
+                                                                          "220px",
+                                                                  }}
+                                                              >
+                                                                  <li>
+                                                                      <button
+                                                                          className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                          data-toggle="modal"
+                                                                          data-target="#modalTimeLine"
+                                                                          onClick={() =>
+                                                                              setDossierIdSelectedTimeLine(
+                                                                                  credit.id_credit,
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <MdTimeline
+                                                                              size={
+                                                                                  16
+                                                                              }
+                                                                              color="#28a745"
+                                                                          />
+                                                                          <span>
+                                                                              Historique
+                                                                              des
+                                                                              signatures
+                                                                          </span>
+                                                                      </button>
+                                                                  </li>
+                                                                  <li>
+                                                                      <hr className="dropdown-divider my-1" />
+                                                                  </li>
+                                                                  <li>
+                                                                      <button
+                                                                          className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                          data-toggle="modal"
+                                                                          data-target="#modalContratPret"
+                                                                          onClick={() =>
+                                                                              setDossierIdSelectedContratPret(
+                                                                                  credit.id_credit,
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <i
+                                                                              className="fas fa-file-contract text-warning"
+                                                                              style={{
+                                                                                  fontSize:
+                                                                                      "16px",
+                                                                              }}
+                                                                          ></i>
+                                                                          <span>
+                                                                              Contrat
+                                                                              de
+                                                                              prêt
+                                                                          </span>
+                                                                      </button>
+                                                                  </li>
+                                                                  <li>
+                                                                      <hr className="dropdown-divider my-1" />
+                                                                  </li>
+                                                                  <li>
+                                                                      <button
+                                                                          className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                          data-toggle="modal"
+                                                                          data-target="#modalCheckListSuperviseur"
+                                                                          onClick={() =>
+                                                                              setDossierIdSelectedSuperv(
+                                                                                  credit.id_credit,
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <i
+                                                                              className="fas fa-check-square"
+                                                                              style={{
+                                                                                  color: "#28a745",
+                                                                              }}
+                                                                          ></i>
+                                                                          <span>
+                                                                              Check
+                                                                              Liste
+                                                                              du
+                                                                              superviseur
+                                                                          </span>
+                                                                      </button>
+                                                                  </li>
+                                                                  <li>
+                                                                          <hr className="dropdown-divider my-1" />
+                                                                      </li>
+                                                                      <li>
+                                                                          <button
+                                                                              className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                             data-toggle="modal"
+                                                                             data-target="#modalVisualisationTitre"
+                                                                              onClick={() =>
+                                                                                  setDossierIdSelectedTitre(
+                                                                                      credit.id_credit,
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                               <i className="fas fa-file-alt"></i>
+                                                                              <span>
+                                                                                 Voir tous les titres
+                                                                              </span>
+                                                                          </button>
+                                                                      </li>
+                                                                  
+                                                                  <li>
+                                                                      <hr className="dropdown-divider my-1" />
+                                                                  </li>
+                                                                  <li>
+                                                                      <button
+                                                                          className="dropdown-item d-flex align-items-center gap-3 py-2 text-danger"
+                                                                          onClick={() =>
+                                                                              handleDeleteCredit(
+                                                                                  credit.id_credit,
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <i
+                                                                              className="fas fa-trash-alt text-danger"
+                                                                              style={{
+                                                                                  fontSize:
+                                                                                      "16px",
+                                                                              }}
+                                                                          ></i>
+                                                                          <span>
+                                                                              Supprimer
+                                                                              le
+                                                                              dossier
+                                                                          </span>
+                                                                      </button>
+                                                                  </li>
+                                                              </ul>
+                                                          </div>
                                                       </div>
                                                   </td>
                                               </tr>
@@ -935,30 +957,14 @@ const ValidationC = () => {
                                                   <tr
                                                       key={index}
                                                       className="border-bottom"
-                                                      style={{
-                                                          transition:
-                                                              "background-color 0.2s ease",
-                                                      }}
                                                   >
-                                                      <td
-                                                          className="py-3"
-                                                          style={{
-                                                              fontWeight: "500",
-                                                              color: "#2c3e50",
-                                                          }}
-                                                      >
+                                                      <td className="py-3 fw-semibold">
                                                           {res.NumCompte}
                                                       </td>
                                                       <td className="py-3">
                                                           {res.NomCompte}
                                                       </td>
-                                                      <td
-                                                          className="py-3 text-muted"
-                                                          style={{
-                                                              fontSize:
-                                                                  "0.9rem",
-                                                          }}
-                                                      >
+                                                      <td className="py-3 text-muted">
                                                           {dateParser(
                                                               res.date_demande,
                                                           )}
@@ -966,56 +972,22 @@ const ValidationC = () => {
                                                       <td className="py-3">
                                                           {res.statutDossier ===
                                                           "Refusé" ? (
-                                                              <span
-                                                                  className="badge bg-danger px-3 py-2 rounded-pill"
-                                                                  style={{
-                                                                      fontSize:
-                                                                          "0.75rem",
-                                                                      fontWeight:
-                                                                          "500",
-                                                                  }}
-                                                              >
+                                                              <span className="badge bg-danger px-3 py-2 rounded-pill">
                                                                   ❌ Refusé
                                                               </span>
                                                           ) : res.statutDossier ===
                                                             "Encours" ? (
-                                                              <span
-                                                                  className="badge bg-success px-3 py-2 rounded-pill"
-                                                                  style={{
-                                                                      fontSize:
-                                                                          "0.75rem",
-                                                                      fontWeight:
-                                                                          "500",
-                                                                  }}
-                                                              >
+                                                              <span className="badge bg-success px-3 py-2 rounded-pill">
                                                                   ✅ En cours
                                                               </span>
                                                           ) : (
-                                                              <span
-                                                                  className="badge bg-secondary px-3 py-2 rounded-pill"
-                                                                  style={{
-                                                                      fontSize:
-                                                                          "0.75rem",
-                                                                      fontWeight:
-                                                                          "500",
-                                                                  }}
-                                                              >
+                                                              <span className="badge bg-secondary px-3 py-2 rounded-pill">
                                                                   ⏳ En attente
                                                               </span>
                                                           )}
                                                       </td>
-                                                      <td className="py-3 text-center">
-                                                          <div
-                                                              className="btn-group gap-2"
-                                                              role="group"
-                                                              style={{
-                                                                  display:
-                                                                      "flex",
-                                                                  justifyContent:
-                                                                      "center",
-                                                                  gap: "8px",
-                                                              }}
-                                                          >
+                                                      <td className="py-3">
+                                                          <div className="d-flex gap-2 justify-content-center align-items-center">
                                                               <button
                                                                   type="button"
                                                                   className="btn btn-sm btn-outline-primary"
@@ -1026,33 +998,6 @@ const ValidationC = () => {
                                                                           res.id_credit,
                                                                       )
                                                                   }
-                                                                  style={{
-                                                                      borderRadius:
-                                                                          "6px",
-                                                                      display:
-                                                                          "inline-flex",
-                                                                      alignItems:
-                                                                          "center",
-                                                                      gap: "6px",
-                                                                      transition:
-                                                                          "all 0.2s ease",
-                                                                  }}
-                                                                  onMouseEnter={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(-1px)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "0 2px 6px rgba(13,110,253,0.2)";
-                                                                  }}
-                                                                  onMouseLeave={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(0)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "none";
-                                                                  }}
                                                               >
                                                                   <i className="fas fa-eye"></i>
                                                                   <span>
@@ -1062,141 +1007,146 @@ const ValidationC = () => {
 
                                                               <button
                                                                   type="button"
-                                                                  className="btn btn-sm btn-outline-success"
-                                                                  data-toggle="modal"
-                                                                  data-target="#modalTimeLine"
-                                                                  onClick={() =>
-                                                                      setDossierIdSelected(
-                                                                          res.id_credit,
-                                                                      )
-                                                                  }
-                                                                  style={{
-                                                                      borderRadius:
-                                                                          "6px",
-                                                                      display:
-                                                                          "inline-flex",
-                                                                      alignItems:
-                                                                          "center",
-                                                                      gap: "6px",
-                                                                      transition:
-                                                                          "all 0.2s ease",
-                                                                  }}
-                                                                  onMouseEnter={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(-1px)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "0 2px 6px rgba(25,135,84,0.2)";
-                                                                  }}
-                                                                  onMouseLeave={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(0)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "none";
-                                                                  }}
-                                                              >
-                                                                  <MdTimeline
-                                                                      size={16}
-                                                                  />
-                                                                  <span>
-                                                                      Signatures
-                                                                  </span>
-                                                              </button>
-
-                                                              <button
-                                                                  type="button"
-                                                                  className="btn btn-sm btn-outline-danger"
-                                                                  onClick={() =>
-                                                                      handleDeleteCredit(
-                                                                          res.id_credit,
-                                                                      )
-                                                                  }
-                                                                  style={{
-                                                                      borderRadius:
-                                                                          "6px",
-                                                                      display:
-                                                                          "inline-flex",
-                                                                      alignItems:
-                                                                          "center",
-                                                                      gap: "6px",
-                                                                      transition:
-                                                                          "all 0.2s ease",
-                                                                  }}
-                                                                  onMouseEnter={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(-1px)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "0 2px 6px rgba(220,53,69,0.2)";
-                                                                  }}
-                                                                  onMouseLeave={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(0)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "none";
-                                                                  }}
-                                                              >
-                                                                  <i
-                                                                      className="fa fa-trash"
-                                                                      aria-hidden="true"
-                                                                  ></i>
-                                                                  <span>
-                                                                      Supprimer
-                                                                  </span>
-                                                              </button>
-
-                                                              <button
-                                                                  type="button"
                                                                   className="btn btn-sm btn-outline-info"
                                                                   data-toggle="modal"
                                                                   data-target="#modalContratPret"
                                                                   onClick={() =>
-                                                                      setDossierIdSelected(
+                                                                      setDossierIdSelectedContratPret(
                                                                           res.id_credit,
                                                                       )
                                                                   }
-                                                                  style={{
-                                                                      borderRadius:
-                                                                          "6px",
-                                                                      display:
-                                                                          "inline-flex",
-                                                                      alignItems:
-                                                                          "center",
-                                                                      gap: "6px",
-                                                                      transition:
-                                                                          "all 0.2s ease",
-                                                                  }}
-                                                                  onMouseEnter={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(-1px)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "0 2px 6px rgba(13,202,240,0.2)";
-                                                                  }}
-                                                                  onMouseLeave={(
-                                                                      e,
-                                                                  ) => {
-                                                                      e.currentTarget.style.transform =
-                                                                          "translateY(0)";
-                                                                      e.currentTarget.style.boxShadow =
-                                                                          "none";
-                                                                  }}
                                                               >
-                                                                  <i
-                                                                      className="fa fa-file"
-                                                                      aria-hidden="true"
-                                                                  ></i>
+                                                                  <i className="fa fa-file"></i>
                                                                   <span>
                                                                       Fichiers
                                                                   </span>
                                                               </button>
+
+                                                              <div className="dropdown d-inline-block">
+                                                                  <button
+                                                                      className="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                                      type="button"
+                                                                      data-bs-toggle="dropdown"
+                                                                  >
+                                                                      <i className="fas fa-bars"></i>
+                                                                      <span>
+                                                                          Actions
+                                                                      </span>
+                                                                  </button>
+                                                                  <ul className="dropdown-menu shadow-lg border-0">
+                                                                      <li>
+                                                                          <button
+                                                                              className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                              data-toggle="modal"
+                                                                              data-target="#modalTimeLine"
+                                                                              onClick={() =>
+                                                                                  setDossierIdSelectedTimeLine(
+                                                                                      res.id_credit,
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <MdTimeline
+                                                                                  size={
+                                                                                      16
+                                                                                  }
+                                                                                  color="#28a745"
+                                                                              />
+                                                                              <span>
+                                                                                  Historique
+                                                                                  des
+                                                                                  signatures
+                                                                              </span>
+                                                                          </button>
+                                                                      </li>
+                                                                      <li>
+                                                                          <hr className="dropdown-divider my-1" />
+                                                                      </li>
+                                                                      <li>
+                                                                          <button
+                                                                              className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                              data-toggle="modal"
+                                                                              data-target="#modalContratPret"
+                                                                              onClick={() =>
+                                                                                  setDossierIdSelectedContratPret(
+                                                                                      res.id_credit,
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="fas fa-file-contract text-warning"></i>
+                                                                              <span>
+                                                                                  Contrat
+                                                                                  de
+                                                                                  prêt
+                                                                              </span>
+                                                                          </button>
+                                                                      </li>
+                                                                      <li>
+                                                                          <hr className="dropdown-divider my-1" />
+                                                                      </li>
+                                                                      <li>
+                                                                          <button
+                                                                              className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                              data-toggle="modal"
+                                                                              data-target="#modalCheckListSuperviseur"
+                                                                              onClick={() =>
+                                                                                  setDossierIdSelected(
+                                                                                      res.id_credit,
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="fas fa-check-square"></i>
+                                                                              <span>
+                                                                                  Check
+                                                                                  Liste
+                                                                                  du
+                                                                                  superviseur
+                                                                              </span>
+                                                                          </button>
+                                                                      </li>
+
+                                                                      <li>
+                                                                          <hr className="dropdown-divider my-1" />
+                                                                      </li>
+                                                                      <li>
+                                                                          <button
+                                                                              className="dropdown-item d-flex align-items-center gap-3 py-2"
+                                                                             data-toggle="modal"
+                                                                             data-target="#modalVisualisationTitre"
+                                                                              onClick={() =>
+                                                                                  setDossierIdSelectedTitre(
+                                                                                      res.id_credit,
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                               <i className="fas fa-file-alt"></i>
+                                                                              <span>
+                                                                                 Voir tous les titres
+                                                                              </span>
+                                                                          </button>
+                                                                      </li>
+
+                                                                      <li>
+                                                                          <hr className="dropdown-divider my-1" />
+                                                                      </li>
+                                                                      <li>
+                                                                          <button
+                                                                              className="dropdown-item d-flex align-items-center gap-3 py-2 text-danger"
+                                                                              onClick={() =>
+                                                                                  handleDeleteCredit(
+                                                                                      res.id_credit,
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="fas fa-trash-alt text-danger"></i>
+                                                                              <span>
+                                                                                  Supprimer
+                                                                                  le
+                                                                                  dossier
+                                                                              </span>
+                                                                          </button>
+                                                                      </li>
+                                                                  </ul>
+                                                              </div>
                                                           </div>
                                                       </td>
                                                   </tr>
@@ -1216,280 +1166,162 @@ const ValidationC = () => {
                                     </p>
                                 </div>
                             )}
-                        <div className="d-flex justify-content-center align-items-center mt-4 pt-2">
-                            <nav aria-label="Navigation par pages">
-                                <ul
-                                    className="pagination pagination-sm mb-0"
-                                    style={{ gap: "4px" }}
-                                >
-                                    {/* Bouton Première page */}
-                                    <li
-                                        className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => goToPage(1)}
-                                            disabled={currentPage === 1}
-                                            style={{
-                                                borderRadius: "8px",
-                                                color: "#0d6efd",
-                                                border: "1px solid #dee2e6",
-                                                padding: "6px 12px",
-                                                fontSize: "13px",
-                                                transition: "all 0.2s ease",
-                                                backgroundColor: "white",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (currentPage !== 1) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.color =
-                                                        "white";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(-1px)";
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (currentPage !== 1) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "white";
-                                                    e.currentTarget.style.color =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(0)";
-                                                }
-                                            }}
+
+                        {/* Pagination - Afficher uniquement si pas de recherche et données existantes */}
+                        {!fetchSearchedCredit && fetchData.length > 0 && (
+                            <>
+                                <div className="d-flex justify-content-center align-items-center mt-4 pt-2">
+                                    <nav aria-label="Navigation par pages">
+                                        <ul
+                                            className="pagination pagination-sm mb-0"
+                                            style={{ gap: "4px" }}
                                         >
-                                            <i className="fas fa-angle-double-left me-1"></i>
-                                            Premier
-                                        </button>
-                                    </li>
+                                            {/* Bouton Première page */}
+                                            <li
+                                                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                                            >
+                                                <button
+                                                    className="page-link"
+                                                    onClick={() => goToPage(1)}
+                                                    disabled={currentPage === 1}
+                                                    style={{
+                                                        borderRadius: "8px",
+                                                        color: "#0d6efd",
+                                                        border: "1px solid #dee2e6",
+                                                        padding: "6px 12px",
+                                                        fontSize: "13px",
+                                                        transition: "all 0.2s ease",
+                                                        backgroundColor: "white",
+                                                    }}
+                                                >
+                                                    <i className="fas fa-angle-double-left me-1"></i>
+                                                    Premier
+                                                </button>
+                                            </li>
 
-                                    {/* Bouton Précédent */}
-                                    <li
-                                        className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={goToPrevPage}
-                                            disabled={currentPage === 1}
-                                            style={{
-                                                borderRadius: "8px",
-                                                color: "#0d6efd",
-                                                border: "1px solid #dee2e6",
-                                                padding: "6px 12px",
-                                                fontSize: "13px",
-                                                transition: "all 0.2s ease",
-                                                backgroundColor: "white",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (currentPage !== 1) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.color =
-                                                        "white";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(-1px)";
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (currentPage !== 1) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "white";
-                                                    e.currentTarget.style.color =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(0)";
-                                                }
-                                            }}
-                                        >
-                                            <i className="fas fa-chevron-left me-1"></i>
-                                            Précédent
-                                        </button>
-                                    </li>
+                                            {/* Bouton Précédent */}
+                                            <li
+                                                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                                            >
+                                                <button
+                                                    className="page-link"
+                                                    onClick={goToPrevPage}
+                                                    disabled={currentPage === 1}
+                                                    style={{
+                                                        borderRadius: "8px",
+                                                        color: "#0d6efd",
+                                                        border: "1px solid #dee2e6",
+                                                        padding: "6px 12px",
+                                                        fontSize: "13px",
+                                                        transition: "all 0.2s ease",
+                                                        backgroundColor: "white",
+                                                    }}
+                                                >
+                                                    <i className="fas fa-chevron-left me-1"></i>
+                                                    Précédent
+                                                </button>
+                                            </li>
 
-                                    {/* Numéros de pages */}
-                                    {renderPagination()}
+                                            {/* Numéros de pages */}
+                                            {renderPagination()}
 
-                                    {/* Bouton Suivant */}
-                                    <li
-                                        className={`page-item ${
-                                            currentPage ===
-                                                Math.ceil(
-                                                    fetchData?.length /
-                                                        itemsPerPage,
-                                                ) || fetchData?.length === 0
-                                                ? "disabled"
-                                                : ""
-                                        }`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={goToNextPage}
-                                            disabled={
-                                                currentPage ===
-                                                    Math.ceil(
-                                                        fetchData?.length /
-                                                            itemsPerPage,
-                                                    ) || fetchData?.length === 0
-                                            }
-                                            style={{
-                                                borderRadius: "8px",
-                                                color: "#0d6efd",
-                                                border: "1px solid #dee2e6",
-                                                padding: "6px 12px",
-                                                fontSize: "13px",
-                                                transition: "all 0.2s ease",
-                                                backgroundColor: "white",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (
-                                                    currentPage !==
-                                                        Math.ceil(
-                                                            fetchData?.length /
-                                                                itemsPerPage,
-                                                        ) &&
-                                                    fetchData?.length !== 0
-                                                ) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.color =
-                                                        "white";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(-1px)";
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (
-                                                    currentPage !==
-                                                        Math.ceil(
-                                                            fetchData?.length /
-                                                                itemsPerPage,
-                                                        ) &&
-                                                    fetchData?.length !== 0
-                                                ) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "white";
-                                                    e.currentTarget.style.color =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(0)";
-                                                }
-                                            }}
-                                        >
-                                            Suivant
-                                            <i className="fas fa-chevron-right ms-1"></i>
-                                        </button>
-                                    </li>
+                                            {/* Bouton Suivant */}
+                                            <li
+                                                className={`page-item ${
+                                                    currentPage === totalPages
+                                                        ? "disabled"
+                                                        : ""
+                                                }`}
+                                            >
+                                                <button
+                                                    className="page-link"
+                                                    onClick={goToNextPage}
+                                                    disabled={currentPage === totalPages}
+                                                    style={{
+                                                        borderRadius: "8px",
+                                                        color: "#0d6efd",
+                                                        border: "1px solid #dee2e6",
+                                                        padding: "6px 12px",
+                                                        fontSize: "13px",
+                                                        transition: "all 0.2s ease",
+                                                        backgroundColor: "white",
+                                                    }}
+                                                >
+                                                    Suivant
+                                                    <i className="fas fa-chevron-right ms-1"></i>
+                                                </button>
+                                            </li>
 
-                                    {/* Bouton Dernière page */}
-                                    <li
-                                        className={`page-item ${
-                                            currentPage ===
-                                                Math.ceil(
-                                                    fetchData?.length /
-                                                        itemsPerPage,
-                                                ) || fetchData?.length === 0
-                                                ? "disabled"
-                                                : ""
-                                        }`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() =>
-                                                goToPage(
-                                                    Math.ceil(
-                                                        fetchData?.length /
-                                                            itemsPerPage,
-                                                    ),
-                                                )
-                                            }
-                                            disabled={
-                                                currentPage ===
-                                                    Math.ceil(
-                                                        fetchData?.length /
-                                                            itemsPerPage,
-                                                    ) || fetchData?.length === 0
-                                            }
-                                            style={{
-                                                borderRadius: "8px",
-                                                color: "#0d6efd",
-                                                border: "1px solid #dee2e6",
-                                                padding: "6px 12px",
-                                                fontSize: "13px",
-                                                transition: "all 0.2s ease",
-                                                backgroundColor: "white",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (
-                                                    currentPage !==
-                                                        Math.ceil(
-                                                            fetchData?.length /
-                                                                itemsPerPage,
-                                                        ) &&
-                                                    fetchData?.length !== 0
-                                                ) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.color =
-                                                        "white";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(-1px)";
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (
-                                                    currentPage !==
-                                                        Math.ceil(
-                                                            fetchData?.length /
-                                                                itemsPerPage,
-                                                        ) &&
-                                                    fetchData?.length !== 0
-                                                ) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        "white";
-                                                    e.currentTarget.style.color =
-                                                        "#0d6efd";
-                                                    e.currentTarget.style.transform =
-                                                        "translateY(0)";
-                                                }
-                                            }}
-                                        >
-                                            Dernier
-                                            <i className="fas fa-angle-double-right ms-1"></i>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
+                                            {/* Bouton Dernière page */}
+                                            <li
+                                                className={`page-item ${
+                                                    currentPage === totalPages
+                                                        ? "disabled"
+                                                        : ""
+                                                }`}
+                                            >
+                                                <button
+                                                    className="page-link"
+                                                    onClick={() => goToPage(totalPages)}
+                                                    disabled={currentPage === totalPages}
+                                                    style={{
+                                                        borderRadius: "8px",
+                                                        color: "#0d6efd",
+                                                        border: "1px solid #dee2e6",
+                                                        padding: "6px 12px",
+                                                        fontSize: "13px",
+                                                        transition: "all 0.2s ease",
+                                                        backgroundColor: "white",
+                                                    }}
+                                                >
+                                                    Dernier
+                                                    <i className="fas fa-angle-double-right ms-1"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
 
-                        {/* Indicateur d'information sur la pagination */}
-                        <div className="d-flex justify-content-center align-items-center mt-3">
-                            <small className="text-muted">
-                                Page {currentPage} sur{" "}
-                                {Math.ceil(fetchData?.length / itemsPerPage) ||
-                                    1}{" "}
-                                • Total : {fetchData?.length || 0} élément(s)
-                            </small>
-                        </div>
+                                {/* Indicateur d'information sur la pagination */}
+                                <div className="d-flex justify-content-center align-items-center mt-3">
+                                    <small className="text-muted">
+                                        Page {currentPage} sur {totalPages} • Total : {fetchData.length} élément(s)
+                                    </small>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Modals */}
+                        {dossierIdSelectedSuperv && (
+                            <ModalCheckListSuperviseur
+                                dossierId={dossierIdSelectedSuperv}
+                                NumDossier={NumDossier?.NumDossier}
+                                onClose={() => setDossierIdSelectedSuperv(null)}
+                            />
+                        )}
                         {dossierIdSelected && (
                             <ModalBootstrapVisualisation
                                 dossierId={dossierIdSelected}
                                 onClose={() => setDossierIdSelected(null)}
                             />
                         )}
-
-                        {dossierIdSelected && (
+                        {dossierIdSelectedTimeLine && (
                             <CreditTimeline
-                                creditId={dossierIdSelected}
-                                onClose={() => setDossierIdSelected(null)}
+                                creditId={dossierIdSelectedTimeLine}
+                                onClose={() => setDossierIdSelectedTimeLine(null)}
+                            />
+                        )}
+                        {dossierIdSelectedContratPret && (
+                            <ModalContratPret
+                                creditId={dossierIdSelectedContratPret}
+                                onClose={() => setDossierIdSelectedContratPret(null)}
                             />
                         )}
 
-                        {dossierIdSelected && (
-                            <ModalContratPret
+                        {dossierIdSelectedTitre && (
+                            <ModalTitreCredit
                                 creditId={dossierIdSelected}
-                                onClose={() => setDossierIdSelected(null)}
+                                onClose={() => setDossierIdSelectedTitre(null)}
                             />
                         )}
                     </div>

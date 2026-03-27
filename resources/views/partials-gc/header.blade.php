@@ -152,7 +152,7 @@
         <li class="nav-item">
           <a href="{{ route('gestion_credit.pages.validation-credit') }}" class="nav-link d-flex align-items-center gap-2" style="transition: all 0.2s ease;">
             <i class="fas fa-check-circle" style="font-size: 14px;"></i>
-            <span>Validation</span>
+            <span>Suivi dossier</span>
           </a>
         </li>
 
@@ -165,6 +165,11 @@
             <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.credit-decaisse') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
               <i class="fas fa-money-bill-wave" style="color: #20c997;"></i>
               <span>Crédits décaissés</span>
+            </a>
+
+             <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.rapport-credit') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
+              <i class="fas fa-chart-line fa-3x opacity-75" style="color: #20c997; font-size:13px"></i>
+              <span>Autres rapport</span>
             </a>
           </div>
         </li>

@@ -9,6 +9,7 @@ import { FaDownload } from "react-icons/fa";
 export default function ValidationFile({ dossierId }) {
     const [fetchData, setFetchData] = useState();
     const [showFile, setShowFile] = useState(false);
+    const [propositions, setPropositions] = useState([]);
 
     useEffect(() => {
         getDossierCredit();
@@ -21,6 +22,7 @@ export default function ValidationFile({ dossierId }) {
             .then((res) => {
                 const data = res.data.data; // récupère l'objet dossier complet
                 setFetchData(data); // stocke tout l'objet dossier dans dossier
+                setPropositions(data.propositions || []);
                 // console.log(fetchData);
             })
             .catch(() => setFetchData(null));
@@ -209,7 +211,7 @@ export default function ValidationFile({ dossierId }) {
                         </div>
 
                         {/* Informations principales */}
-                        <div className="row g-3 mt-2">
+                        <div className="row g-3 mt-1">
                             {/* Colonne 1 */}
                             <div className="col-md-4">
                                 <div className="card border-0 shadow-sm rounded-3 h-100">
@@ -389,7 +391,10 @@ export default function ValidationFile({ dossierId }) {
                                                             ).format(
                                                                 fetchData.montant_demande,
                                                             )}{" "}
-                                                            FC
+                                                            {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
                                                         </strong>
                                                     </td>
                                                 </tr>
@@ -633,6 +638,27 @@ export default function ValidationFile({ dossierId }) {
                                                         {fetchData.source_fond}
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td
+                                                        style={{
+                                                            padding: "12px",
+                                                            fontWeight: "600",
+                                                            color: "#495057",
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-building me-2 text-teal"></i>
+                                                        Agence
+                                                    </td>
+                                                    <td
+                                                        style={{
+                                                            padding: "12px",
+                                                            fontWeight: "500",
+                                                            color: "#2c3e50",
+                                                        }}
+                                                    >
+                                                        {fetchData.Agence}
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -711,7 +737,10 @@ export default function ValidationFile({ dossierId }) {
                                                         ).format(
                                                             fetchData.valeur_comptable,
                                                         )}{" "}
-                                                        FC
+                                                        {fetchData.monnaie ==
+                                                        "CDF"
+                                                            ? "FC "
+                                                            : " USD"}
                                                     </td>
                                                 </tr>
                                                 <tr
@@ -769,7 +798,10 @@ export default function ValidationFile({ dossierId }) {
                                                             ).format(
                                                                 fetchData.valeur_garantie,
                                                             )}{" "}
-                                                            FC
+                                                            {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
                                                         </strong>
                                                     </td>
                                                 </tr>
@@ -855,8 +887,120 @@ export default function ValidationFile({ dossierId }) {
                             </div>
                         </div>
 
-                        {/* Section signatures */}
-                        <div className="mt-4">
+
+                          {/* Section récapitulative des propositions */}
+                                    {propositions &&
+                                        propositions.length > 0 && (
+                                            <div
+                                                className="mt-1 p-3"
+                                                style={{
+                                                    borderRadius: "12px",
+                                                    backgroundColor: "#f8f9fa",
+                                                    pageBreakBefore: "always", // Force une nouvelle page avant cet élément
+                                                    breakBefore: "page", // Alternative moderne
+                                                    marginTop: "0", // Ajuste la marge pour éviter l'espace blanc
+
+                                                }}
+                                            >
+                                                <h6
+                                                    className="fw-bold mb-3"
+                                                    style={{ color: "#20c997" }}
+                                                >
+                                                    <i className="fas fa-chart-line me-2"></i>
+                                                    Historique des propositions
+                                                    de montant
+                                                </h6>
+                                               <div className="row g-3">
+    {propositions.map((prop, index) => (
+        <div key={index} className="col-md-6 col-lg-4">
+            <div className="card h-100 border-0 shadow-sm" style={{
+                borderRadius: "14px",
+                transition: "all 0.2s ease",
+                borderTop: `3px solid ${index === propositions.length - 1 ? "#20c997" : "#ffc107"}`,
+                overflow: "hidden"
+            }}>
+                <div className="card-body p-3">
+                    {/* En-tête */}
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <i className="fas fa-user-circle me-1" style={{ color: "#20c997", fontSize: "14px" }}></i>
+                            <span className="fw-semibold" style={{ fontSize: "13px" }}>
+                                {prop.role || prop.nom}
+                            </span>
+                            {index === propositions.length - 1 && (
+                                <span className="badge ms-2" style={{
+                                    backgroundColor: "#20c997",
+                                    fontSize: "8px",
+                                    padding: "2px 6px"
+                                }}>
+                                    <i className="fas fa-star"></i>
+                                </span>
+                            )}
+                        </div>
+                        <small className="text-muted" style={{ fontSize: "9px" }}>
+                            {new Date(prop.date).toLocaleDateString("fr-FR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })}
+                        </small>
+                    </div>
+
+                    {/* Contenu principal : Montant + Commentaire côte à côte */}
+                    <div className="d-flex gap-2 mt-2">
+                        {/* Montant */}
+                        <div className="flex-shrink-0 text-center" style={{ width: "100px" }}>
+                            <div className="p-2 rounded-3" style={{
+                                backgroundColor: "rgba(32, 201, 151, 0.1)",
+                                borderRadius: "10px"
+                            }}>
+                                <span className="text-muted d-block" style={{ fontSize: "9px" }}>Montant</span>
+                                <span className="fw-bold" style={{ fontSize: "14px", color: "#20c997" }}>
+                                    {new Intl.NumberFormat("fr-FR").format(prop.montant)}
+                                </span>
+                                <span className="text-muted" style={{ fontSize: "8px" }}>
+                                    {fetchData?.monnaie === "CDF" ? "FC" : "USD"}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Commentaire */}
+                        <div className="flex-grow-1">
+                            {prop.commentaire ? (
+                                <div className="p-2 rounded-3 h-100" style={{
+                                    backgroundColor: "#fff9e6",
+                                    borderLeft: "3px solid #ffc107"
+                                }}>
+                                    <div className="d-flex gap-1">
+                                        <i className="fas fa-comment-dots" style={{ fontSize: "10px", color: "#ffc107" }}></i>
+                                        <small style={{ fontSize: "11px", color: "#856404", lineHeight: "1.3" }}>
+                                            {prop.commentaire.length > 100 
+                                                ? prop.commentaire.substring(0, 100) + "..." 
+                                                : prop.commentaire}
+                                        </small>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-2 text-center rounded-3" style={{
+                                    backgroundColor: "#f8f9fa"
+                                }}>
+                                    <i className="fas fa-comment-slash" style={{ fontSize: "12px", color: "#adb5bd" }}></i>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    ))}
+</div>
+                                            </div>
+                                        )}
+
+
+                        {/* Section signatures avec montants proposés */}
+                        <div className="mt-1">
                             <div className="card border-0 shadow-sm rounded-3">
                                 <div
                                     className="card-header bg-teal text-white"
@@ -872,8 +1016,9 @@ export default function ValidationFile({ dossierId }) {
                                 </div>
                                 <div className="card-body">
                                     <div className="row g-3">
+                                        {/* Agent crédit */}
                                         <div className="col-md-2">
-                                            <div className="text-center p-3 border rounded-3 bg-light">
+                                            <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-user-check fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
                                                     Agent crédit
@@ -893,10 +1038,38 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
+                                                {/* Montant proposé par l'agent crédit */}
+                                                {propositions &&
+                                                    propositions.find(
+                                                        (p) =>
+                                                            p.nom ===
+                                                            fetchData.recouvreur,
+                                                    ) && (
+                                                        <div className="mt-2 p-1 bg-success bg-opacity-10 rounded">
+                                                            <small className="text-success fw-semibold">
+                                                                <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                {new Intl.NumberFormat(
+                                                                    "fr-FR",
+                                                                ).format(
+                                                                    propositions.find(
+                                                                        (p) =>
+                                                                            p.nom ===
+                                                                            fetchData.recouvreur,
+                                                                    ).montant,
+                                                                )}{" "}
+                                                               {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
+                                                            </small>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
+
+                                        {/* Superviseur */}
                                         <div className="col-md-2">
-                                            <div className="text-center p-3 border rounded-3 bg-light">
+                                            <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-chart-line fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
                                                     Superviseur
@@ -916,13 +1089,41 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
+                                                {/* Montant proposé par le superviseur */}
+                                                {propositions &&
+                                                    propositions.find(
+                                                        (p) =>
+                                                            p.nom ===
+                                                            "Superviseur",
+                                                    ) && (
+                                                        <div className="mt-2 p-1 bg-success bg-opacity-10 rounded">
+                                                            <small className="text-success fw-semibold">
+                                                                <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                {new Intl.NumberFormat(
+                                                                    "fr-FR",
+                                                                ).format(
+                                                                    propositions.find(
+                                                                        (p) =>
+                                                                            p.nom ===
+                                                                            "Superviseur",
+                                                                    ).montant,
+                                                                )}{" "}
+                                                                {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
+                                                            </small>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
+
+                                        {/* Chef Agence */}
                                         <div className="col-md-2">
-                                            <div className="text-center p-3 border rounded-3 bg-light">
+                                            <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-building fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
-                                                    C. Agence
+                                                    Chef Agence
                                                 </p>
                                                 <small className="text-muted">
                                                     Signature
@@ -939,10 +1140,38 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
+                                                {/* Montant proposé par le chef agence */}
+                                                {propositions &&
+                                                    propositions.find(
+                                                        (p) =>
+                                                            p.nom ===
+                                                            "Chef Agence",
+                                                    ) && (
+                                                        <div className="mt-2 p-1 bg-success bg-opacity-10 rounded">
+                                                            <small className="text-success fw-semibold">
+                                                                <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                {new Intl.NumberFormat(
+                                                                    "fr-FR",
+                                                                ).format(
+                                                                    propositions.find(
+                                                                        (p) =>
+                                                                            p.nom ===
+                                                                            "Chef Agence",
+                                                                    ).montant,
+                                                                )}{" "}
+                                                                {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
+                                                            </small>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
+
+                                        {/* CTC */}
                                         <div className="col-md-2">
-                                            <div className="text-center p-3 border rounded-3 bg-light">
+                                            <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-check-double fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
                                                     CTC
@@ -962,10 +1191,36 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
+                                                {/* Montant proposé par le CTC */}
+                                                {propositions &&
+                                                    propositions.find(
+                                                        (p) => p.nom === "CTC",
+                                                    ) && (
+                                                        <div className="mt-2 p-1 bg-success bg-opacity-10 rounded">
+                                                            <small className="text-success fw-semibold">
+                                                                <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                {new Intl.NumberFormat(
+                                                                    "fr-FR",
+                                                                ).format(
+                                                                    propositions.find(
+                                                                        (p) =>
+                                                                            p.nom ===
+                                                                            "CTC",
+                                                                    ).montant,
+                                                                )}{" "}
+                                                               {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
+                                                            </small>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
+
+                                        {/* DG */}
                                         <div className="col-md-2">
-                                            <div className="text-center p-3 border rounded-3 bg-light">
+                                            <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-crown fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
                                                     DG
@@ -985,10 +1240,36 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
+                                                {/* Montant proposé par le DG */}
+                                                {propositions &&
+                                                    propositions.find(
+                                                        (p) => p.nom === "DG",
+                                                    ) && (
+                                                        <div className="mt-2 p-1 bg-success bg-opacity-10 rounded">
+                                                            <small className="text-success fw-semibold">
+                                                                <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                {new Intl.NumberFormat(
+                                                                    "fr-FR",
+                                                                ).format(
+                                                                    propositions.find(
+                                                                        (p) =>
+                                                                            p.nom ===
+                                                                            "DG",
+                                                                    ).montant,
+                                                                )}{" "}
+                                                                {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
+                                                            </small>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
+
+                                        {/* CC */}
                                         <div className="col-md-2">
-                                            <div className="text-center p-3 border rounded-3 bg-light">
+                                            <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-users fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
                                                     CC
@@ -1008,18 +1289,44 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
+                                                {/* Montant proposé par le CC */}
+                                                {propositions &&
+                                                    propositions.find(
+                                                        (p) => p.nom === "CC",
+                                                    ) && (
+                                                        <div className="mt-2 p-1 bg-success bg-opacity-10 rounded">
+                                                            <small className="text-success fw-semibold">
+                                                                <i className="fas fa-hand-holding-usd me-1"></i>
+                                                                {new Intl.NumberFormat(
+                                                                    "fr-FR",
+                                                                ).format(
+                                                                    propositions.find(
+                                                                        (p) =>
+                                                                            p.nom ===
+                                                                            "CC",
+                                                                    ).montant,
+                                                                )}{" "}
+                                                               {fetchData.monnaie ==
+                                                            "CDF"
+                                                                ? "FC "
+                                                                : " USD"}
+                                                            </small>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
                                     </div>
+
+                                  
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Bouton de téléchargement */}
-                    <div className="text-center mt-4">
+                    <div className="text-center mt-1">
                         <button
-                            className="btn btn-teal btn-lg d-inline-flex align-items-center gap-3"
+                            className="btn  bg-gradient-primary text-white btn-lg d-inline-flex align-items-center gap-3"
                             style={{
                                 borderRadius: "50px",
                                 padding: "12px 32px",

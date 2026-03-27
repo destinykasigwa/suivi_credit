@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Credits;
-use App\Models\Signature;
-use App\Models\Commentaire;
 use Illuminate\Http\Request;
-use App\Models\CreditsImages;
+use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use App\Models\{Commentaire, CreditChecklist, Credits, CreditsImages, PropositionMontant, Signature};
 use App\Services\SendNotification;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class AGestionCreditController extends Controller
 {
@@ -106,6 +101,8 @@ class AGestionCreditController extends Controller
             'nombre_homme_groupe' => $request->nombre_homme_groupe,
             'nombre_femme_groupe' => $request->nombre_femme_groupe,
             'objet_credit' => $request->objet_credit,
+            'Agence' => $request->Agence,
+            
         ]);
 
         if (isset($request->description_titre)) {
@@ -144,6 +141,11 @@ class AGestionCreditController extends Controller
         //         // 'credit' => $credit->load('images'),
         //     ]);
         // }
+        PropositionMontant::create([
+            'idUser' => Auth::id(),
+            'idDossier' => $idCredit,
+            'montant_propose' => $request->montant_demande
+        ]);
 
         return response()->json([
             'status' => 1,
@@ -207,6 +209,26 @@ class AGestionCreditController extends Controller
                             $q->where('type_credit', $ref);
                             // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
                         });
+                })
+                ->limit(10)
+                ->get();
+
+            // Ajout des images pour chaque crédit trouvé
+            foreach ($credits as $credit) {
+                $credit->images = DB::table('credits_images')
+                    ->where('credits_id', $credit->id_credit)
+                    ->pluck('path'); // Retourne un tableau simple
+            }
+            return response()->json([
+                "status" => 1,
+                "data" => $credits
+            ]);
+        }else if ($request->type_recherche == "credit_refuse"){
+
+          $ref = $request->ref;
+            $credits = DB::table('credits')
+                ->where(function ($query) use ($ref) {
+                    $query->where('statutDossier', '=', 'Refusé');
                 })
                 ->limit(10)
                 ->get();
@@ -340,6 +362,28 @@ class AGestionCreditController extends Controller
     {
         // Récupère le dossier
         $dossier = DB::table('credits')->where('id_credit', $id)->first();
+         // Récupérer les propositions de montant pour ce dossier
+         // Récupérer les propositions avec la dernière par acteur
+        $propositions = DB::table('proposition_montants')
+            ->join('users', 'proposition_montants.idUser', '=', 'users.id')
+            ->where('proposition_montants.idDossier', $id)
+            ->select(
+                'users.name as nom',
+                'users.role as role',
+                'users.id as userId',
+                'proposition_montants.montant_propose as montant',
+                'proposition_montants.created_at as date',
+                'proposition_montants.idUser',
+                'proposition_montants.commentaire'
+            )
+            ->orderBy('proposition_montants.created_at', 'desc')
+            ->get()
+            ->unique('userId') // Prend la dernière proposition par utilisateur (car orderBy desc)
+            ->values();
+        
+        
+       
+        
 
         if (!$dossier) {
             return response()->json(['message' => 'Dossier non trouvé'], 404);
@@ -416,6 +460,7 @@ class AGestionCreditController extends Controller
 
         // Convertis l'objet $dossier (stdClass) en tableau associatif
         $dossierArray = (array) $dossier;
+        $dossierArray['propositions'] = $propositions;
         //dd($excels);
         // Ajoute images, pdfs et signatures
         $dossierArray['images'] = $images;
@@ -475,7 +520,8 @@ class AGestionCreditController extends Controller
                 'nombre_homme_groupe' => $request->nombre_homme_groupe,
                 'nombre_femme_groupe' => $request->nombre_femme_groupe,
                 'objet_credit' => $request->objetCredit,
-                "statutDossier" => $request->statutDossier
+                "statutDossier" => $request->statutDossier,
+                "Agence" => $request->Agence
             ]);
 
             return response()->json([
@@ -1034,4 +1080,230 @@ class AGestionCreditController extends Controller
             throw $th;
         }
     }
+
+
+    /**
+     * Récupérer l'historique des propositions pour un dossier
+     */
+    public function getHistorique($dossierId)
+    {
+        $propositions = PropositionMontant::with('user')
+            ->where('idDossier', $dossierId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json($propositions);
+    }
+
+    //CETTE FONCTION PERMET DE PROPOSER UN MONTANT
+
+    public function storeProposeMontant(Request $request){
+         $request->validate([
+            'idDossier' => 'required|exists:credits,id_credit',
+            'montantPropose' => 'required|numeric|min:0'
+        ]);
+
+        $proposition = PropositionMontant::create([
+            'idUser' => Auth::id(),
+            'idDossier' => $request->idDossier,
+            'montant_propose' => $request->montantPropose,
+            'commentaire' =>$request->commentaire
+        ]);
+       
+        //ENREGISTRE LE COMMENTAIRE DE SA PROPOSITION POUR QU'IL SOIT VISIBLE DANS LA CHAT
+
+            Commentaire::create([
+                'credit_id' => $request->idDossier,
+                'user_id' => auth()->id(),
+                'contenu' => $request->commentaire,
+            ]);
+        
+
+        // Charger la relation user pour la réponse
+        $proposition->load('user');
+
+        return response()->json(["status"=>1,"msg"=>"Votre proposition a bien été publiée."]);
+    }
+
+     /**
+     * Récupérer la dernière proposition pour un dossier
+     */
+    public function getLastProposition($dossierId)
+    {
+        $lastProposition = PropositionMontant::with('user')
+            ->where('idDossier', $dossierId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return response()->json($lastProposition);
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $proposition = PropositionMontant::findOrFail($id);
+            
+            // Vérifier que l'utilisateur est le propriétaire de la proposition
+            if ($proposition->idUser !== Auth::id()) {
+                return response()->json([
+                    'msg' => 'Vous n\'êtes pas autorisé à supprimer cette proposition',
+                    'status'=>0
+                ], 403);
+            }
+
+            $proposition->delete();
+
+            return response()->json([
+                'msg' => 'Proposition supprimée avec succès',
+                  'status'=>1,
+                'id' => $id
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'msg' => 'Erreur lors de la suppression',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+public function storeCreditChecklist(Request $request)
+{
+  try {
+            // Validation minimale
+            $validated = $request->validate([
+                'nom_demandeur' => 'required|string|max:255',
+                'numero_dossier' => 'required|string|max:100',
+                'montant' => 'nullable|numeric',
+                'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            ]);
+
+            // Récupérer toutes les données
+            $data = $request->except(['signature']);
+            // Ajouter l'ID de l'utilisateur authentifié
+            $data['idUser'] = auth()->id();
+            
+            // Fonction pour convertir en booléen
+            $toBoolean = function($value) {
+                if (is_bool($value)) return $value;
+                if (is_null($value)) return false;
+                if (is_string($value)) {
+                    $value = strtolower(trim($value));
+                    // Convertir 'oui'/'non' en booléen
+                    if ($value === 'oui') return true;
+                    if ($value === 'non') return false;
+                    return in_array($value, ['true', 'on', '1', 'yes']);
+                }
+                return (bool) $value;
+            };
+            
+            // Liste des champs checkbox
+            $checkboxFields = [
+                'piece_identite', 'lettre_demande', 'formulaire_pret',
+                'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
+                'document_activite', 'bilan',
+                'decision_ctc', 'decision_cc',
+                'contrat_signe', 'garanties_constituees', 'rencontre_client',
+                'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'nantissement'
+            ];
+            
+            // Convertir les checkboxes en booléen
+            foreach ($checkboxFields as $field) {
+                if (isset($data[$field])) {
+                    $data[$field] = $toBoolean($data[$field]);
+                } else {
+                    $data[$field] = false;
+                }
+            }
+            
+            // Convertir les champs 'oui'/'non' en booléen pour la base de données
+            $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+            foreach ($ouiNonFields as $field) {
+                if (isset($data[$field])) {
+                    // Convertir 'oui' en true, 'non' en false
+                    $data[$field] = $toBoolean($data[$field]);
+                } else {
+                    $data[$field] = false;
+                }
+            }
+
+            // Traiter la signature
+            if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
+                $signature = $request->file('signature');
+                $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
+                $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
+                $data['signature'] = $signaturePath;
+            }
+
+            // Créer la checklist
+            $checklist = CreditChecklist::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Checklist enregistrée avec succès',
+                'data' => $checklist
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            Log::error('Erreur: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'enregistrement',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    
 }
+
+
+//PERMET DE RECUPERER UN CHECK LISTE SPECIFIQUE
+
+public function getCreditChecklist($dossierId){
+   
+  try {
+      if($dossierId){
+        $data=CreditChecklist::where("idCredit",$dossierId)->first();
+         if($data){
+             return response()->json([
+                'status' => 1,
+                'data' => $data,
+            ], 200);
+         }else{
+             return response()->json([
+                'status' => 0,
+            ], 500);
+         }
+    }else{
+        return response()->json([
+                'status' => 0,
+            ], 500);
+    }
+  } catch (\Throwable $th) {
+    throw $th;
+  }
+}
+
+
+public function RapportCreditHomePage(){
+    return view("gestion_credit.pages.rapport-credit");
+}
+
+public function getRapportCredit(){
+    $data=Credits::all();
+
+     return response()->json([
+                'status' => 1,
+                'data'=>$data
+            ], 200);
+}
+}
+

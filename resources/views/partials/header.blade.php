@@ -150,7 +150,7 @@
             </button>
             <div class="collapse navbar-collapse text-center" id="ftco-nav">
                 <ul class="navbar-nav m-auto">
-                    <li class="nav-item active"><a href="eco/home" class="nav-link">Home</a></li>
+                    <li class="nav-item active"><a href="/" class="nav-link">Home</a></li>
                     @if ($isCaissier)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"

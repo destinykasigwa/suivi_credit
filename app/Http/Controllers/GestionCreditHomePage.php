@@ -15,4 +15,6 @@ class GestionCreditHomePage extends Controller
     {
         return view("gestion_credit.home");
     }
+
+    
 }

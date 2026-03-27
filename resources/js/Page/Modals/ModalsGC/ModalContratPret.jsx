@@ -434,7 +434,7 @@ export default function ModalContratPret({ creditId, onClose }) {
                 Gestion des documents
               </h5>
               <small className="text-white-50">
-                {creditId ? `Dossier #${creditId}` : "Crédit sélectionné"}
+                {dossier ? `Dossier #${dossier.NumDossier}` : "Crédit sélectionné"}
               </small>
             </div>
           </div>
@@ -795,18 +795,23 @@ export default function ModalContratPret({ creditId, onClose }) {
                         </div>
                       ))}
                     </div>
-                    <button
+                  
+                  </>
+                 
+                )}
+              </div>
+              
+                
+            </div>
+             <button
                       onClick={handleSubmitAddFileImage}
-                      className="btn btn-success w-100"
+                      className="btn btn-success w-100 p-3 mb-5"
                       style={{ borderRadius: "8px" }}
                     >
                       <i className="fas fa-save me-2"></i>
                       Enregistrer ({images.length} fichier{images.length > 1 ? "s" : ""})
                     </button>
-                  </>
-                )}
-              </div>
-            </div>
+         
           </div>
 
           {/* GPS */}

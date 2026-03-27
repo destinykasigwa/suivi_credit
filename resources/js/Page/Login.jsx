@@ -159,7 +159,6 @@ const LoginForm = () => {
 
     // Bouton désactivé si l'un des deux champs est vide
     const isDisabled = user.name.trim() === "" || user.password.trim() === "";
-
     return (
         <div className="container-fluid p-0">
             {expiredPassword == false ? (
@@ -374,10 +373,10 @@ const LoginForm = () => {
                                             Se connecter
                                         </>
                                     )} */}
-                                     <>
-                                            <i className="fas fa-sign-in-alt me-2"></i>
-                                            Se connecter
-                                        </>
+                                    <>
+                                        <i className="fas fa-sign-in-alt me-2"></i>
+                                        Se connecter
+                                    </>
                                 </button>
 
                                 <div className="text-center mt-4">

@@ -31,6 +31,12 @@ class User extends Authenticatable
         'role',
     ];
 
+
+    public function checklists()
+{
+    return $this->hasMany(CreditChecklist::class, 'idUser');
+}
+
     /**
      * The attributes that should be hidden for serialization.
      *

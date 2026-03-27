@@ -6,41 +6,73 @@
     <!-- Logo/Header -->
     <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center justify-content-center" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px !important;">
       <div class="text-center">
-       
         <div class="mb-2 d-flex justify-content-center">
-            <a href="/">
-          <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #20c997 0%, #198764 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-chart-line" style="color: white; font-size: 24px;"></i>
-          </div>
+          <a href="/">
+            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #20c997 0%, #198764 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-chart-line" style="color: white; font-size: 24px;"></i>
+            </div>
           </a>
         </div>
-      </a>
-       <a href="/" class="d-block text-light"
-                     style="font-size: 30px;margin-top:-10px"><strong><i style="color: #fff">C</i><i style="color: teal">redi</i><i style="color:#fff ">X</i></strong></a>
+        <a href="/" class="d-block text-light" style="font-size: 30px;margin-top:-10px">
+          <strong><i style="color: #fff">C</i><i style="color: teal">redi</i><i style="color:#fff ">X</i></strong>
+        </a>
         <small class="text-muted" style="font-size: 11px;">Gestion de crédit</small>
       </div>
     </div>
-
+    
     <!-- Navigation Menu -->
     <nav class="mt-2" style="flex: 1; overflow-y: auto; overflow-x: hidden;">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" style="padding: 0 12px;">
         
-        <!-- Menu Rapport -->
+        <!-- Menu Dossier (premier menu - ouvert par défaut) -->
         <li class="nav-item menu-open mb-2">
-          <a href="#" class="nav-link" style="border-radius: 10px; transition: all 0.2s ease;" data-toggle="collapse" data-target="#rapport-submenu" aria-expanded="true">
+          <a href="#" class="nav-link" style="border-radius: 10px; transition: all 0.2s ease;" data-toggle="collapse" data-target="#dossier-submenu" aria-expanded="true">
             <div class="d-flex align-items-center gap-3">
               <div style="width: 32px; height: 32px; background: rgba(32, 201, 151, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-chart-line" style="color: #20c997; font-size: 14px;"></i>
+                <i class="fas fa-folder" style="color: #20c997; font-size: 14px;"></i>
               </div>
-              <span style="font-weight: 500;">RAPPORT</span>
+              <span style="font-weight: 500;">DOSSIER</span>
               <i class="fas fa-chevron-down ms-auto" style="font-size: 12px; transition: transform 0.2s ease;"></i>
             </div>
           </a>
-          <ul class="nav nav-treeview collapse show" id="rapport-submenu" style="padding-left: 20px; margin-top: 8px;">
+          <ul class="nav nav-treeview collapse show" id="dossier-submenu" style="padding-left: 20px; margin-top: 8px;">
+            <li class="nav-item">
+              <a href="{{ route('gestion_credit.pages.montage-credit') }}" class="nav-link d-flex align-items-center gap-2" style="border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                <i class="fas fa-circle" style="font-size: 6px; color: #20c997;"></i>
+                <span>Nouveau dossier</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('gestion_credit.pages.validation-credit') }}" class="nav-link d-flex align-items-center gap-2" style="border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                <i class="fas fa-circle" style="font-size: 6px; color: #20c997;"></i>
+                <span>Suivi dossier</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menu Rapport (deuxième menu - fermé par défaut) -->
+        <li class="nav-item mb-2">
+          <a href="#" class="nav-link" style="border-radius: 10px; transition: all 0.2s ease;" data-toggle="collapse" data-target="#rapport-submenu" aria-expanded="false">
+            <div class="d-flex align-items-center gap-3">
+              <div style="width: 32px; height: 32px; background: rgba(32, 201, 151, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-chart-bar" style="color: #20c997; font-size: 14px;"></i>
+              </div>
+              <span style="font-weight: 500;">RAPPORT</span>
+              <i class="fas fa-chevron-right ms-auto" style="font-size: 12px; transition: transform 0.2s ease;"></i>
+            </div>
+          </a>
+          <ul class="nav nav-treeview collapse" id="rapport-submenu" style="padding-left: 20px; margin-top: 8px;">
             <li class="nav-item">
               <a href="{{ route('gestion_credit.pages.credit-decaisse') }}" class="nav-link d-flex align-items-center gap-2" style="border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                 <i class="fas fa-circle" style="font-size: 6px; color: #20c997;"></i>
                 <span>Crédits décaissés</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('gestion_credit.pages.rapport-credit') }}" class="nav-link d-flex align-items-center gap-2" style="border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                <i class="fas fa-circle" style="font-size: 6px; color: #20c997;"></i>
+                <span>Autres rapports</span>
               </a>
             </li>
           </ul>
@@ -90,7 +122,6 @@
   </div>
 </aside>
 
-<!-- Script pour gérer l'ouverture/fermeture des sous-menus -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Gestion des toggles des sous-menus
@@ -104,6 +135,24 @@
         const icon = this.querySelector('.fa-chevron-right, .fa-chevron-down');
         
         if (target) {
+          // Fermer tous les autres sous-menus
+          const allSubmenus = document.querySelectorAll('.nav-treeview');
+          allSubmenus.forEach(submenu => {
+            if (submenu.id !== targetId.substring(1) && submenu.classList.contains('show')) {
+              submenu.classList.remove('show');
+              // Changer l'icône du parent correspondant
+              const parentLink = document.querySelector(`[data-target="#${submenu.id}"]`);
+              if (parentLink) {
+                const parentIcon = parentLink.querySelector('.fa-chevron-down');
+                if (parentIcon) {
+                  parentIcon.classList.remove('fa-chevron-down');
+                  parentIcon.classList.add('fa-chevron-right');
+                }
+              }
+            }
+          });
+          
+          // Ouvrir/fermer le menu cliqué
           if (target.classList.contains('show')) {
             target.classList.remove('show');
             if (icon) {
@@ -144,6 +193,26 @@
           }
         }
       }
+    });
+    
+    // S'assurer que seul le premier menu est ouvert par défaut
+    const defaultOpenMenu = document.getElementById('dossier-submenu');
+    const otherMenus = document.querySelectorAll('.nav-treeview:not(#dossier-submenu)');
+    
+    if (defaultOpenMenu) {
+      defaultOpenMenu.classList.add('show');
+      const parentLink = document.querySelector('[data-target="#dossier-submenu"]');
+      if (parentLink) {
+        const icon = parentLink.querySelector('.fa-chevron-right');
+        if (icon) {
+          icon.classList.remove('fa-chevron-right');
+          icon.classList.add('fa-chevron-down');
+        }
+      }
+    }
+    
+    otherMenus.forEach(menu => {
+      menu.classList.remove('show');
     });
   });
 </script>

@@ -3,7 +3,7 @@
 <div class="content-wrapper" style="background:#e6f2f9">
     <section class="content">
         <div class="container-fluid">
-            <div class="row" id="validationC">
+            <div class="row" id="rapportCredit">
 
             </div>
         </div>

@@ -42,6 +42,7 @@ const MontageCreditA = () => {
     const [objetCredit, setObjetCredit] = useState("");
     const [isLoadingBar, setIsLoadingBar] = useState();
     const [progress, setProgress] = useState(0);
+    const [Agence,setAgence]=useState("");
     // const handleImageChange = (e) => {
     //     const files = Array.from(e.target.files);
     //     setImages(files);
@@ -115,6 +116,7 @@ const MontageCreditA = () => {
         formData.append("nombre_membre_groupe", nombre_membre_groupe);
         formData.append("nombre_homme_groupe", nombre_homme_groupe);
         formData.append("nombre_femme_groupe", nombre_femme_groupe);
+         formData.append("Agence", Agence);
         formData.append("objet_credit", objetCredit);
 
         images.forEach((img) => {
@@ -209,19 +211,36 @@ const MontageCreditA = () => {
     return (
         <>
             <div className="container-fluid" style={{ marginTop: "10px" }}>
-                <div className="row">
-                    <div className="col-md-12 card rounded-10 p-1">
-                        <div
-                            style={{
-                                background: "teal",
-                                borderRadius: "10px",
-                                height: "10",
-                                padding: "2px",
-                                color: "white",
-                            }}
-                        >
-                            <h5 className="text-bold p-1">Montage crédit</h5>
-                        </div>{" "}
+                <div className="row mb-3">
+                    <div className="col-md-12">
+                        <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
+                            <div
+                                style={{
+                                    background:
+                                        "teal",
+                                    padding: "12px 20px",
+                                    borderRadius: "8px 8px 0 0",
+                                }}
+                            >
+                                <h5
+                                    className="fw-semibold mb-0"
+                                    style={{
+                                        color: "white",
+                                        letterSpacing: "0.3px",
+                                    }}
+                                >
+                                    <i className="fas fa-tools me-2"></i>
+                                    Montage crédit
+                                </h5>
+                                <small
+                                    className="text-white-50"
+                                    style={{ fontSize: "12px" }}
+                                >
+                                    <i className="fas fa-hourglass-half me-1"></i>
+                                    Formulaire de mise en place des crédits
+                                </small>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <form>
@@ -996,6 +1015,51 @@ const MontageCreditA = () => {
                                                                     nombre_echeance
                                                                 }
                                                             />
+                                                        </td>
+                                                    </tr>
+                                                     <tr>
+                                                        <td
+                                                            style={{
+                                                                padding:
+                                                                    "6px 8px",
+                                                            }}
+                                                        >
+                                                            <label
+                                                                htmlFor="Agence"
+                                                                className="fw-semibold small mb-0"
+                                                                style={{
+                                                                    color: "#4682b4",
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-calculator me-1"></i>
+                                                                Agence
+                                                            </label>
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                padding:
+                                                                    "6px 8px",
+                                                            }}
+                                                        >
+                                                            <select
+                                                              
+                                                                className="form-select form-select-sm"
+                                                                name="Agence"
+                                                                id="Agence"
+                                                                onChange={(e) =>
+                                                                    setAgence(
+                                                                        e.target
+                                                                            .value,
+                                                                    )
+                                                                }
+                                                                value={
+                                                                    Agence
+                                                                }
+                                                            >
+                                                                <option value="GOMA">GOMA</option>
+                                                                <option value="KATINDO">KATINDO</option>
+                                                                <option value="BUNIA">BUNIA</option>
+                                                          </select>
                                                         </td>
                                                     </tr>
                                                 </tbody>

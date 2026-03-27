@@ -6,6 +6,8 @@ import axios from "axios";
 import ValidationFile from "../../GC/Reports/ValidationFile";
 import Swal from "sweetalert2";
 import ModalVisualisationGPS from "../ModalVisualisationGPS";
+import PropositionMontant from "./PropositionMontant";
+import ModalCheckListSuperviseur from "./ModalCheckListSuperviseur";
 import {
     FaDownload,
     FaUserCircle,
@@ -61,6 +63,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const endOfCommentsRef = useRef(null);
     const [replyTo, setReplyTo] = useState(null);
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
+    const [Agence, setAgence] = useState("");
 
     const handleReply = (comment) => {
         setReplyTo(comment);
@@ -142,6 +145,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 setObjetCredit(data.objet_credit);
                 setstatutDossier(data.statutDossier);
                 setGetDossierId(data.id_credit);
+                setAgence(data.Agence);
             })
             .catch(() => setDossier(null));
     };
@@ -173,7 +177,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
         let confirmation;
         confirmation = await Swal.fire({
             title: "Êtes-vous sûr?",
-            text: "Vous êtes sûr ? vous êtes sur le point de supprimer ce dossier voulez vous continuer ?",
+            text: "Vous êtes sûr ? vous êtes sur le point de modifier ce dossier voulez vous continuer ?",
             icon: "question",
             showCancelButton: true,
             confirmButtonText: "Oui",
@@ -212,16 +216,21 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     nombre_femme_groupe,
                     objetCredit,
                     idDossier: getDossierId,
+                    Agence,
                 },
             );
             if (res.data.status == 1) {
                 setIsLoadingBar(false);
+
                 Swal.fire({
-                    title: "Modification",
-                    text: res.data.msg,
                     icon: "success",
-                    timer: 8000,
-                    confirmButtonText: "Okay",
+                    title: "Modification du dossier !",
+                    text: res.data.msg,
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
                 });
                 getDossierCredit();
             } else {
@@ -415,7 +424,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 aria-hidden="true"
                 id="modalVisualisationDossier"
             >
-                <div className="modal-dialog modal-xl">
+                <div className="modal-dialog modal-xl modal-full-height">
                     <div className="modal-content border-0 shadow-lg rounded-3">
                         {/* Header modernisé */}
                         <div
@@ -517,7 +526,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                     </div>
 
                                     <div className="d-flex gap-2 flex-wrap">
-                                        {dossier &&
+                                        {/* {dossier &&
                                             dossier.signatures &&
                                             dossier.signatures.length > 0 && (
                                                 <button
@@ -533,7 +542,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     <FaDownload />
                                                     Télécharger & signer
                                                 </button>
-                                            )}
+                                            )} */}
 
                                         <button
                                             className="btn btn-light btn-sm d-flex align-items-center gap-2"
@@ -553,6 +562,23 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     {nbCommentaires}
                                                 </span>
                                             )}
+                                        </button>
+
+                                        <button
+                                            className="btn btn-light btn-sm d-flex align-items-center gap-2"
+                                            type="button"
+                                            data-toggle="modal"
+                                            data-target="#modalCheckListSuperviseur"
+                                            style={{
+                                                borderRadius: "20px",
+                                                padding: "6px 16px",
+                                            }}
+                                            onClick={() =>
+                                                setDossierIdSelected(dossierId)
+                                            }
+                                        >
+                                            <i className="fas fa-user"></i>
+                                            Superviseur{" "}
                                         </button>
 
                                         <button
@@ -1267,6 +1293,68 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 )
                                                                             }
                                                                         />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            htmlFor="Agence"
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-building"></i>{" "}
+                                                                            Agence
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <select
+                                                                            className="form-select form-select-sm"
+                                                                            name="Agence"
+                                                                            id="Agence"
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setAgence(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                            value={
+                                                                                Agence
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value={
+                                                                                    Agence
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    Agence
+                                                                                }
+                                                                            </option>
+                                                                            <option value="GOMA">
+                                                                                GOMA
+                                                                            </option>
+                                                                            <option value="KATINDO">
+                                                                                KATINDO
+                                                                            </option>
+                                                                            <option value="BUNIA">
+                                                                                BUNIA
+                                                                            </option>
+                                                                        </select>
                                                                     </td>
                                                                 </tr>
 
@@ -2222,7 +2310,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                         />
                                                                     </td>
                                                                 </tr>
-                                                                <tr>
+                                                                {/* <tr>
                                                                     <td
                                                                         style={{
                                                                             padding:
@@ -2264,48 +2352,77 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                             }
                                                                         ></textarea>
                                                                     </td>
+                                                                </tr> */}
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <button
+                                                                            onClick={
+                                                                                handleSubmitUpadate
+                                                                            }
+                                                                            className="btn w-100 mt-3  bg-gradient-primary text-white"
+                                                                            style={{
+                                                                                color: "white",
+                                                                                transition:
+                                                                                    "all 0.2s ease",
+                                                                                borderRadius:
+                                                                                    "10px",
+                                                                            }}
+                                                                            onMouseEnter={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.currentTarget.style.backgroundColor =
+                                                                                    "#198764";
+                                                                                e.currentTarget.style.transform =
+                                                                                    "translateY(-1px)";
+                                                                            }}
+                                                                            onMouseLeave={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.currentTarget.style.backgroundColor =
+                                                                                    "#20c997";
+                                                                                e.currentTarget.style.transform =
+                                                                                    "translateY(0)";
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-save me-2"></i>
+                                                                            Modifier
+                                                                            le
+                                                                            dossier
+                                                                        </button>
+                                                                    </td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
-                                                        <button
-                                                            onClick={
-                                                                handleSubmitUpadate
-                                                            }
-                                                            className="btn w-100 mt-3"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    "#20c997",
-                                                                color: "white",
-                                                                borderRadius:
-                                                                    "8px",
-                                                                transition:
-                                                                    "all 0.2s ease",
-                                                            }}
-                                                            onMouseEnter={(
-                                                                e,
-                                                            ) => {
-                                                                e.currentTarget.style.backgroundColor =
-                                                                    "#198764";
-                                                                e.currentTarget.style.transform =
-                                                                    "translateY(-1px)";
-                                                            }}
-                                                            onMouseLeave={(
-                                                                e,
-                                                            ) => {
-                                                                e.currentTarget.style.backgroundColor =
-                                                                    "#20c997";
-                                                                e.currentTarget.style.transform =
-                                                                    "translateY(0)";
-                                                            }}
-                                                        >
-                                                            <i className="fas fa-save me-2"></i>
-                                                            Modifier le dossier
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
+
+                                    {/* Dans votre modal-body, entourez le composant avec une colonne */}
+                                    <div className="row">
+                                        <div className="col-md-8">
+                                            {/* 👇 AJOUTEZ ICI 👇 */}
+
+                                            {getDossierId && (
+                                                <PropositionMontant
+                                                    dossierId={getDossierId}
+                                                    currentUserId={
+                                                        currentUserId
+                                                    } // Ajoutez cette prop avec l'ID de l'utilisateur connecté
+                                                    onMontantPropose={(
+                                                        newProposition,
+                                                    ) => {
+                                                        console.log(
+                                                            "Nouvelle proposition:",
+                                                            newProposition,
+                                                        );
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
 
                                     {/* Section signature améliorée - Sans drag & drop */}
                                     <div className="card border-0 shadow-sm rounded-3 mt-4 overflow-hidden">
@@ -2619,7 +2736,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                         La signature sera
                                                         ajoutée au dossier et
                                                         sera visible par
-                                                        l'équipe de validation.
+                                                        l'équipe de
+                                                        validation...
                                                     </small>
                                                 </div>
                                             </div>
@@ -2772,18 +2890,21 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
                     <style>
                         {`
-    @keyframes pulse {
-      0% {
-        transform: scale(0.95);
-        opacity: 0.5;
-      }
-      100% {
-        transform: scale(1.2);
-        opacity: 1;
-      }
-    }
-  `}
+                        @keyframes pulse {
+                        0% {
+                            transform: scale(0.95);
+                            opacity: 0.5;
+                        }
+                        100% {
+                            transform: scale(1.2);
+                            opacity: 1;
+                        }
+                        }
+
+                        
+                    `}
                     </style>
+
                     <div
                         className="offcanvas-body"
                         style={{
@@ -2958,12 +3079,31 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     </div>
                 </div>
             </div>
+
+            {dossierIdSelected && (
+                <ModalCheckListSuperviseur
+                    dossierId={dossierIdSelected}
+                    NumDossier={dossier?.NumDossier}
+                    onClose={() => setDossierIdSelected(null)}
+                />
+            )}
+
             {dossierIdSelected && (
                 <ModalVisualisationGPS
                     dossierId={dossierIdSelected}
                     onClose={() => setDossierIdSelected(null)}
                 />
             )}
+
+            {/* Dans la section du modal body, après la signature ou avant les commentaires */}
+            {/* Ajoutez ceci après la section signature */}
+            {/* {getDossierId && (
+                <>
+                    <div className="mt-3">
+                        <ValidationFile dossierId={getDossierId} />
+                    </div>
+                </>
+            )} */}
         </>
     );
 }
@@ -3082,7 +3222,15 @@ const CommentaireItem = ({
                     </small>
                 </div>
 
-                <p className="mb-1" style={{ fontSize: "14px" }}>
+                <p
+                    className="mb-1"
+                    style={{
+                        fontSize: "14px",
+                        wordBreak: "break-word", // Force la coupure des mots longs
+                        whiteSpace: "normal", // Empêche le texte de rester sur une ligne
+                        overflowWrap: "break-word", // Alternative moderne
+                    }}
+                >
                     {commentaire.contenu}
                 </p>
                 <button

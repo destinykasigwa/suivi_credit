@@ -49,3 +49,105 @@ font-size:"15px";
     white-space: nowrap; /* empêche le retour à la ligne automatique */
 }
 
+
+
+
+
+
+
+
+
+/* PropositionMontant.css */
+.pm-timeline-container {
+    position: relative;
+    padding: 0;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.pm-timeline-container::-webkit-scrollbar {
+    width: 3px;
+}
+
+.pm-timeline-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.pm-timeline-container::-webkit-scrollbar-thumb {
+    background: #20c997;
+    border-radius: 5px;
+}
+
+@keyframes pm-slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.pm-timeline-item-last {
+    animation: pm-slideIn 0.2s ease-out;
+}
+
+.pm-input-group {
+    display: flex;
+    height: 38px;
+}
+
+.pm-input-group:focus-within {
+    box-shadow: 0 0 0 2px rgba(32, 201, 151, 0.2);
+    border-radius: 8px;
+}
+
+.pm-input-group-text {
+    font-size: 12px;
+    border: 1px solid #dee2e6;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 0 10px;
+}
+
+.pm-input {
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+    padding: 6px 12px;
+    border: 1px solid #dee2e6;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    width: 100%;
+}
+
+.pm-input:focus {
+    outline: none;
+    border-color: #20c997;
+}
+
+.pm-message-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.pm-message-error {
+    background-color: #dc3545;
+    color: white;
+}
+
+.pm-message {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+

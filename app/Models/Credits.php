@@ -64,4 +64,12 @@ class Credits extends Model
     }
 
     protected $primaryKey = 'id_credit';
+
+
+
+      // Relation avec les propositions de montant
+    public function propositionsMontant()
+    {
+        return $this->hasMany(PropositionMontant::class, 'idDossier', 'id_credit');
+    }
 }

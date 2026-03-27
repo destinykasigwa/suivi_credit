@@ -46,7 +46,7 @@ export default function Dashboard() {
     }
 
     return (
-       <div className="container-fluid px-4 py-4">
+       <div className="container-fluid px-4 py-4" style={{background:"#e6f2f9"}}>
   {/* En-tête */}
   <div className="d-flex justify-content-between align-items-center mb-4">
     <div>
