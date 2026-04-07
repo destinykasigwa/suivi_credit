@@ -141,11 +141,11 @@ class AGestionCreditController extends Controller
         //         // 'credit' => $credit->load('images'),
         //     ]);
         // }
-        PropositionMontant::create([
-            'idUser' => Auth::id(),
-            'idDossier' => $idCredit,
-            'montant_propose' => $request->montant_demande
-        ]);
+        // PropositionMontant::create([
+        //     'idUser' => Auth::id(),
+        //     'idDossier' => $idCredit,
+        //     'montant_propose' => $request->montant_demande
+        // ]);
 
         return response()->json([
             'status' => 1,
@@ -686,9 +686,9 @@ class AGestionCreditController extends Controller
         $roles = [
             "AC",
             "Superviseur",
-            "Chef Agence",
+            // "Chef Agence",
             "CTC",
-            "DG",
+            // "DG",
             "CC"
         ];
 

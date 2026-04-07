@@ -1263,6 +1263,7 @@ const MontageCreditA = () => {
                                                                 <option value="">
                                                                     Sélectionnez
                                                                 </option>
+                                                               
                                                                 <option value="ALAME KUZANWA WILLY">
                                                                     ALAME
                                                                     KUZANWA
@@ -1288,6 +1289,9 @@ const MontageCreditA = () => {
                                                                     NEEMA
                                                                     MULINGA
                                                                     GRACE
+                                                                </option>
+                                                                 <option value="NGASHANI ALBERT">
+                                                                    NGASHANI ALBERT
                                                                 </option>
                                                                 <option value="WIVINE ALISA">
                                                                     WIVINE ALISA

@@ -5,8 +5,8 @@ import VisualisationChecklist from "./VisualisationChecklist";
 
 export default function ModalCheckListSuperviseur({
     dossierId,
-    onClose,
     NumDossier,
+    onClose,
 }) {
     const [dossier, setDossier] = useState(null);
     const [isLoadingBar, setIsLoadingBar] = useState(false);
@@ -392,10 +392,9 @@ export default function ModalCheckListSuperviseur({
                                         <button
                                             type="button"
                                             className="btn-close btn-close-white"
-                                            onClick={() => {
-                                                onClose(); // Ferme le modal (cache le modal React)
-                                                window.location.reload(); // Recharge la page
-                                            }}
+                                            data-dismiss="modal"
+                                            aria-label="Close"
+                                            onClick={onClose}
                                         ></button>
                                     </div>
                                 </div>

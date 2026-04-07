@@ -526,7 +526,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                     </div>
 
                                     <div className="d-flex gap-2 flex-wrap">
-                                        {/* {dossier &&
+                                        {dossier &&
                                             dossier.signatures &&
                                             dossier.signatures.length > 0 && (
                                                 <button
@@ -542,7 +542,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     <FaDownload />
                                                     Télécharger & signer
                                                 </button>
-                                            )} */}
+                                            )}
 
                                         <button
                                             className="btn btn-light btn-sm d-flex align-items-center gap-2"
@@ -1782,6 +1782,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 MULINGA
                                                                                 GRACE
                                                                             </option>
+                                                                             <option value="NGASHANI ALBERT">
+                                                                               NGASHANI ALBERT
+                                                                            </option>
+                                                                            
                                                                             <option value="WIVINE ALISA">
                                                                                 WIVINE
                                                                                 ALISA

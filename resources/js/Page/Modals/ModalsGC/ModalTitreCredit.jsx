@@ -131,10 +131,7 @@ export default function ModalTitreCredit({ onClose }) {
                                 className="btn-close btn-close-white"
                                 data-dismiss="modal"
                                 aria-label="Close"
-                                onClick={() => {
-                                    onClose(); // Ferme le modal (cache le modal React)
-                                    window.location.reload(); // Recharge la page
-                                }}
+                                onClick={onClose}
                             ></button>
                         </div>
                     </div>

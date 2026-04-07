@@ -597,66 +597,7 @@ const Bilan = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                    {/* <tr>
-                                        <td>
-                                            <label
-                                                class="form-check-label"
-                                                for="type_compte"
-                                                style={{
-                                                    fontSize: "15px",
-                                                    color: "steelblue",
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                                Compte de
-                                            </label>
-                                            <input
-                                                id="type_compte"
-                                                style={{
-                                                    padding: "1px ",
-                                                    border: `${"1px solid teal"}`,
-                                                    marginBottom: "5px",
-                                                    width: "80px",
-                                                    height: "25px",
-                                                }}
-                                                type="text"
-                                                name="compte_balance_debut"
-                                                onChange={(e) =>
-                                                    setcompte_balance_debut(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />{" "}
-                                            <label
-                                                class="form-check-label"
-                                                for="compte_balance_fin"
-                                                style={{
-                                                    fontSize: "15px",
-                                                    color: "steelblue",
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                                à
-                                            </label>{" "}
-                                            <input
-                                                id="compte_balance_fin"
-                                                name="compte_balance_fin"
-                                                style={{
-                                                    padding: "1px ",
-                                                    border: `${"1px solid teal"}`,
-                                                    marginBottom: "5px",
-                                                    width: "80px",
-                                                    height: "25px",
-                                                }}
-                                                onChange={(e) =>
-                                                    setcompte_balance_fin(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="text"
-                                            />
-                                        </td>
-                                    </tr> */}
+                                    
                                 </fieldset>
                                 <br />
                             </table>

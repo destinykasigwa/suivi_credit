@@ -1229,27 +1229,26 @@ class SuiviCreditController extends Controller
                     $numOperation = CompteurTransaction::latest()->first();
                     $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "R00" . $numOperation->id;
                     //DEBITE LE COMPTE CREDIT
-                    $compteCreditAuxMembreCDF = "3210000000202";
-
-                    Transactions::create([
-                        "NumTransaction" => $NumTransaction,
-                        "DateTransaction" => $dateSystem,
-                        "DateSaisie" => $dateSaisie,
-                        "TypeTransaction" => "D",
-                        "CodeMonnaie" => 2,
-                        "CodeAgence" => "20",
-                        "NumDossier" => "DOS00" . $numOperation->id,
-                        "NumDemande" => "V00" . $numOperation->id,
-                        "NumCompte" => $compteCreditAuxMembreCDF,
-                        "NumComptecp" => $dataCredit->NumCompteEpargne,
-                        "Debit" => $dataCredit->MontantAccorde,
-                        "Operant" =>  $dataCredit->Gestionnaire,
-                        "Debitusd" => $dataCredit->MontantAccorde / $tauxDuJour,
-                        "Debitfc" => $dataCredit->MontantAccorde,
-                        "NomUtilisateur" => Auth::user()->name,
-                        "Libelle" => "Crédit à court terme octroyé à " . $dataCredit->NomCompte . " en date du " . $dateSystem . " Numéro dossier " . $dataCredit->NumDossier,
-                        "refCompteMembre" => $compteCreditAuxMembreCDF,
-                    ]);
+                    // $compteCreditAuxMembreCDF = "3210000000202";
+                    // Transactions::create([
+                    //     "NumTransaction" => $NumTransaction,
+                    //     "DateTransaction" => $dateSystem,
+                    //     "DateSaisie" => $dateSaisie,
+                    //     "TypeTransaction" => "D",
+                    //     "CodeMonnaie" => 2,
+                    //     "CodeAgence" => "20",
+                    //     "NumDossier" => "DOS00" . $numOperation->id,
+                    //     "NumDemande" => "V00" . $numOperation->id,
+                    //     "NumCompte" => $compteCreditAuxMembreCDF,
+                    //     "NumComptecp" => $dataCredit->NumCompteEpargne,
+                    //     "Debit" => $dataCredit->MontantAccorde,
+                    //     "Operant" =>  $dataCredit->Gestionnaire,
+                    //     "Debitusd" => $dataCredit->MontantAccorde / $tauxDuJour,
+                    //     "Debitfc" => $dataCredit->MontantAccorde,
+                    //     "NomUtilisateur" => Auth::user()->name,
+                    //     "Libelle" => "Crédit à court terme octroyé à " . $dataCredit->NomCompte . " en date du " . $dateSystem . " Numéro dossier " . $dataCredit->NumDossier,
+                    //     "refCompteMembre" => $compteCreditAuxMembreCDF,
+                    // ]);
                     //PUIS ON DEBITE LE COMPTE CREDIT DU MEMBRE
 
 
@@ -1307,30 +1306,28 @@ class SuiviCreditController extends Controller
                     $numOperation = CompteurTransaction::latest()->first();
                     $NumTransaction = Auth::user()->name[0] . Auth::user()->name[1] . "R00" . $numOperation->id;
 
-                    $compteCreditAuxMembreUSD = "3210000000201";
+                    // $compteCreditAuxMembreUSD = "3210000000201";
                     //DEBITE LE COMPTE CREDIT USD
-                    Transactions::create([
-                        "NumTransaction" => $NumTransaction,
-                        "DateTransaction" => $dateSystem,
-                        "DateSaisie" => $dateSaisie,
-                        "TypeTransaction" => "D",
-                        "CodeMonnaie" => 1,
-                        "CodeAgence" => "20",
-                        "NumDossier" => "DOS00" . $numOperation->id,
-                        "NumDemande" => "V00" . $numOperation->id,
-                        "NumCompte" => $compteCreditAuxMembreUSD,
-                        "NumComptecp" => $dataCredit->NumCompteEpargne,
-                        "Debit" => $dataCredit->MontantAccorde,
-                        "Operant" =>  $dataCredit->Gestionnaire,
-                        "Debitusd" => $dataCredit->MontantAccorde,
-                        "Debitfc" => $dataCredit->MontantAccorde * $tauxDuJour,
-                        "NomUtilisateur" => Auth::user()->name,
-                        "Libelle" => "Crédit à court terme octroyé à " . $dataCredit->NomCompte . " en date du " . $dateSystem . " Numéro dossier " . $dataCredit->NumDossier,
-                        "refCompteMembre" => $compteCreditAuxMembreUSD,
-                    ]);
+                    // Transactions::create([
+                    //     "NumTransaction" => $NumTransaction,
+                    //     "DateTransaction" => $dateSystem,
+                    //     "DateSaisie" => $dateSaisie,
+                    //     "TypeTransaction" => "D",
+                    //     "CodeMonnaie" => 1,
+                    //     "CodeAgence" => "20",
+                    //     "NumDossier" => "DOS00" . $numOperation->id,
+                    //     "NumDemande" => "V00" . $numOperation->id,
+                    //     "NumCompte" => $compteCreditAuxMembreUSD,
+                    //     "NumComptecp" => $dataCredit->NumCompteEpargne,
+                    //     "Debit" => $dataCredit->MontantAccorde,
+                    //     "Operant" =>  $dataCredit->Gestionnaire,
+                    //     "Debitusd" => $dataCredit->MontantAccorde,
+                    //     "Debitfc" => $dataCredit->MontantAccorde * $tauxDuJour,
+                    //     "NomUtilisateur" => Auth::user()->name,
+                    //     "Libelle" => "Crédit à court terme octroyé à " . $dataCredit->NomCompte . " en date du " . $dateSystem . " Numéro dossier " . $dataCredit->NumDossier,
+                    //     "refCompteMembre" => $compteCreditAuxMembreUSD,
+                    // ]);
                     //PUIS ON DEBITE LE COMPTE CREDIT DU MEMBRE
-
-
                     Transactions::create([
                         "NumTransaction" => $NumTransaction,
                         "DateTransaction" => $dateSystem,

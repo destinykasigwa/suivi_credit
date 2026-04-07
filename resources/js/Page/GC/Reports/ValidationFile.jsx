@@ -976,7 +976,7 @@ export default function ValidationFile({ dossierId }) {
                                         <i className="fas fa-comment-dots" style={{ fontSize: "10px", color: "#ffc107" }}></i>
                                         <small style={{ fontSize: "11px", color: "#856404", lineHeight: "1.3" }}>
                                             {prop.commentaire.length > 100 
-                                                ? prop.commentaire.substring(0, 100) + "..." 
+                                                ? prop.commentaire.substring(0, 500) + "..." 
                                                 : prop.commentaire}
                                         </small>
                                     </div>
@@ -1119,7 +1119,7 @@ export default function ValidationFile({ dossierId }) {
                                         </div>
 
                                         {/* Chef Agence */}
-                                        <div className="col-md-2">
+                                        {/* <div className="col-md-2">
                                             <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-building fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
@@ -1140,7 +1140,7 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
-                                                {/* Montant proposé par le chef agence */}
+                                            
                                                 {propositions &&
                                                     propositions.find(
                                                         (p) =>
@@ -1167,7 +1167,7 @@ export default function ValidationFile({ dossierId }) {
                                                         </div>
                                                     )}
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         {/* CTC */}
                                         <div className="col-md-2">
@@ -1219,7 +1219,7 @@ export default function ValidationFile({ dossierId }) {
                                         </div>
 
                                         {/* DG */}
-                                        <div className="col-md-2">
+                                        {/* <div className="col-md-2">
                                             <div className="text-center p-3 border rounded-3 bg-light h-100">
                                                 <i className="fas fa-crown fa-2x text-teal mb-2"></i>
                                                 <p className="mb-0 fw-semibold">
@@ -1240,7 +1240,7 @@ export default function ValidationFile({ dossierId }) {
                                                         _________________
                                                     </span>
                                                 </div>
-                                                {/* Montant proposé par le DG */}
+                                                 Montant proposé par le DG *
                                                 {propositions &&
                                                     propositions.find(
                                                         (p) => p.nom === "DG",
@@ -1265,7 +1265,7 @@ export default function ValidationFile({ dossierId }) {
                                                         </div>
                                                     )}
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         {/* CC */}
                                         <div className="col-md-2">
