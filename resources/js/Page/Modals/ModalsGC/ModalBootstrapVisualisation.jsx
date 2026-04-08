@@ -8,6 +8,8 @@ import Swal from "sweetalert2";
 import ModalVisualisationGPS from "../ModalVisualisationGPS";
 import PropositionMontant from "./PropositionMontant";
 import ModalCheckListSuperviseur from "./ModalCheckListSuperviseur";
+import PropositionsHistory from "../../GC/Reports/PropositionsHistory";
+// import { PrintPropositionsHistory } from "../../GC/Reports/PropositionsHistory";
 import {
     FaDownload,
     FaUserCircle,
@@ -64,6 +66,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
     const [replyTo, setReplyTo] = useState(null);
     const [dossierIdSelected, setDossierIdSelected] = useState(null);
     const [Agence, setAgence] = useState("");
+
+    const [showPropositions, setShowPropositions] = useState(false);
 
     const handleReply = (comment) => {
         setReplyTo(comment);
@@ -217,6 +221,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                     objetCredit,
                     idDossier: getDossierId,
                     Agence,
+                    date_expiration_titre,
+                    date_sortie_titre,
                 },
             );
             if (res.data.status == 1) {
@@ -413,6 +419,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
         }, 0);
     };
 
+    // Quand vous voulez afficher les propositions
+    const handleViewPropositions = () => {
+        setShowPropositions(true);
+    };
     // Dans ton composant (avant le return)
     const nbCommentaires = countAllComments(dossier?.commentaires || []);
 
@@ -1782,10 +1792,11 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 MULINGA
                                                                                 GRACE
                                                                             </option>
-                                                                             <option value="NGASHANI ALBERT">
-                                                                               NGASHANI ALBERT
+                                                                            <option value="NGASHANI ALBERT">
+                                                                                NGASHANI
+                                                                                ALBERT
                                                                             </option>
-                                                                            
+
                                                                             <option value="WIVINE ALISA">
                                                                                 WIVINE
                                                                                 ALISA
@@ -2425,6 +2436,114 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                     }}
                                                 />
                                             )}
+                                            <button
+                                                onClick={() =>
+                                                    handleViewPropositions()
+                                                }
+                                                style={{
+                                                    background:
+                                                        "linear-gradient(98deg, #006892 0%, #0085af 100%)",
+                                                    border: "none",
+                                                    padding: "12px 28px",
+                                                    borderRadius: "40px",
+                                                    color: "white",
+                                                    fontWeight: "600",
+                                                    fontSize: "14px",
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: "12px",
+                                                    cursor: "pointer",
+                                                    transition:
+                                                        "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                                    boxShadow:
+                                                        "0 4px 12px rgba(0, 104, 146, 0.3)",
+                                                    letterSpacing: "0.3px",
+                                                    fontFamily:
+                                                        "'Inter', sans-serif",
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(-2px)";
+                                                    e.currentTarget.style.boxShadow =
+                                                        "0 8px 20px rgba(0, 104, 146, 0.4)";
+                                                    e.currentTarget.style.background =
+                                                        "linear-gradient(98deg, #005a7c 0%, #006d91 100%)";
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.transform =
+                                                        "translateY(0)";
+                                                    e.currentTarget.style.boxShadow =
+                                                        "0 4px 12px rgba(0, 104, 146, 0.3)";
+                                                    e.currentTarget.style.background =
+                                                        "linear-gradient(98deg, #006892 0%, #0085af 100%)";
+                                                }}
+                                            >
+                                                <svg
+                                                    width="18"
+                                                    height="18"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
+                                                        stroke="white"
+                                                        strokeWidth="2"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M2.45801 12C3.73201 7.943 7.52301 5 12 5C16.477 5 20.268 7.943 21.542 12C20.268 16.057 16.477 19 12 19C7.52301 19 3.73201 16.057 2.45801 12Z"
+                                                        stroke="white"
+                                                        strokeWidth="2"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                </svg>
+                                                Voir les propositions
+                                                <svg
+                                                    width="14"
+                                                    height="14"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M5 12H19M19 12L13 6M19 12L13 18"
+                                                        stroke="white"
+                                                        strokeWidth="2"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                </svg>
+                                            </button>
+
+                                            {/* Modal ou Offcanvas pour afficher le composant */}
+                                            {showPropositions && (
+                                                <div
+                                                    className="modal show d-block"
+                                                    style={{
+                                                        backgroundColor:
+                                                            "rgba(0,0,0,0.5)",
+                                                    }}
+                                                >
+                                                    <div className="modal-dialog modal-xl">
+                                                        <div className="modal-content">
+                                                            <PropositionsHistory
+                                                                propositionId={
+                                                                    getDossierId
+                                                                }
+                                                                NumDossier={dossier.NumDossier}
+                                                                onClose={() =>
+                                                                    setShowPropositions(
+                                                                        false,
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -2748,14 +2867,24 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                         </div>
                                     </div>
 
+                                    {dossier &&
+                                        dossier.signatures &&
+                                        !dossier.signatures.length && (
+                                            <div className="mt-3">
+                                                <ValidationFile
+                                                    dossierId={getDossierId}
+                                                />
+                                            </div>
+                                        )}
+
                                     {/* Validation File */}
-                                    {getDossierId && (
+                                    {/* {getDossierId && (
                                         <div className="mt-3">
                                             <ValidationFile
                                                 dossierId={getDossierId}
                                             />
                                         </div>
-                                    )}
+                                    )} */}
                                 </>
                             )}
                         </div>

@@ -1339,11 +1339,11 @@ const ValidationC = () => {
                                                 </div>
                                                 <div className="action-content">
                                                     <h6 className="mb-0 fw-semibold">
-                                                        Contrat de prêt
+                                                        Fichiers du prêt
                                                     </h6>
                                                     <small className="text-muted">
-                                                        Visualisez et
-                                                        téléchargez le contrat
+                                                        Visualisez tous
+                                                        les fichiers
                                                     </small>
                                                 </div>
                                                 <i className="fas fa-chevron-right action-arrow"></i>
@@ -1353,9 +1353,10 @@ const ValidationC = () => {
                                             <button
                                                 className="action-item"
                                                 onClick={() => {
-                                                    setSelectedDossierIdSuperv(
-                                                        currentCredit?.id_credit,
-                                                    );
+                                                    setSelectedDossierIdSuperv({
+        id: currentCredit?.id_credit,
+        numDossier: currentCredit?.NumDossier
+    });
                                                     setShowActionsOffcanvas(
                                                         false,
                                                     );
@@ -1702,10 +1703,10 @@ const ValidationC = () => {
             {/* Modal Check Liste Superviseur */}
             {selectedDossierIdSuperv && (
                 <ModalCheckListSuperviseur
-                    dossierId={selectedDossierIdSuperv}
-                    NumDossier={NumDossier?.NumDossier}
-                    onClose={() => setSelectedDossierIdSuperv(null)}
-                />
+        dossierId={selectedDossierIdSuperv.id}
+        NumDossier={selectedDossierIdSuperv.numDossier}
+        onClose={() => setSelectedDossierIdSuperv(null)}
+    />
             )}
 
             {/* Modal Visualisation Titre */}
@@ -1828,7 +1829,7 @@ const ValidationC = () => {
 
     .modern-table tbody tr:hover {
       background-color: #fefce8;
-      transform: scale(1.01);
+      //transform: scale(1.01);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 

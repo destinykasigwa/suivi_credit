@@ -26,6 +26,7 @@ export default function RapportCredits() {
     const [selectedTypeCredit, setSelectedTypeCredit] = useState("");
     const [selectedProduit, setSelectedProduit] = useState("");
     const [selectedMonnaie, setSelectedMonnaie] = useState("");
+    const [selectedStatut, setSelectedStatut] = useState("");
 
    // Informations de l'organisation
     const organisation = {
@@ -121,10 +122,13 @@ export default function RapportCredits() {
         if (selectedMonnaie) {
             filtered = filtered.filter((credit) => credit.monnaie === selectedMonnaie);
         }
+         if (selectedStatut) {
+            filtered = filtered.filter((credit) => credit.statutDossier === selectedStatut);
+        }
 
         setFilteredCredits(filtered);
         setCurrentPage(1);
-    }, [searchTerm, dateDebut, dateFin, selectedAgence, selectedGestionnaire, selectedTypeCredit, selectedProduit, selectedMonnaie, credits, type_recherche]);
+    }, [searchTerm, dateDebut, dateFin, selectedAgence, selectedGestionnaire, selectedTypeCredit, selectedProduit, selectedMonnaie,selectedStatut, credits, type_recherche]);
 
     // Pagination
     useEffect(() => {
@@ -150,6 +154,7 @@ export default function RapportCredits() {
         setSelectedTypeCredit("");
         setSelectedProduit("");
         setSelectedMonnaie("");
+        setSelectedStatut("");
         setFilteredCredits(credits);
         setCurrentPage(1);
     };
@@ -159,7 +164,7 @@ export default function RapportCredits() {
     const typesCreditUniques = [...new Set(credits.map((c) => c.type_credit).filter(Boolean))];
     const produitsUniques = [...new Set(credits.map((c) => c.produit_credit).filter(Boolean))];
     const monnaiesUniques = [...new Set(credits.map((c) => c.monnaie).filter(Boolean))];
-
+    const statutUniques = [...new Set(credits.map((c) => c.statutDossier).filter(Boolean))];
     const totalMontant = filteredCredits.reduce((sum, credit) => sum + (parseFloat(credit.montant_demande) || 0), 0);
     const nombreTotal = filteredCredits.length;
 
@@ -266,6 +271,7 @@ export default function RapportCredits() {
             if (selectedGestionnaire) filterText += ` | Gestionnaire: ${selectedGestionnaire}`;
             if (selectedTypeCredit) filterText += ` | Type: ${selectedTypeCredit}`;
             if (selectedMonnaie) filterText += ` | Monnaie: ${selectedMonnaie}`;
+            if (selectedStatut) filterText += ` | Statut: ${selectedStatut}`;
             if (type_recherche === "credit_refuse") filterText += ` | Filtre: Crédits refusés`;
             doc.text(filterText, 152, 48, { align: "center" });
             
@@ -358,10 +364,16 @@ export default function RapportCredits() {
             {/* En-tête avec logo officiel (visible à l'écran) */}
             <div className="no-print mb-4">
                 <div className="card shadow-sm border-0 rounded-4 overflow-hidden">
-                    <div style={{ background: "#fff", padding: "20px 30px" }}>
+                    <div     style={{
+                                    background:
+                                        "teal",
+                                    padding: "12px 20px",
+                                    borderRadius: "8px 8px 0 0",
+                                    color:"#fff"
+                                }}>
                         <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div className="d-flex align-items-center gap-4">
-                               <h5
+                               <h3
                                     className="fw-semibold mb-0"
                                     style={{
                                         color: "#1a2632 0%",
@@ -370,7 +382,7 @@ export default function RapportCredits() {
                                 >
                                     <i className="fas fa-file"></i> {" "}  Rapports
                                        
-                                </h5>
+                                </h3>
                             </div >
                             <div className="text-end" style={{
                                         color: "#1a2632 0%",
@@ -414,6 +426,8 @@ export default function RapportCredits() {
                             <div className="col-md-3 mb-2"><label className="form-label small fw-semibold">Gestionnaire</label><select className="form-select form-select-sm" value={selectedGestionnaire} onChange={(e) => setSelectedGestionnaire(e.target.value)}><option value="">Tous</option>{gestionnairesUniques.map(g => <option key={g} value={g}>{g}</option>)}</select></div>
                             <div className="col-md-3 mb-2"><label className="form-label small fw-semibold">Type crédit</label><select className="form-select form-select-sm" value={selectedTypeCredit} onChange={(e) => setSelectedTypeCredit(e.target.value)}><option value="">Tous</option>{typesCreditUniques.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
                             <div className="col-md-3 mb-2"><label className="form-label small fw-semibold">Produit crédit</label><select className="form-select form-select-sm" value={selectedProduit} onChange={(e) => setSelectedProduit(e.target.value)}><option value="">Tous</option>{produitsUniques.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                            <div className="col-md-3 mb-2"><label className="form-label small fw-semibold">Statut crédit</label><select className="form-select form-select-sm" value={selectedStatut} onChange={(e) => setSelectedStatut(e.target.value)}><option value="">Tous</option>{statutUniques.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                           
                             <div className="col-md-3 mb-2"><label className="form-label small fw-semibold"><i className="fas fa-coins me-1"></i> Monnaie</label><select className="form-select form-select-sm" value={selectedMonnaie} onChange={(e) => setSelectedMonnaie(e.target.value)}><option value="">Toutes</option>{monnaiesUniques.map(m => <option key={m} value={m}>{m === "USD" ? "💵 USD" : m === "CDF" ? "🇨🇩 CDF" : m}</option>)}</select></div>
                         </div>
                     )}
@@ -436,21 +450,24 @@ export default function RapportCredits() {
                             <thead style={{ 
                                 position: "sticky", 
                                 top: 0, 
-                                background:" linear-gradient(180deg, #1a2632 0%",
+                                // background:" linear-gradient(180deg, #1a2632 0%",
+                                background:" #dcdcdc",
                                 zIndex: 2,
-                                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                textTransform:"uppercase"
+                              
                             }}>
                                 <tr>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>N° Compte</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Nom client</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Agence</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Produit</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Type</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Gestionnaire</th>
-                                    <th className="py-3 px-3 text-white text-end" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Montant</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Monnaie</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Date demande</th>
-                                    <th className="py-3 px-3 text-white" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Statut</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>N_Compte</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Nom_client</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Agence</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Produit</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Type</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Gestionnaire</th>
+                                    <th className="py-3 px-3 text-dark text-end" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Montant</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Monnaie</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Date_demande</th>
+                                    <th className="py-3 px-3 text-dark" style={{ fontWeight: "600", fontSize: "0.85rem", letterSpacing: "0.5px" }}>Statut</th>
                                    </tr>
                             </thead>
                             <tbody>

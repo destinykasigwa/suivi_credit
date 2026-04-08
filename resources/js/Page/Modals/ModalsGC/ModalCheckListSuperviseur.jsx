@@ -347,9 +347,10 @@ export default function ModalCheckListSuperviseur({
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div className="d-flex align-items-center gap-3 flex-wrap">
                                         <i className="fas fa-folder-open fa-2x"></i>
-                                        <h5 className="mb-0 fw-bold">
-                                            Checklist Dossier de Crédit N°{" "}
-                                            {NumDossier!==null?NumDossier:dossierId}
+                                        <h5 className="mb-0 fw-bold" >
+                                            Checklist Dossier de Crédit N° 
+                                           <span style={{color:"green" }}> #{NumDossier??NumDossier}</span>
+                                            {}
                                         </h5>
                                     </div>
                                     <div className="d-flex gap-2">

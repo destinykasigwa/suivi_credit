@@ -189,7 +189,6 @@ export default function ValidationFile({ dossierId }) {
                         <div className="text-center mb-4">
                             <EnteteRapport />
                         </div>
-
                         {/* Titre principal */}
                         <div className="text-center mb-4">
                             <h4
@@ -209,7 +208,6 @@ export default function ValidationFile({ dossierId }) {
                                 📄 FICHE DE SUIVI DE CREDIT
                             </h4>
                         </div>
-
                         {/* Informations principales */}
                         <div className="row g-3 mt-1">
                             {/* Colonne 1 */}
@@ -886,118 +884,7 @@ export default function ValidationFile({ dossierId }) {
                                 </div>
                             </div>
                         </div>
-
-
-                          {/* Section récapitulative des propositions */}
-                                    {propositions &&
-                                        propositions.length > 0 && (
-                                            <div
-                                                className="mt-1 p-3"
-                                                style={{
-                                                    borderRadius: "12px",
-                                                    backgroundColor: "#f8f9fa",
-                                                    pageBreakBefore: "always", // Force une nouvelle page avant cet élément
-                                                    breakBefore: "page", // Alternative moderne
-                                                    marginTop: "0", // Ajuste la marge pour éviter l'espace blanc
-
-                                                }}
-                                            >
-                                                <h6
-                                                    className="fw-bold mb-3"
-                                                    style={{ color: "#20c997" }}
-                                                >
-                                                    <i className="fas fa-chart-line me-2"></i>
-                                                    Historique des propositions
-                                                    de montant
-                                                </h6>
-                                               <div className="row g-3">
-    {propositions.map((prop, index) => (
-        <div key={index} className="col-md-6 col-lg-4">
-            <div className="card h-100 border-0 shadow-sm" style={{
-                borderRadius: "14px",
-                transition: "all 0.2s ease",
-                borderTop: `3px solid ${index === propositions.length - 1 ? "#20c997" : "#ffc107"}`,
-                overflow: "hidden"
-            }}>
-                <div className="card-body p-3">
-                    {/* En-tête */}
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <div>
-                            <i className="fas fa-user-circle me-1" style={{ color: "#20c997", fontSize: "14px" }}></i>
-                            <span className="fw-semibold" style={{ fontSize: "13px" }}>
-                                {prop.role || prop.nom}
-                            </span>
-                            {index === propositions.length - 1 && (
-                                <span className="badge ms-2" style={{
-                                    backgroundColor: "#20c997",
-                                    fontSize: "8px",
-                                    padding: "2px 6px"
-                                }}>
-                                    <i className="fas fa-star"></i>
-                                </span>
-                            )}
-                        </div>
-                        <small className="text-muted" style={{ fontSize: "9px" }}>
-                            {new Date(prop.date).toLocaleDateString("fr-FR", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit"
-                            })}
-                        </small>
-                    </div>
-
-                    {/* Contenu principal : Montant + Commentaire côte à côte */}
-                    <div className="d-flex gap-2 mt-2">
-                        {/* Montant */}
-                        <div className="flex-shrink-0 text-center" style={{ width: "100px" }}>
-                            <div className="p-2 rounded-3" style={{
-                                backgroundColor: "rgba(32, 201, 151, 0.1)",
-                                borderRadius: "10px"
-                            }}>
-                                <span className="text-muted d-block" style={{ fontSize: "9px" }}>Montant</span>
-                                <span className="fw-bold" style={{ fontSize: "14px", color: "#20c997" }}>
-                                    {new Intl.NumberFormat("fr-FR").format(prop.montant)}
-                                </span>
-                                <span className="text-muted" style={{ fontSize: "8px" }}>
-                                    {fetchData?.monnaie === "CDF" ? "FC" : "USD"}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Commentaire */}
-                        <div className="flex-grow-1">
-                            {prop.commentaire ? (
-                                <div className="p-2 rounded-3 h-100" style={{
-                                    backgroundColor: "#fff9e6",
-                                    borderLeft: "3px solid #ffc107"
-                                }}>
-                                    <div className="d-flex gap-1">
-                                        <i className="fas fa-comment-dots" style={{ fontSize: "10px", color: "#ffc107" }}></i>
-                                        <small style={{ fontSize: "11px", color: "#856404", lineHeight: "1.3" }}>
-                                            {prop.commentaire.length > 100 
-                                                ? prop.commentaire.substring(0, 500) + "..." 
-                                                : prop.commentaire}
-                                        </small>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="p-2 text-center rounded-3" style={{
-                                    backgroundColor: "#f8f9fa"
-                                }}>
-                                    <i className="fas fa-comment-slash" style={{ fontSize: "12px", color: "#adb5bd" }}></i>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    ))}
-</div>
-                                            </div>
-                                        )}
-
+                        {/* ICI SECTION DE MONTANT ET COMMENTAIRE ENLEVER TEMPORAIREMENT */}
 
                         {/* Section signatures avec montants proposés */}
                         <div className="mt-1">
@@ -1057,10 +944,10 @@ export default function ValidationFile({ dossierId }) {
                                                                             fetchData.recouvreur,
                                                                     ).montant,
                                                                 )}{" "}
-                                                               {fetchData.monnaie ==
-                                                            "CDF"
-                                                                ? "FC "
-                                                                : " USD"}
+                                                                {fetchData.monnaie ==
+                                                                "CDF"
+                                                                    ? "FC "
+                                                                    : " USD"}
                                                             </small>
                                                         </div>
                                                     )}
@@ -1109,9 +996,9 @@ export default function ValidationFile({ dossierId }) {
                                                                     ).montant,
                                                                 )}{" "}
                                                                 {fetchData.monnaie ==
-                                                            "CDF"
-                                                                ? "FC "
-                                                                : " USD"}
+                                                                "CDF"
+                                                                    ? "FC "
+                                                                    : " USD"}
                                                             </small>
                                                         </div>
                                                     )}
@@ -1208,10 +1095,10 @@ export default function ValidationFile({ dossierId }) {
                                                                             "CTC",
                                                                     ).montant,
                                                                 )}{" "}
-                                                               {fetchData.monnaie ==
-                                                            "CDF"
-                                                                ? "FC "
-                                                                : " USD"}
+                                                                {fetchData.monnaie ==
+                                                                "CDF"
+                                                                    ? "FC "
+                                                                    : " USD"}
                                                             </small>
                                                         </div>
                                                     )}
@@ -1306,68 +1193,184 @@ export default function ValidationFile({ dossierId }) {
                                                                             "CC",
                                                                     ).montant,
                                                                 )}{" "}
-                                                               {fetchData.monnaie ==
-                                                            "CDF"
-                                                                ? "FC "
-                                                                : " USD"}
+                                                                {fetchData.monnaie ==
+                                                                "CDF"
+                                                                    ? "FC "
+                                                                    : " USD"}
                                                             </small>
                                                         </div>
                                                     )}
                                             </div>
                                         </div>
                                     </div>
-
-                                  
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Bouton de téléchargement */}
-                    <div className="text-center mt-1">
-                        <button
-                            className="btn  bg-gradient-primary text-white btn-lg d-inline-flex align-items-center gap-3"
+                    <div
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)",
+                            borderRadius: "28px",
+                            padding: "28px",
+                            marginTop: "24px",
+                            marginRight: "auto", // ✅ Ajoutez cette ligne (pousse à gauche)
+                            marginLeft: "0", // ✅ Ajoutez cette ligne (assure qu'il colle à gauche)
+                            border: "1px solid rgba(32, 201, 151, 0.3)",
+                            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.08)",
+                            width: "fit-content", // ✅ Optionnel : le container prend la largeur de son contenu
+                            maxWidth: "100%", // ✅ Optionnel : éviter le débordement
+                        }}
+                    >
+                        {/* Badge d'information */}
+                        <div
                             style={{
-                                borderRadius: "50px",
-                                padding: "12px 32px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "8px",
                                 backgroundColor: "#20c997",
                                 color: "white",
-                                border: "none",
-                                transition: "all 0.3s ease",
-                                boxShadow: "0 4px 12px rgba(32, 201, 151, 0.3)",
-                            }}
-                            onClick={handleClickPrint}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#198764";
-                                e.currentTarget.style.transform =
-                                    "translateY(-2px)";
-                                e.currentTarget.style.boxShadow =
-                                    "0 6px 16px rgba(32, 201, 151, 0.4)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#20c997";
-                                e.currentTarget.style.transform =
-                                    "translateY(0)";
-                                e.currentTarget.style.boxShadow =
-                                    "0 4px 12px rgba(32, 201, 151, 0.3)";
+                                padding: "6px 16px",
+                                borderRadius: "50px",
+                                marginBottom: "20px",
+                                fontSize: "12px",
+                                fontWeight: "500",
                             }}
                         >
-                            <i className="fas fa-download fa-lg"></i>
-                            <div className="text-start">
-                                <small
-                                    className="d-block"
-                                    style={{ fontSize: "11px" }}
+                            <i className="fas fa-star-of-life"></i>
+                            <span>Nouveau</span>
+                        </div>
+
+                        {/* Titre principal */}
+                        <div style={{ marginBottom: "20px" }}>
+                            <h3
+                                style={{
+                                    fontSize: "20px",
+                                    fontWeight: "700",
+                                    color: "#1f2937",
+                                    marginBottom: "8px",
+                                }}
+                            >
+                                📄 Fiche de suivi vierge
+                            </h3>
+                            <p
+                                style={{
+                                    fontSize: "14px",
+                                    color: "#6b7280",
+                                    margin: 0,
+                                }}
+                            >
+                                Document officiel pour la collecte des
+                                signatures
+                            </p>
+                        </div>
+
+                        {/* Message informatif avec icône */}
+                        <div
+                            style={{
+                                backgroundColor: "#fefce8",
+                                borderRadius: "16px",
+                                padding: "16px",
+                                marginBottom: "24px",
+                                display: "flex",
+                                gap: "12px",
+                                alignItems: "flex-start",
+                            }}
+                        >
+                            <i
+                                className="fas fa-hand-point-right"
+                                style={{ color: "#eab308", fontSize: "24px" }}
+                            ></i>
+                            <div>
+                                <strong
+                                    style={{
+                                        color: "#854d0e",
+                                        fontSize: "13px",
+                                        display: "block",
+                                        marginBottom: "4px",
+                                    }}
                                 >
-                                    Pour poser votre signature
-                                </small>
-                                <span className="fw-semibold">
-                                    Télécharger la fiche de suivi
-                                </span>
+                                    Important
+                                </strong>
+                                <p
+                                    style={{
+                                        color: "#854d0e",
+                                        fontSize: "12px",
+                                        margin: 0,
+                                        lineHeight: "1.5",
+                                    }}
+                                >
+                                    Ce document doit être signé par toutes les
+                                    parties concernées avant validation finale.
+                                </p>
                             </div>
-                            <i className="fas fa-file-pdf fa-2x"></i>
-                        </button>
+                        </div>
+
+                        {/* Bouton - Changé de "text-center" à "text-start" */}
+                        <div style={{ marginBottom: "24px" }}>
+                            {" "}
+                            {/* ✅ Supprimé className="text-center" */}
+                            <button
+                                onClick={handleClickPrint}
+                                style={{
+                                    background:
+                                        "linear-gradient(135deg, #20c997 0%, #059669 100%)",
+                                    border: "none",
+                                    padding: "14px 32px",
+                                    borderRadius: "50px",
+                                    color: "white",
+                                    fontWeight: "600",
+                                    fontSize: "15px",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "12px",
+                                    cursor: "pointer",
+                                    transition:
+                                        "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                    boxShadow:
+                                        "0 6px 20px rgba(32, 201, 151, 0.35)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform =
+                                        "translateY(-3px)";
+                                    e.currentTarget.style.boxShadow =
+                                        "0 12px 28px rgba(32, 201, 151, 0.45)";
+                                    e.currentTarget.style.background =
+                                        "linear-gradient(135deg, #059669 0%, #047857 100%)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform =
+                                        "translateY(0)";
+                                    e.currentTarget.style.boxShadow =
+                                        "0 6px 20px rgba(32, 201, 151, 0.35)";
+                                    e.currentTarget.style.background =
+                                        "linear-gradient(135deg, #20c997 0%, #059669 100%)";
+                                }}
+                            >
+                                <i className="fas fa-download fa-lg"></i>
+                                <span>Télécharger la fiche vierge</span>
+                                <i className="fas fa-file-pdf fa-lg"></i>
+                            </button>
+                        </div>
+
+                        {/* Note de bas - Changé de "center" à "flex-start" */}
+                        <div
+                            style={{
+                                textAlign: "left", // ✅ Changé
+                                fontSize: "11px",
+                                color: "#9ca3af",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "flex-start", // ✅ Changé
+                                gap: "8px",
+                            }}
+                        >
+                            <i className="fas fa-print"></i>
+                            <span>Format A4 - Prêt à imprimer</span>
+                            <i className="fas fa-qrcode"></i>
+                        </div>
                     </div>
                 </div>
             )}

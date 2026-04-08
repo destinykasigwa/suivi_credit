@@ -663,6 +663,9 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('gestion_credit/dossier/montant-propose', [AGestionCreditController::class, 'storeProposeMontant']);
     Route::get('gestion_credit/dossier/montant-propose/last/{dossierId}', [AGestionCreditController::class, 'getLastProposition']);
     Route::delete('gestion_credit/dossier/montant-propose/{id}', [AGestionCreditController::class, 'destroy']);
+    
+    Route::get('gestion_credit/dossier/montant-propose/{dossierId}', [AGestionCreditController::class, 'getHistorique']);
+    Route::get('gestion_credit/propositions/{id}/commentaires', [AGestionCreditController::class, 'getPropositions']);
 
 
     Route::post('gestion_credit/dossier/credit-checklists', [AGestionCreditController::class, 'storeCreditChecklist']);

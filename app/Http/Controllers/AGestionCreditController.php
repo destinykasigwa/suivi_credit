@@ -102,7 +102,7 @@ class AGestionCreditController extends Controller
             'nombre_femme_groupe' => $request->nombre_femme_groupe,
             'objet_credit' => $request->objet_credit,
             'Agence' => $request->Agence,
-            
+
         ]);
 
         if (isset($request->description_titre)) {
@@ -223,9 +223,9 @@ class AGestionCreditController extends Controller
                 "status" => 1,
                 "data" => $credits
             ]);
-        }else if ($request->type_recherche == "credit_refuse"){
+        } else if ($request->type_recherche == "credit_refuse") {
 
-          $ref = $request->ref;
+            $ref = $request->ref;
             $credits = DB::table('credits')
                 ->where(function ($query) use ($ref) {
                     $query->where('statutDossier', '=', 'Refusé');
@@ -362,8 +362,8 @@ class AGestionCreditController extends Controller
     {
         // Récupère le dossier
         $dossier = DB::table('credits')->where('id_credit', $id)->first();
-         // Récupérer les propositions de montant pour ce dossier
-         // Récupérer les propositions avec la dernière par acteur
+        // Récupérer les propositions de montant pour ce dossier
+        // Récupérer les propositions avec la dernière par acteur
         $propositions = DB::table('proposition_montants')
             ->join('users', 'proposition_montants.idUser', '=', 'users.id')
             ->where('proposition_montants.idDossier', $id)
@@ -380,10 +380,10 @@ class AGestionCreditController extends Controller
             ->get()
             ->unique('userId') // Prend la dernière proposition par utilisateur (car orderBy desc)
             ->values();
-        
-        
-       
-        
+
+
+
+
 
         if (!$dossier) {
             return response()->json(['message' => 'Dossier non trouvé'], 404);
@@ -482,6 +482,7 @@ class AGestionCreditController extends Controller
     //UPDATE DOSSIER
     public function updateDossier(Request $request)
     {
+        //dd($request->all());
 
         $checkStatus = Credits::where("id_credit", $request->idDossier)->first();
 
@@ -751,29 +752,26 @@ class AGestionCreditController extends Controller
             'credits_rejetes'   => Credits::where('statutDossier', 'Refusé')->count(),
         ];
 
-        // 2. Répartition des signatures par acteur (signed_by)
-        // 2. Répartition des signatures par acteur (signed_by)
-        // $signatures = Signature::select('signed_by', DB::raw('count(*) as total'))
-        //     ->groupBy('signed_by')
-        //     ->orderByRaw('MIN(id) ASC') // ou created_at si tu veux l’ordre chronologique
-        //     ->get();
+        // 2. Total des dossiers (TOUS les statuts confondus)
+        $totalDossiers = Credits::count();
+
+        // 3. Répartition des signatures par acteur
         $signatures = Signature::select('signed_by', DB::raw('count(*) as total'))
             ->groupBy('signed_by')
+            ->orderBy(DB::raw('MIN(signatures.created_at)'))
             ->get();
 
-
-        // 3. Temps moyen de signature par acteur (en jours)
+        // 4. Délai moyen de signature par acteur (en jours)
         $delaiSignatures = Signature::select(
             'signed_by',
             DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
         )
             ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
             ->groupBy('signed_by')
-            ->orderByRaw('MIN(id) ASC') // ou created_at si tu veux l’ordre chronologique
-            //->orderBy(DB::raw('MIN(signatures.created_at)'))
+            ->orderBy(DB::raw('MIN(signatures.created_at)'))
             ->get();
 
-        // 4. Timeline globale : temps moyen par mois
+        // 5. Timeline globale : délai moyen par mois
         $timeline = Signature::select(
             DB::raw("DATE_FORMAT(signatures.created_at, '%Y-%m') as mois"),
             DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
@@ -783,11 +781,25 @@ class AGestionCreditController extends Controller
             ->orderBy('mois')
             ->get();
 
+        // 6. Intervalles entre signatures par acteur
+        $intervals = DB::select("
+        SELECT 
+            s1.signed_by as etape,
+            AVG(TIMESTAMPDIFF(DAY, s1.created_at, s2.created_at)) as interval_jours
+        FROM signatures s1
+        JOIN signatures s2 ON s1.credit_id = s2.credit_id 
+            AND s1.id < s2.id
+        GROUP BY s1.signed_by
+        ORDER BY MIN(s1.created_at)
+    ");
+
         return response()->json([
             'stats' => $stats,
+            'total_dossiers' => $totalDossiers,
             'signatures' => $signatures,
             'delaiSignatures' => $delaiSignatures,
             'timeline' => $timeline,
+            'intervals' => $intervals,
         ]);
     }
 
@@ -962,11 +974,13 @@ class AGestionCreditController extends Controller
 
     public function deleteSignature($id)
     {
+
         $signature = Signature::find($id);
         $signature->delete();
+
         return response()->json([
             'status' => 1,
-            'msg' => 'Image supprimée avec succès',
+            'msg' => 'Signature supprimée avec succès',
         ]);
     }
 
@@ -1097,8 +1111,9 @@ class AGestionCreditController extends Controller
 
     //CETTE FONCTION PERMET DE PROPOSER UN MONTANT
 
-    public function storeProposeMontant(Request $request){
-         $request->validate([
+    public function storeProposeMontant(Request $request)
+    {
+        $request->validate([
             'idDossier' => 'required|exists:credits,id_credit',
             'montantPropose' => 'required|numeric|min:0'
         ]);
@@ -1107,25 +1122,25 @@ class AGestionCreditController extends Controller
             'idUser' => Auth::id(),
             'idDossier' => $request->idDossier,
             'montant_propose' => $request->montantPropose,
-            'commentaire' =>$request->commentaire
+            'commentaire' => $request->commentaire
         ]);
-       
+
         //ENREGISTRE LE COMMENTAIRE DE SA PROPOSITION POUR QU'IL SOIT VISIBLE DANS LA CHAT
 
-            Commentaire::create([
-                'credit_id' => $request->idDossier,
-                'user_id' => auth()->id(),
-                'contenu' => $request->commentaire,
-            ]);
-        
+        Commentaire::create([
+            'credit_id' => $request->idDossier,
+            'user_id' => auth()->id(),
+            'contenu' => $request->commentaire,
+        ]);
+
 
         // Charger la relation user pour la réponse
         $proposition->load('user');
 
-        return response()->json(["status"=>1,"msg"=>"Votre proposition a bien été publiée."]);
+        return response()->json(["status" => 1, "msg" => "Votre proposition a bien été publiée."]);
     }
 
-     /**
+    /**
      * Récupérer la dernière proposition pour un dossier
      */
     public function getLastProposition($dossierId)
@@ -1142,12 +1157,12 @@ class AGestionCreditController extends Controller
     {
         try {
             $proposition = PropositionMontant::findOrFail($id);
-            
+
             // Vérifier que l'utilisateur est le propriétaire de la proposition
             if ($proposition->idUser !== Auth::id()) {
                 return response()->json([
                     'msg' => 'Vous n\'êtes pas autorisé à supprimer cette proposition',
-                    'status'=>0
+                    'status' => 0
                 ], 403);
             }
 
@@ -1155,10 +1170,9 @@ class AGestionCreditController extends Controller
 
             return response()->json([
                 'msg' => 'Proposition supprimée avec succès',
-                  'status'=>1,
+                'status' => 1,
                 'id' => $id
             ], 200);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'msg' => 'Erreur lors de la suppression',
@@ -1168,9 +1182,72 @@ class AGestionCreditController extends Controller
     }
 
 
-public function storeCreditChecklist(Request $request)
-{
-  try {
+
+    //PERMET DE RECUPERER LES PROPOSITION DES MONTANTS POUR LES AFFICHER A L'UTILISATEUR
+
+    public function getPropositions($id)
+    {
+        try {
+            // Récupérer les propositions avec le rôle directement depuis users
+            $propositions = DB::table('proposition_montants')
+                ->join("credits", "proposition_montants.idDossier", "credits.id_credit")
+                ->join("users", "proposition_montants.idUser", "users.id")
+                ->where('proposition_montants.idDossier', $id)
+                ->whereNotNull('proposition_montants.montant_propose')
+                ->select(
+                    'proposition_montants.*',
+                    'users.name as nom',
+                    'users.role',                    // ← Le rôle directement depuis users !
+                    'credits.monnaie as devise'
+                )
+                ->orderBy('proposition_montants.created_at', 'asc')
+                ->get();
+
+            // Statistiques des signatures (toujours depuis la table signatures)
+            $signatures = DB::table('signatures')
+                ->where('credit_id', $id)
+                ->select('signed_by', 'created_at')
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $ordreIntervenants = ['Commercial', 'Chef de département', 'Directrice financière', 'Directeur Général'];
+            $totalSignatures = $signatures->count();
+            $totalIntervenants = count($ordreIntervenants);
+            $pourcentageAvancement = $totalIntervenants > 0 ? ($totalSignatures / $totalIntervenants) * 100 : 0;
+
+            $rolesExistants = $signatures->pluck('signed_by')->toArray();
+            $prochaineSignature = null;
+            foreach ($ordreIntervenants as $role) {
+                if (!in_array($role, $rolesExistants)) {
+                    $prochaineSignature = $role;
+                    break;
+                }
+            }
+
+            return response()->json([
+                'status' => 1,
+                'data' => $propositions,
+                'signatures_stats' => [
+                    'total_signatures' => $totalSignatures,
+                    'total_intervenants' => $totalIntervenants,
+                    'pourcentage_avancement' => round($pourcentageAvancement, 1),
+                    'signataires' => $signatures,
+                    'reste_a_signer' => max(0, $totalIntervenants - $totalSignatures),
+                    'prochaine_signature' => $prochaineSignature
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'msg' => 'Erreur: ' . $e->getMessage(),
+                'data' => []
+            ]);
+        }
+    }
+
+    public function storeCreditChecklist(Request $request)
+    {
+        try {
             // Validation minimale
             $validated = $request->validate([
                 'nom_demandeur' => 'required|string|max:255',
@@ -1183,9 +1260,9 @@ public function storeCreditChecklist(Request $request)
             $data = $request->except(['signature']);
             // Ajouter l'ID de l'utilisateur authentifié
             $data['idUser'] = auth()->id();
-            
+
             // Fonction pour convertir en booléen
-            $toBoolean = function($value) {
+            $toBoolean = function ($value) {
                 if (is_bool($value)) return $value;
                 if (is_null($value)) return false;
                 if (is_string($value)) {
@@ -1197,17 +1274,31 @@ public function storeCreditChecklist(Request $request)
                 }
                 return (bool) $value;
             };
-            
+
             // Liste des champs checkbox
             $checkboxFields = [
-                'piece_identite', 'lettre_demande', 'formulaire_pret',
-                'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
-                'document_activite', 'bilan',
-                'decision_ctc', 'decision_cc',
-                'contrat_signe', 'garanties_constituees', 'rencontre_client',
-                'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'nantissement'
+                'piece_identite',
+                'lettre_demande',
+                'formulaire_pret',
+                'contrat_travail',
+                'fiche_paye',
+                'recommandation',
+                'caution_employeur',
+                'document_activite',
+                'bilan',
+                'decision_ctc',
+                'decision_cc',
+                'contrat_signe',
+                'garanties_constituees',
+                'rencontre_client',
+                'hypothèque',
+                'lettre_garantie',
+                'domiciliation_salaire',
+                'dat',
+                'aval',
+                'nantissement'
             ];
-            
+
             // Convertir les checkboxes en booléen
             foreach ($checkboxFields as $field) {
                 if (isset($data[$field])) {
@@ -1216,7 +1307,7 @@ public function storeCreditChecklist(Request $request)
                     $data[$field] = false;
                 }
             }
-            
+
             // Convertir les champs 'oui'/'non' en booléen pour la base de données
             $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
             foreach ($ouiNonFields as $field) {
@@ -1244,66 +1335,65 @@ public function storeCreditChecklist(Request $request)
                 'message' => 'Checklist enregistrée avec succès',
                 'data' => $checklist
             ], 201);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
                 'errors' => $e->errors()
             ], 422);
-            
         } catch (\Exception $e) {
             Log::error('Erreur: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'enregistrement',
                 'error' => $e->getMessage()
             ], 500);
         }
-    
-}
-
-
-//PERMET DE RECUPERER UN CHECK LISTE SPECIFIQUE
-
-public function getCreditChecklist($dossierId){
-   
-  try {
-      if($dossierId){
-        $data=CreditChecklist::where("idCredit",$dossierId)->first();
-         if($data){
-             return response()->json([
-                'status' => 1,
-                'data' => $data,
-            ], 200);
-         }else{
-             return response()->json([
-                'status' => 0,
-            ], 500);
-         }
-    }else{
-        return response()->json([
-                'status' => 0,
-            ], 500);
     }
-  } catch (\Throwable $th) {
-    throw $th;
-  }
+
+
+    //PERMET DE RECUPERER UN CHECK LISTE SPECIFIQUE
+
+    public function getCreditChecklist($dossierId)
+    {
+
+        try {
+            if ($dossierId) {
+                $data = CreditChecklist::where("idCredit", $dossierId)->first();
+                if ($data) {
+                    return response()->json([
+                        'status' => 1,
+                        'data' => $data,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => 0,
+                    ], 500);
+                }
+            } else {
+                return response()->json([
+                    'status' => 0,
+                ], 500);
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+
+    public function RapportCreditHomePage()
+    {
+        return view("gestion_credit.pages.rapport-credit");
+    }
+
+    public function getRapportCredit()
+    {
+        $data = Credits::all();
+
+        return response()->json([
+            'status' => 1,
+            'data' => $data
+        ], 200);
+    }
 }
-
-
-public function RapportCreditHomePage(){
-    return view("gestion_credit.pages.rapport-credit");
-}
-
-public function getRapportCredit(){
-    $data=Credits::all();
-
-     return response()->json([
-                'status' => 1,
-                'data'=>$data
-            ], 200);
-}
-}
-

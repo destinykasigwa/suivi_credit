@@ -8,7 +8,7 @@ import {
 } from "react-icons/md";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { Modal } from "bootstrap";
+// import { Modal } from "bootstrap";
 
 export default function CreditTimeline({ creditId}) {
     const [timeline, setTimeline] = useState([]);
@@ -50,23 +50,25 @@ export default function CreditTimeline({ creditId}) {
     };
 
     const deleteSignature = async (id) => {
-        const confirmation = await Swal.fire({
-            title: "Êtes-vous sûr ?",
-            text: "Vous êtes sur le point de supprimer cette signature. Cette action est irréversible.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Oui, supprimer",
-            cancelButtonText: "Annuler",
-            confirmButtonColor: "#dc3545",
-            cancelButtonColor: "#6c757d",
-        });
+      
+        let confirmation;
+               confirmation = await Swal.fire({
+                   title: "Êtes-vous sûr?",
+                   text: "Vous êtes sûr ? vous êtes sur le point de supprimer ce fichier voulez vous continuer ?",
+                   icon: "question",
+                   showCancelButton: true,
+                   confirmButtonText: "Oui",
+                   cancelButtonText: "Non",
+               });
 
+        
         if (confirmation.isConfirmed) {
             try {
                 const res = await axios.delete(
                     "/gestion_credit/pages/files/credit/timeline/signature/delete/" +
                         id,
                 );
+                
                 if (res.data.status == 1) {
                     getTimeLine();
                     Swal.fire({
@@ -95,6 +97,7 @@ export default function CreditTimeline({ creditId}) {
                 });
             }
         }
+
     };
 
     const getDelayText = (delay) => {

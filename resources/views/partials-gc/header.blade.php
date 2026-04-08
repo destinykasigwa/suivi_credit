@@ -162,14 +162,14 @@
             <span>Rapport</span>
           </a>
           <div class="dropdown-menu" aria-labelledby="dropdown04" style="border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-top: 4px;">
-            <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.credit-decaisse') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
+            {{-- <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.credit-decaisse') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
               <i class="fas fa-money-bill-wave" style="color: #20c997;"></i>
               <span>Crédits décaissés</span>
-            </a>
+            </a> --}}
 
              <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.rapport-credit') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
               <i class="fas fa-chart-line fa-3x opacity-75" style="color: #20c997; font-size:13px"></i>
-              <span>Autres rapport</span>
+              <span>Rapports dossiers</span>
             </a>
           </div>
         </li>

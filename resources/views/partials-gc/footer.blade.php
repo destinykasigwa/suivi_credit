@@ -42,7 +42,7 @@ $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"'
               <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-calendar" style="color: #20c997;"></i>
                 <span class="text-white">
-                  {{ isset($dateSaisie) ? date('d/m/Y', strtotime($dateSaisie->DateSystem)) : date('d/m/Y') }}
+                  {{ date('d/m/Y') }}
                 </span>
               </div>
               <div class="d-flex align-items-center gap-2">
