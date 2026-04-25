@@ -707,6 +707,10 @@ const MontageCreditA = () => {
                                                                     Crédit à
                                                                     l'habitat CT
                                                                 </option>
+                                                                <option value="Crédit à l'habitat MT ">
+                                                                    Crédit à
+                                                                    l'habitat MT
+                                                                </option>
                                                                 <option value="Crédits à la consommation à MT ">
                                                                     Crédits à la
                                                                     consommation

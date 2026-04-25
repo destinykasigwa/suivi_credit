@@ -390,7 +390,7 @@ const PropositionsHistory = ({ propositionId, NumDossier, onClose = null }) => {
                     </button>
 
                     {/* Bouton Impression */}
-                    <button
+                    {/* <button
                         onClick={handlePrint}
                         style={{
                             padding: "8px 20px",
@@ -410,7 +410,7 @@ const PropositionsHistory = ({ propositionId, NumDossier, onClose = null }) => {
                     >
                         <MdPrint size={16} />
                         Imprimer
-                    </button>
+                    </button> */}
 
                     {onClose && (
                         <button

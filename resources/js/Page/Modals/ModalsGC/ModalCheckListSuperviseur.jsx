@@ -151,7 +151,8 @@ export default function ModalCheckListSuperviseur({
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+         e.preventDefault();
         try {
             setIsLoadingBar(true);
             setProgress(0);
@@ -203,9 +204,9 @@ export default function ModalCheckListSuperviseur({
                     timer: 2000,
                 });
 
-                setTimeout(() => {
-                    onClose();
-                }, 2000);
+                // setTimeout(() => {
+                //     onClose();
+                // }, 2000);
             }, 500);
         } catch (error) {
             setIsLoadingBar(false);
@@ -990,6 +991,18 @@ export default function ModalCheckListSuperviseur({
                                                 />
                                                 <label className="form-check-label">
                                                     Nantissement
+                                                </label>
+                                            </div>
+                                             <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    name="salaire"
+                                                    checked={form.salaire}
+                                                    onChange={handleChange}
+                                                />
+                                                <label className="form-check-label">
+                                                    Salaire
                                                 </label>
                                             </div>
                                         </div>

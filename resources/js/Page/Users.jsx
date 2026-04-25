@@ -1208,7 +1208,7 @@ const customStyles = {
                   <button
                     className="btn btn-outline-teal w-100 mb-3"
                     onClick={getProfilForSelectedUser}
-                    style={{ borderRadius: "8px", borderColor: "teal", color: "#fff" }}
+                    style={{ borderRadius: "8px", borderColor: "teal", color: "#000" }}
                   >
                     <i className="fas fa-sync-alt me-2"></i>
                     Charger les profils

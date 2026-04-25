@@ -35,30 +35,30 @@ Route::middleware(['web'])->group(function () {
     Route::get('/auth/forget-password', [Authentication::class, 'recuperationHomePage']);
     Route::get('/auth/reset-password', [Authentication::class, 'resetHomePage']);
     Route::get('/gestion_credit/pages/utilisateurs', [UtilisateurController::class, 'getUsersHomePage'])->middleware('checkRole:isIT')->name('gestion_credit.pages.utilisateurs');
-    Route::get('/eco/pages/compte-param', [ComptesParamController::class, 'getComptesHomePage'])->name('eco.pages.compte-param');
-    Route::get('/eco/pages/adhesion-membre', [AdhesionController::class, 'getAdhesionHomePage'])->name('eco.pages.adhesion-membre');
-    Route::get('/eco/pages/depot-espece', [TransactionsController::class, 'getDepotEspeceHomePage'])->name('eco.pages.depot-espece');
-    Route::get('/eco/pages/visa', [TransactionsController::class, 'getVisaHomePage'])->name('eco.pages.visa');
-    Route::get('/eco/pages/retrait-espece', [TransactionsController::class, 'getRetraitHomePage'])->name('eco.pages.retrait-espece');
-    Route::get('/eco/pages/delestage', [TransactionsController::class, 'getDelestageHomePage'])->name('eco.pages.delestage');
+    Route::get('/eco/pages/compte-param', [ComptesParamController::class, 'getComptesHomePage'])->middleware('checkRole:isIT')->name('eco.pages.compte-param');
+    Route::get('/eco/pages/adhesion-membre', [AdhesionController::class, 'getAdhesionHomePage'])->middleware('checkRole:isIT')->name('eco.pages.adhesion-membre');
+    Route::get('/eco/pages/depot-espece', [TransactionsController::class, 'getDepotEspeceHomePage'])->middleware('checkRole:isIT')->name('eco.pages.depot-espece');
+    Route::get('/eco/pages/visa', [TransactionsController::class, 'getVisaHomePage'])->middleware('checkRole:isIT')->name('eco.pages.visa');
+    Route::get('/eco/pages/retrait-espece', [TransactionsController::class, 'getRetraitHomePage'])->middleware('checkRole:isIT')->name('eco.pages.retrait-espece');
+    Route::get('/eco/pages/delestage', [TransactionsController::class, 'getDelestageHomePage'])->middleware('checkRole:isIT')->name('eco.pages.delestage');
     Route::get('/eco/pages/appro', [TransactionsController::class, 'getApproHomePage'])->middleware('checkRole:isChefCaisse')->name('eco.pages.appro');
-    Route::get('/eco/pages/entreeT', [TransactionsController::class, 'getEntreeTHomePage'])->name('eco.pages.entreeT');
-    Route::get('/eco/pages/releve', [TransactionsController::class, 'getReleveHomePage'])->name('eco.pages.releve');
-    Route::get('/eco/pages/journal', [ReportsController::class, 'getJournalHomePage'])->name('eco.pages.journal');
-    Route::get('/eco/pages/suspens', [TransactionsController::class, 'getSuspensHomePage'])->name('eco.pages.suspens');
-    Route::get('/eco/pages/repertoire', [ReportsController::class, 'getRepertoireHomePage'])->name('eco.pages.repertoire');
-    Route::get('/eco/pages/debiter', [TransactionsController::class, 'getDebiterHomePage'])->name('eco.pages.debiter');
-    Route::get('/eco/pages/crediter', [TransactionsController::class, 'getCrediterHomePage'])->name('eco.pages.crediter');
-    Route::get('/eco/pages/montage-credit', [SuiviCreditController::class, 'getMontageCreditHomePage'])->name('eco.pages.montage-credit');
-    Route::get('/eco/pages/type-credit', [SuiviCreditController::class, 'getTypeCreditHomePage'])->name('eco.pages.type-credit');
-    Route::get('/eco/pages/credit/rapport-credit', [ReportsController::class, 'getEcheancierCreditHomePage'])->name('eco.pages.rapport-credit');
-    Route::get('/eco/pages/balance', [ReportsController::class, 'getBalanceHomePage'])->name('eco.pages.balance');
-    Route::get('/eco/pages/bilan', [ReportsController::class, 'getBilanHomePage'])->name('eco.pages.bilan');
-    Route::get('/eco/pages/tfr', [ReportsController::class, 'getTfrHomePage'])->name('eco.pages.tfr');
-    Route::get('/eco/pages/remboursement-attendu', [ReportsController::class, 'getRemboursementAttenduHomePage'])->name('eco.pages.remboursement-attendu');
-    Route::get('/eco/pages/sommaire-compte', [ReportsController::class, 'getSommaireCompteHomePage'])->name('eco.pages.sommaire-compte');
-    Route::get('/eco/pages/cloture', [PostageController::class, 'getClotureHomePage'])->name('eco.pages.cloture');
-    Route::get('/eco/pages/sms-banking', [SMSBankingController::class, 'getSMSBankingHomePage'])->name('eco.pages.sms-banking');
+    Route::get('/eco/pages/entreeT', [TransactionsController::class, 'getEntreeTHomePage'])->middleware('checkRole:isIT')->name('eco.pages.entreeT');
+    Route::get('/eco/pages/releve', [TransactionsController::class, 'getReleveHomePage'])->middleware('checkRole:isIT')->name('eco.pages.releve');
+    Route::get('/eco/pages/journal', [ReportsController::class, 'getJournalHomePage'])->middleware('checkRole:isIT')->name('eco.pages.journal');
+    Route::get('/eco/pages/suspens', [TransactionsController::class, 'getSuspensHomePage'])->middleware('checkRole:isIT')->name('eco.pages.suspens');
+    Route::get('/eco/pages/repertoire', [ReportsController::class, 'getRepertoireHomePage'])->middleware('checkRole:isIT')->name('eco.pages.repertoire');
+    Route::get('/eco/pages/debiter', [TransactionsController::class, 'getDebiterHomePage'])->middleware('checkRole:isIT')->name('eco.pages.debiter');
+    Route::get('/eco/pages/crediter', [TransactionsController::class, 'getCrediterHomePage'])->middleware('checkRole:isIT')->name('eco.pages.crediter');
+    Route::get('/eco/pages/montage-credit', [SuiviCreditController::class, 'getMontageCreditHomePage'])->middleware('checkRole:isIT')->name('eco.pages.montage-credit');
+    Route::get('/eco/pages/type-credit', [SuiviCreditController::class, 'getTypeCreditHomePage'])->middleware('checkRole:isIT')->name('eco.pages.type-credit');
+    Route::get('/eco/pages/credit/rapport-credit', [ReportsController::class, 'getEcheancierCreditHomePage'])->middleware('checkRole:isIT')->name('eco.pages.rapport-credit');
+    Route::get('/eco/pages/balance', [ReportsController::class, 'getBalanceHomePage'])->middleware('checkRole:isIT')->name('eco.pages.balance');
+    Route::get('/eco/pages/bilan', [ReportsController::class, 'getBilanHomePage'])->middleware('checkRole:isIT')->name('eco.pages.bilan');
+    Route::get('/eco/pages/tfr', [ReportsController::class, 'getTfrHomePage'])->middleware('checkRole:isIT')->name('eco.pages.tfr');
+    Route::get('/eco/pages/remboursement-attendu', [ReportsController::class, 'getRemboursementAttenduHomePage'])->middleware('checkRole:isIT')->name('eco.pages.remboursement-attendu');
+    Route::get('/eco/pages/sommaire-compte', [ReportsController::class, 'getSommaireCompteHomePage'])->middleware('checkRole:isIT')->name('eco.pages.sommaire-compte');
+    Route::get('/eco/pages/cloture', [PostageController::class, 'getClotureHomePage'])->middleware('checkRole:isIT')->name('eco.pages.cloture');
+    Route::get('/eco/pages/sms-banking', [SMSBankingController::class, 'getSMSBankingHomePage'])->middleware('checkRole:isIT')->name('eco.pages.sms-banking');
 
     //GET USER TO RESET PASSWORD
     Route::get('auth/eco/pages/get-user', [Authenticate::class, 'getUser']);
@@ -369,6 +369,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
         [ReportsController::class, 'getBilanCompte']
     );
 
+
     //PERMET D'AFFICHER LE TFR
     Route::post(
         "eco/pages/rapport/etat-financier/tfr",
@@ -593,6 +594,16 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
         [AGestionCreditController::class, 'getSearchedCredit']
     );
 
+      Route::post(
+        "montage_credit/page/validation/credit/reference/decaisse",
+        [AGestionCreditController::class, 'getSearchedCreditDecaisse']
+    );
+
+    Route::post(
+        "montage_credit/page/validation/credit/reference/attente",
+        [AGestionCreditController::class, 'getSearchedCreditAtente']
+    );
+
 
     Route::post(
         "gestion_credit/pages/dossier-credit/delete/{id}",
@@ -611,6 +622,11 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::get('/gestion_credit/pages/credit-decaisse', [AGestionCreditController::class, 'CreditDecaisseHomePage'])->name('gestion_credit.pages.credit-decaisse');
 
     Route::get('/montage-credit/rapport/credit/decaisse', [AGestionCreditController::class, 'getCreditDecaisse']);
+
+
+   Route::get('/gestion_credit/pages/credit-encours-decaisss', [AGestionCreditController::class, 'getCreditEncoursDecaisseHomePage'])->name('gestion_credit.pages.credit-encours-decaisss');
+
+    Route::get('/montage-credit/rapport/credit/encours-decaisse', [AGestionCreditController::class, 'getCreditEncoursDecaisse']);
 
 
 

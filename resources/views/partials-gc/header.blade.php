@@ -156,23 +156,71 @@
           </a>
         </li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="transition: all 0.2s ease;">
-            <i class="fas fa-chart-bar" style="font-size: 14px;"></i>
-            <span>Rapport</span>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="dropdown04" style="border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin-top: 4px;">
-            {{-- <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.credit-decaisse') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
-              <i class="fas fa-money-bill-wave" style="color: #20c997;"></i>
-              <span>Crédits décaissés</span>
-            </a> --}}
+       <li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-white" 
+     href="#" 
+     id="dropdown04" 
+     data-toggle="dropdown" 
+     aria-haspopup="true" 
+     aria-expanded="false"
+     style="transition: all 0.2s ease;">
+    
+    <i class="fas fa-chart-bar"></i>
+    <span>Rapport</span>
+  </a>
 
-             <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('gestion_credit.pages.rapport-credit') }}" style="padding: 10px 20px; transition: all 0.2s ease;">
-              <i class="fas fa-chart-line fa-3x opacity-75" style="color: #20c997; font-size:13px"></i>
-              <span>Rapports dossiers</span>
-            </a>
-          </div>
-        </li>
+  <div class="dropdown-menu" 
+       aria-labelledby="dropdown04" 
+       style="
+         background: #0d0d0d;
+         border: none;
+         border-radius: 12px;
+         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+         padding: 10px 0;
+         min-width: 260px;
+       ">
+
+    <!-- Crédit décaissé -->
+    <a class="dropdown-item text-white d-flex align-items-center gap-2 menu-item"
+       href="{{ route('gestion_credit.pages.credit-decaisse') }}">
+        <i class="fas fa-money-bill-wave text-success"></i>
+        <span>Crédits décaissés</span>
+    </a>
+
+    <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;">
+
+    <!-- Crédit encours -->
+    <a class="dropdown-item text-white d-flex align-items-center gap-2 menu-item"
+       href="{{ route('gestion_credit.pages.credit-encours-decaisss') }}">
+        <i class="fas fa-coins text-warning"></i>
+        <span>Crédits encours de décaissement</span>
+    </a>
+
+    <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;">
+
+    <!-- Autres rapports -->
+    <a class="dropdown-item text-white d-flex align-items-center gap-2 menu-item"
+       href="{{ route('gestion_credit.pages.rapport-credit') }}">
+        <i class="fas fa-chart-line text-info"></i>
+        <span>Autres rapports</span>
+    </a>
+
+  </div>
+</li>
+
+<style>
+.menu-item {
+  padding: 10px 20px;
+  transition: all 0.25s ease;
+  border-radius: 8px;
+  margin: 2px 8px;
+}
+
+.menu-item:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateX(4px);
+}
+</style>
       </ul>
 
       <!-- Optionnel: barre de recherche compacte -->

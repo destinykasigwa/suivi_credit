@@ -67,6 +67,7 @@ export default function ModalContratPret({ creditId, onClose }) {
         e.preventDefault();
         setIsLoadingBar(true);
         setProgress(0);
+        
         try {
             const formData = new FormData();
             formData.append("creditId", creditId);
@@ -704,115 +705,153 @@ export default function ModalContratPret({ creditId, onClose }) {
           </div>
 
           {/* Ajout d'images */}
-          <div className="col-md-5">
-             <div className="card-header bg-white border-0 pt-3">
-                <div className="d-flex justify-content-between align-items-center">
-                  <h6 className="fw-semibold mb-0">
-                    <i className="fas fa-images text-info me-2"></i>
-                    Ajouter des images
-                  </h6>
-                  <select
-                    className="form-select form-select-sm w-auto"
-                    name="type_image"
-                    value={type_image}
-                    onChange={(e) => settype_image(e.target.value)}
-                    style={{ borderRadius: "8px", borderColor: "#dee2e6" }}
-                  >
-                    <option value="">Type d'image</option>
-                    <option value="im">👥 Image membre</option>
-                    <option value="ia">📸 Image activité</option>
-                    <option value="it">📄 Image titre</option>
-                    <option value="ig">🔒 Image garantie</option>
-                  </select>
-                </div>
-              </div>
-            <div className="card border-0 shadow-sm rounded-3 h-100">
-             
-              <div className="card-body">
-                {/* Zone de drop stylisée */}
-                <div
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onClick={handleClick}
-                  className="border-2 border-dashed rounded-3 text-center p-4 mb-3"
-                  style={{
-                    borderColor: "#20c997",
-                    backgroundColor: "#f8f9fa",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#f0fdf4";
-                    e.currentTarget.style.borderColor = "#198764";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#f8f9fa";
-                    e.currentTarget.style.borderColor = "#20c997";
-                  }}
-                >
-                  <i className="fas fa-cloud-upload-alt fa-3x text-teal mb-2"></i>
-                  <p className="mb-1 fw-semibold">Glissez-déposez vos images ici</p>
-                  <small className="text-muted">ou cliquez pour sélectionner</small>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*,application/pdf"
-                    ref={fileInputRef}
-                    onChange={handleInputChange}
-                    className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-                    style={{ cursor: "pointer" }}
-                  />
-                </div>
+         <div className="col-md-5">
+  <div className="card border-0 shadow-sm rounded-3 h-100">
+    <div className="card-header bg-white border-0 pt-3">
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h6 className="fw-semibold mb-0">
+          <i className="fas fa-images text-info me-2"></i>
+          Ajouter des images
+        </h6>
+        <select
+          className="form-select form-select-sm"
+          name="type_image"
+          value={type_image}
+          onChange={(e) => settype_image(e.target.value)}
+          style={{ borderRadius: "8px", borderColor: "#dee2e6", width: "auto" }}
+          required
+        >
+          <option value="">Type d'image *</option>
+          <option value="im">👥 Image membre</option>
+          <option value="ia">📸 Image activité</option>
+          <option value="it">📄 Image titre</option>
+          <option value="ig">🔒 Image garantie</option>
+        </select>
+      </div>
+    </div>
 
-                {/* Prévisualisation */}
-                {images.length > 0 && (
-                  <>
-                    <div className="d-flex flex-wrap gap-2 mb-3">
-                      {images.map((file, index) => (
-                        <div key={index} className="position-relative" style={{ width: "80px" }}>
-                          {file.type.startsWith("image/") ? (
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt="preview"
-                              className="rounded-3"
-                              style={{ width: "80px", height: "80px", objectFit: "cover" }}
-                            />
-                          ) : (
-                            <div className="bg-danger rounded-3 d-flex flex-column align-items-center justify-content-center text-white"
-                                 style={{ width: "80px", height: "80px" }}>
-                              <i className="fas fa-file-pdf fa-2x"></i>
-                              <small>PDF</small>
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(index)}
-                            className="position-absolute top-0 end-0 btn btn-sm btn-danger rounded-circle p-0 m-1"
-                            style={{ width: "20px", height: "20px", fontSize: "12px" }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  
-                  </>
-                 
-                )}
-              </div>
-              
-                
-            </div>
-             <button
-                      onClick={handleSubmitAddFileImage}
-                      className="btn btn-success w-100 p-3 mb-5"
-                      style={{ borderRadius: "8px" }}
-                    >
-                      <i className="fas fa-save me-2"></i>
-                      Enregistrer ({images.length} fichier{images.length > 1 ? "s" : ""})
-                    </button>
-         
+    <div className="card-body">
+      {/* Zone de drop stylisée */}
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onClick={handleClick}
+        className="border-2 border-dashed rounded-3 text-center p-4 mb-3 transition-all"
+        style={{
+          borderColor: "#20c997",
+          backgroundColor: "#f8fafc",
+          cursor: "pointer",
+          transition: "all 0.2s ease-in-out",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#f0fdf4";
+          e.currentTarget.style.borderColor = "#0d9488";
+          e.currentTarget.style.transform = "scale(1.01)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "#f8fafc";
+          e.currentTarget.style.borderColor = "#20c997";
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        <i className="fas fa-cloud-upload-alt fa-3x mb-2" style={{ color: "#20c997" }}></i>
+        <p className="mb-1 fw-semibold">Glissez-déposez vos images ici</p>
+        <small className="text-muted">ou cliquez pour sélectionner (JPG, PNG)</small>
+        <input
+          type="file"
+          multiple
+          // accept="image/*,application/pdf"
+           accept="image/*"
+          ref={fileInputRef}
+          onChange={handleInputChange}
+          className="d-none"
+        />
+      </div>
+
+      {/* Prévisualisation améliorée */}
+      {images.length > 0 && (
+        <div className="mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <small className="text-muted">
+              <i className="fas fa-images me-1"></i> {images.length} fichier(s) sélectionné(s)
+            </small>
+            <button
+              type="button"
+              onClick={() => setImages([])}
+              className="btn btn-sm btn-link text-danger p-0"
+              style={{ fontSize: "12px" }}
+            >
+              <i className="fas fa-trash-alt me-1"></i> Tout supprimer
+            </button>
           </div>
+          <div className="d-flex flex-wrap gap-3">
+            {images.map((file, index) => (
+              <div
+                key={index}
+                className="position-relative shadow-sm rounded-3 overflow-hidden"
+                style={{ width: "90px", height: "90px" }}
+              >
+                {file.type.startsWith("image/") ? (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`preview-${index}`}
+                    className="w-100 h-100 object-fit-cover"
+                  />
+                ) : (
+                  <div className="w-100 h-100 bg-danger bg-opacity-10 d-flex flex-column align-items-center justify-content-center">
+                    <i className="fas fa-file-pdf fa-2x text-danger"></i>
+                    <small className="text-muted mt-1" style={{ fontSize: "10px" }}>PDF</small>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="position-absolute top-0 end-0 btn btn-sm btn-danger rounded-circle p-0 m-1"
+                  style={{ width: "22px", height: "22px", fontSize: "12px", lineHeight: "1" }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div className="card-footer bg-white border-0 pb-4 pt-0">
+      <button
+        onClick={handleSubmitAddFileImage}
+        disabled={isLoadingBar || images.length === 0 || !type_image}
+        className="btn w-100 py-3 fw-semibold rounded-3 d-flex align-items-center justify-content-center gap-2"
+        style={{
+          background: "linear-gradient(135deg, #20c997 0%, #0d9488 100%)",
+          border: "none",
+          color: "white",
+          transition: "all 0.2s",
+          opacity: isLoadingBar || images.length === 0 || !type_image ? 0.6 : 1,
+          cursor: isLoadingBar || images.length === 0 || !type_image ? "not-allowed" : "pointer",
+        }}
+      >
+        {isLoadingBar ? (
+          <>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Enregistrement en cours...
+          </>
+        ) : (
+          <>
+            <i className="fas fa-save"></i>
+            Enregistrer ({images.length} fichier{images.length > 1 ? "s" : ""})
+          </>
+        )}
+      </button>
+      {!type_image && images.length > 0 && (
+        <small className="text-danger d-block text-center mt-2">
+          <i className="fas fa-exclamation-circle me-1"></i> Veuillez sélectionner un type d’image
+        </small>
+      )}
+    </div>
+  </div>
+</div>
 
           {/* GPS */}
           <div className="col-md-3">

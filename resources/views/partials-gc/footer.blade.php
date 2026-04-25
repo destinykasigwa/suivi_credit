@@ -47,7 +47,7 @@ $userInfo = DB::select('SELECT * FROM users WHERE id="' . Auth::user()->id . '"'
               </div>
               <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-code" style="color: #20c997;"></i>
-                <span class="text-white">Destin KASIGWA</span>
+                <span class="text-white">AKIBA YETU</span>
               </div>
             </div>
           </div>

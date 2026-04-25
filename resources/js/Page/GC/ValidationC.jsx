@@ -586,7 +586,7 @@ const ValidationC = () => {
                                                                 "Encours" ? (
                                                                   <span className="badge-modern badge-encours">
                                                                       ✅ En
-                                                                      cours
+                                                                      étude 
                                                                   </span>
                                                               ) : (
                                                                   <span className="badge-modern badge-attente">
@@ -722,7 +722,7 @@ const ValidationC = () => {
                                                                 "Encours" ? (
                                                                   <span className="badge-modern badge-encours">
                                                                       ✅ En
-                                                                      cours
+                                                                      étude
                                                                   </span>
                                                               ) : (
                                                                   <span className="badge-modern badge-attente">
@@ -863,11 +863,11 @@ const ValidationC = () => {
                                                       ) : credit.statutDossier ===
                                                         "Encours" ? (
                                                           <span className="badge-modern badge-encours">
-                                                              ✅ En cours
+                                                              ✅ En étude
                                                           </span>
                                                       ) : (
                                                           <span className="badge-modern badge-attente">
-                                                              ⏳ En attente
+                                                              ⏳ En attente de decaissement
                                                           </span>
                                                       )}
                                                   </div>
@@ -976,11 +976,11 @@ const ValidationC = () => {
                                                       ) : res.statutDossier ===
                                                         "Encours" ? (
                                                           <span className="badge-modern badge-encours">
-                                                              ✅ En cours
+                                                              ✅ En étude
                                                           </span>
                                                       ) : (
                                                           <span className="badge-modern badge-attente">
-                                                              ⏳ En attente
+                                                              ⏳ En attente de decaissement
                                                           </span>
                                                       )}
                                                   </div>
@@ -1225,8 +1225,8 @@ const ValidationC = () => {
                                                     Actions du dossier
                                                 </h5>
                                                 <p className="mb-0 small opacity-75">
-                                                    #{currentCredit?.NumDossier} -{" "}
-                                                   {currentCredit?.NomCompte}
+                                                    #{currentCredit?.NumDossier}{" "}
+                                                    - {currentCredit?.NomCompte}
                                                 </p>
                                             </div>
                                         </div>
@@ -1290,20 +1290,37 @@ const ValidationC = () => {
                                                 <i className="fas fa-chevron-right action-arrow"></i>
                                             </button> */}
                                             <button
-    className="action-item"
-    onClick={() => {
-        setSelectedDossierIdTimeline(currentCredit?.id_credit);
-        setShowActionsOffcanvas(false); // ferme le offcanvas des actions
-    }}
->
-    <div className="action-icon" style={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}>
-        <MdTimeline size={20} />
-    </div>
-    <div className="action-content">
-        <h6 className="mb-0 fw-semibold">Historique des signatures</h6>
-        <small className="text-muted">Suivez l'évolution des signatures</small>
-    </div>
-</button>
+                                                className="action-item"
+                                                onClick={() => {
+                                                    setSelectedDossierIdTimeline(
+                                                        currentCredit?.id_credit,
+                                                    );
+                                                    setShowActionsOffcanvas(
+                                                        false,
+                                                    ); // ferme le offcanvas des actions
+                                                }}
+                                            >
+                                                <div
+                                                    className="action-icon"
+                                                    style={{
+                                                        backgroundColor:
+                                                            "#e8f5e9",
+                                                        color: "#2e7d32",
+                                                    }}
+                                                >
+                                                    <MdTimeline size={20} />
+                                                </div>
+                                                <div className="action-content">
+                                                    <h6 className="mb-0 fw-semibold">
+                                                        Historique des
+                                                        signatures
+                                                    </h6>
+                                                    <small className="text-muted">
+                                                        Suivez l'évolution des
+                                                        signatures
+                                                    </small>
+                                                </div>
+                                            </button>
 
                                             {/* ===== CONTRAT ===== */}
                                             <button
@@ -1342,8 +1359,8 @@ const ValidationC = () => {
                                                         Fichiers du prêt
                                                     </h6>
                                                     <small className="text-muted">
-                                                        Visualisez tous
-                                                        les fichiers
+                                                        Visualisez tous les
+                                                        fichiers
                                                     </small>
                                                 </div>
                                                 <i className="fas fa-chevron-right action-arrow"></i>
@@ -1354,9 +1371,10 @@ const ValidationC = () => {
                                                 className="action-item"
                                                 onClick={() => {
                                                     setSelectedDossierIdSuperv({
-        id: currentCredit?.id_credit,
-        numDossier: currentCredit?.NumDossier
-    });
+                                                        id: currentCredit?.id_credit,
+                                                        numDossier:
+                                                            currentCredit?.NumDossier,
+                                                    });
                                                     setShowActionsOffcanvas(
                                                         false,
                                                     );
@@ -1501,192 +1519,226 @@ const ValidationC = () => {
                 </div>
             </div>
 
+            <div
+                className={`offcanvas offcanvas-bottom ${selectedDossierIdTimeline ? "show" : ""}`}
+                tabIndex="-1"
+                style={{
+                    visibility: selectedDossierIdTimeline
+                        ? "visible"
+                        : "hidden",
+                    height: "100vh",
+                    backgroundColor: "white",
+                    borderTopLeftRadius: "0",
+                    borderTopRightRadius: "0",
+                    boxShadow: "0 -4px 12px rgba(0,0,0,0.2)",
+                    transition: "visibility 0.3s, transform 0.3s",
+                    transform: selectedDossierIdTimeline
+                        ? "translateY(0)"
+                        : "translateY(100%)",
+                    width: "100%",
+                    maxWidth: "100%",
+                    left: "0",
+                    right: "0",
+                }}
+            >
+                {/* Header moderne amélioré */}
+                <div
+                    className="offcanvas-header border-0"
+                    style={{
+                        background:
+                            "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                        borderRadius: 0,
+                        padding: "1.25rem 1.5rem",
+                        flexShrink: 0,
+                        margin: 0,
+                        position: "relative",
+                    }}
+                >
+                    {/* Indicateur de tirage pour fermer */}
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: "12px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            width: "40px",
+                            height: "4px",
+                            background: "rgba(255, 255, 255, 0.2)",
+                            borderRadius: "2px",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                        }}
+                        onClick={() => setSelectedDossierIdTimeline(null)}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background =
+                                "rgba(255, 255, 255, 0.4)";
+                            e.currentTarget.style.width = "50px";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background =
+                                "rgba(255, 255, 255, 0.2)";
+                            e.currentTarget.style.width = "40px";
+                        }}
+                    ></div>
 
+                    <div className="d-flex align-items-center justify-content-between w-100">
+                        <div className="d-flex align-items-center gap-3">
+                            <div
+                                style={{
+                                    width: "48px",
+                                    height: "48px",
+                                    background:
+                                        "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%)",
+                                    borderRadius: "16px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backdropFilter: "blur(10px)",
+                                    border: "1px solid rgba(16, 185, 129, 0.2)",
+                                }}
+                            >
+                                <MdTimeline size={24} color="#10b981" />
+                            </div>
+                            <div>
+                                <h4
+                                    className="fw-bold mb-1"
+                                    style={{
+                                        background:
+                                            "linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)",
+                                        WebkitBackgroundClip: "text",
+                                        WebkitTextFillColor: "transparent",
+                                        backgroundClip: "text",
+                                        letterSpacing: "-0.3px",
+                                        margin: 0,
+                                        fontSize: "1.35rem",
+                                    }}
+                                >
+                                    Historique des signatures
+                                </h4>
+                                <p
+                                    className="mb-0"
+                                    style={{
+                                        fontSize: "0.8rem",
+                                        color: "rgba(255, 255, 255, 0.7)",
+                                        fontWeight: "400",
+                                    }}
+                                >
+                                    Suivi chronologique des signatures du
+                                    dossier
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedDossierIdTimeline(null)}
+                            style={{
+                                width: "36px",
+                                height: "36px",
+                                borderRadius: "12px",
+                                background: "rgba(255, 255, 255, 0.1)",
+                                border: "none",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                                backdropFilter: "blur(10px)",
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background =
+                                    "rgba(255, 255, 255, 0.2)";
+                                e.currentTarget.style.transform =
+                                    "scale(1.05) rotate(90deg)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background =
+                                    "rgba(255, 255, 255, 0.1)";
+                                e.currentTarget.style.transform =
+                                    "scale(1) rotate(0deg)";
+                            }}
+                        >
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="white"
+                                strokeWidth="2.5"
+                            >
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
+                <div className="offcanvas-body overflow-auto p-0">
+                    {selectedDossierIdTimeline && (
+                        <CreditTimeline creditId={selectedDossierIdTimeline} />
+                    )}
+                </div>
 
-
-
-
-
-
-   <div
-  className={`offcanvas offcanvas-bottom ${selectedDossierIdTimeline ? "show" : ""}`}
-  tabIndex="-1"
-  style={{
-    visibility: selectedDossierIdTimeline ? "visible" : "hidden",
-    height: "100vh",
-    backgroundColor: "white",
-    borderTopLeftRadius: "0",
-    borderTopRightRadius: "0",
-    boxShadow: "0 -4px 12px rgba(0,0,0,0.2)",
-    transition: "visibility 0.3s, transform 0.3s",
-    transform: selectedDossierIdTimeline ? "translateY(0)" : "translateY(100%)",
-    width: "100%",
-    maxWidth: "100%",
-    left: "0",
-    right: "0",
-  }}
->
-  {/* Header moderne amélioré */}
-  <div 
-    className="offcanvas-header border-0"  
-    style={{
-      background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-      borderRadius: 0,
-      padding: "1.25rem 1.5rem",
-      flexShrink: 0,
-      margin: 0,
-      position: "relative",
-    }}
-  >
-    {/* Indicateur de tirage pour fermer */}
-    <div
-      style={{
-        position: "absolute",
-        top: "12px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "40px",
-        height: "4px",
-        background: "rgba(255, 255, 255, 0.2)",
-        borderRadius: "2px",
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-      }}
-      onClick={() => setSelectedDossierIdTimeline(null)}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = "rgba(255, 255, 255, 0.4)";
-        e.currentTarget.style.width = "50px";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
-        e.currentTarget.style.width = "40px";
-      }}
-    ></div>
-
-    <div className="d-flex align-items-center justify-content-between w-100">
-      <div className="d-flex align-items-center gap-3">
-        <div
-          style={{
-            width: "48px",
-            height: "48px",
-            background: "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%)",
-            borderRadius: "16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(16, 185, 129, 0.2)",
-          }}
-        >
-          <MdTimeline size={24} color="#10b981" />
-        </div>
-        <div>
-          <h4
-            className="fw-bold mb-1"
-            style={{
-              background: "linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              letterSpacing: "-0.3px",
-              margin: 0,
-              fontSize: "1.35rem",
-            }}
-          >
-            Historique des signatures
-          </h4>
-          <p
-            className="mb-0"
-            style={{
-              fontSize: "0.8rem",
-              color: "rgba(255, 255, 255, 0.7)",
-              fontWeight: "400",
-            }}
-          >
-            Suivi chronologique des signatures du dossier
-          </p>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={() => setSelectedDossierIdTimeline(null)}
-        style={{
-          width: "36px",
-          height: "36px",
-          borderRadius: "12px",
-          background: "rgba(255, 255, 255, 0.1)",
-          border: "none",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          backdropFilter: "blur(10px)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
-          e.currentTarget.style.transform = "scale(1.05) rotate(90deg)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-          e.currentTarget.style.transform = "scale(1) rotate(0deg)";
-        }}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <div className="offcanvas-body overflow-auto p-0">
-    {selectedDossierIdTimeline && (
-      <CreditTimeline
-        creditId={selectedDossierIdTimeline}
-      />
-    )}
-  </div>
-
-  {/* Footer avec bouton modernisé */}
-  <div className="offcanvas-footer p-3 pt-0" style={{ background: "#ffffff", borderTop: "1px solid #eef2ff" }}>
-    <button 
-      className="btn w-100" 
-      onClick={() => setSelectedDossierIdTimeline(null)}
-      style={{
-        background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-        border: "1px solid #e2e8f0",
-        padding: "12px",
-        borderRadius: "14px",
-        color: "#475569",
-        fontWeight: "600",
-        fontSize: "0.9rem",
-        transition: "all 0.2s ease",
-        letterSpacing: "-0.2px",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)";
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.05)";
-        e.currentTarget.style.borderColor = "#cbd5e1";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)";
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "none";
-        e.currentTarget.style.borderColor = "#e2e8f0";
-      }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: "inline", marginRight: "8px", verticalAlign: "middle" }}>
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-      Fermer
-    </button>
-  </div>
-</div>
+                {/* Footer avec bouton modernisé */}
+                <div
+                    className="offcanvas-footer p-3 pt-0"
+                    style={{
+                        background: "#ffffff",
+                        borderTop: "1px solid #eef2ff",
+                    }}
+                >
+                    <button
+                        className="btn w-100"
+                        onClick={() => setSelectedDossierIdTimeline(null)}
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+                            border: "1px solid #e2e8f0",
+                            padding: "12px",
+                            borderRadius: "14px",
+                            color: "#475569",
+                            fontWeight: "600",
+                            fontSize: "0.9rem",
+                            transition: "all 0.2s ease",
+                            letterSpacing: "-0.2px",
+                            cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background =
+                                "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)";
+                            e.currentTarget.style.transform =
+                                "translateY(-2px)";
+                            e.currentTarget.style.boxShadow =
+                                "0 4px 12px rgba(0, 0, 0, 0.05)";
+                            e.currentTarget.style.borderColor = "#cbd5e1";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background =
+                                "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)";
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.boxShadow = "none";
+                            e.currentTarget.style.borderColor = "#e2e8f0";
+                        }}
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            style={{
+                                display: "inline",
+                                marginRight: "8px",
+                                verticalAlign: "middle",
+                            }}
+                        >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Fermer
+                    </button>
+                </div>
+            </div>
 
             {/* Modales */}
 
@@ -1703,10 +1755,10 @@ const ValidationC = () => {
             {/* Modal Check Liste Superviseur */}
             {selectedDossierIdSuperv && (
                 <ModalCheckListSuperviseur
-        dossierId={selectedDossierIdSuperv.id}
-        NumDossier={selectedDossierIdSuperv.numDossier}
-        onClose={() => setSelectedDossierIdSuperv(null)}
-    />
+                    dossierId={selectedDossierIdSuperv.id}
+                    NumDossier={selectedDossierIdSuperv.numDossier}
+                    onClose={() => setSelectedDossierIdSuperv(null)}
+                />
             )}
 
             {/* Modal Visualisation Titre */}

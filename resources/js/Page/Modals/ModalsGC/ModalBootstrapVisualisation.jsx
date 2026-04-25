@@ -428,11 +428,23 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
     return (
         <>
+        {/* <style>
+            {`
+            .modal.full-height .modal-dialog {
+    margin-bottom: 5 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    align-items: stretch !important;
+}
+            `}
+        </style> */}
             <div
-                className="modal fade"
+                 className="modal fade full-height"
                 tabIndex="-1"
                 aria-hidden="true"
                 id="modalVisualisationDossier"
+                style={{ height: "100vh !important"}}
             >
                 <div className="modal-dialog modal-xl modal-full-height">
                     <div className="modal-content border-0 shadow-lg rounded-3">
@@ -495,6 +507,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                         <option value="Décaissé">
                                                             Décaissé
                                                         </option>
+                                                        <option value="Encours de Décaissement">Encours de Décaissement</option>
                                                     </select>
                                                 ) : (
                                                     <select
@@ -529,6 +542,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                         <option value="Décaissé">
                                                             Décaissé
                                                         </option>
+                                                        <option value="Encours de Décaissement">Encours de Décaissement</option>
+
                                                     </select>
                                                 )}
                                             </div>
@@ -3239,6 +3254,8 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             )} */}
         </>
     );
+
+
 }
 
 const CommentaireItem = ({

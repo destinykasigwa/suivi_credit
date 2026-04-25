@@ -71,14 +71,21 @@ export default function Dashboard() {
         ? ((stats.credits_encours / totalDossiers) * 100).toFixed(1)
         : 0;
 
+           const tauxEncoursD = stats?.credits_encours_decaissement && totalDossiers
+        ? ((stats.credits_encours_decaissement / totalDossiers) * 100).toFixed(1)
+        : 0;
+
+        
+
     // Données pour le graphique circulaire
     const pieData = [
         { name: "En cours", value: stats?.credits_encours || 0, color: "#20c997", taux: tauxEncours },
         { name: "Décaissés", value: stats?.credits_decaisse || 0, color: "#28a745", taux: tauxConversion },
         { name: "Rejetés", value: stats?.credits_rejetes || 0, color: "#dc3545", taux: tauxRejet },
+        { name: "En ettente décaiss.", value: stats?.credits_encours_decaissement || 0, color: "#29ae", taux: tauxEncoursD },
     ];
 
-    const COLORS = ["#20c997", "#28a745", "#dc3545"];
+    const COLORS = ["#20c997", "#28a745", "#dc3545","#29ae"];
 
     // Statistiques sur les intervalles entre signatures
     const avgInterval = intervalData.length > 0
@@ -111,147 +118,146 @@ export default function Dashboard() {
                         <i className="fas fa-sync-alt me-1"></i>
                         Actualiser
                     </button>
-                    <button 
+                    {/* <button 
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => window.print()}
                         style={{ borderRadius: "10px" }}
                     >
                         <i className="fas fa-print me-1"></i>
                         Exporter
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
             {/* KPI Cards */}
-            <div className="row g-4 mb-5">
-                {/* Total dossiers - TOUS STATUTS CONFONDUS */}
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm rounded-3 h-100">
-                        <div className="card-body p-4">
-                            <div className="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div className="d-flex align-items-center gap-2 mb-2">
-                                        <div style={{ width: "35px", height: "35px", backgroundColor: "rgba(108, 117, 125, 0.1)", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                            <i className="fas fa-folder-open" style={{ color: "#6c757d", fontSize: "18px" }}></i>
-                                        </div>
-                                        <span className="text-muted small fw-semibold">TOTAL DOSSIERS</span>
-                                    </div>
-                                    <h3 className="fw-bold mb-0" style={{ fontSize: "2.2rem", color: "#2c3e50" }}>
-                                        {totalDossiers}
-                                    </h3>
-                                    <p className="text-muted small mb-0">Tous statuts confondus</p>
+            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    </div>
+
+    {/* Ligne des KPI Cards - 5 cartes alignées avec flex */}
+    <div className="d-flex flex-wrap gap-4 mb-5" style={{ rowGap: "1.5rem" }}>
+        {/* Total dossiers */}
+        <div className="flex-grow-1" style={{ flex: "1 1 180px", minWidth: "180px" }}>
+            <div className="card border-0 shadow-sm rounded-3 h-100">
+                <div className="card-body p-4">
+                    <div className="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div className="d-flex align-items-center gap-2 mb-2">
+                                <div style={{ width: "35px", height: "35px", backgroundColor: "rgba(108,117,125,0.1)", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <i className="fas fa-folder-open" style={{ color: "#6c757d", fontSize: "18px" }}></i>
                                 </div>
-                                <div className="text-end">
-                                    <i className="fas fa-chart-simple text-muted opacity-50 fa-lg"></i>
+                                <span className="text-muted small fw-semibold">TOTAL DOSSIERS</span>
+                            </div>
+                            <h3 className="fw-bold mb-0" style={{ fontSize: "2rem", color: "#2c3e50" }}>{totalDossiers}</h3>
+                            <p className="text-muted small mb-0">Tous statuts confondus</p>
+                        </div>
+                        <div className="text-end">
+                            <i className="fas fa-chart-simple text-muted opacity-50 fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Crédits en cours */}
+        <div className="flex-grow-1" style={{ flex: "1 1 180px", minWidth: "180px" }}>
+            <a href="/gestion_credit/pages/validation-credit" className="text-decoration-none">
+                <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}>
+                    <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #20c997 0%, #198764 100%)" }}>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                    <i className="fas fa-clock fa-2x text-white opacity-75"></i>
+                                    <span className="badge bg-white text-teal rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>En étude</span>
                                 </div>
+                                <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>{stats?.credits_encours || 0}</h3>
+                                <p className="text-white-50 mb-0 small">{tauxEncours}% du total</p>
+                            </div>
+                            <div className="text-end">
+                                <i className="fas fa-arrow-right text-white opacity-50 fa-lg"></i>
                             </div>
                         </div>
                     </div>
                 </div>
+            </a>
+        </div>
 
-                {/* Crédits en cours */}
-                <div className="col-md-3">
-                    <a href="/gestion_credit/pages/validation-credit" className="text-decoration-none">
-                        <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = "translateY(-5px)";
-                                e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = "translateY(0)";
-                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
-                            }}>
-                            <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #20c997 0%, #198764 100%)" }}>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div className="d-flex align-items-center gap-2 mb-2">
-                                            <i className="fas fa-clock fa-2x text-white opacity-75"></i>
-                                            <span className="badge bg-white text-teal rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                                                En cours
-                                            </span>
-                                        </div>
-                                        <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>
-                                            {stats?.credits_encours || 0}
-                                        </h3>
-                                        <p className="text-white-50 mb-0 small">{tauxEncours}% du total</p>
-                                    </div>
-                                    <div className="text-end">
-                                        <i className="fas fa-arrow-right text-white opacity-50 fa-lg"></i>
-                                    </div>
+        {/* Crédits décaissés */}
+        <div className="flex-grow-1" style={{ flex: "1 1 180px", minWidth: "180px" }}>
+            <a href="/gestion_credit/pages/credit-decaisse" className="text-decoration-none">
+                <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}>
+                    <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #28a745 0%, #1e7e34 100%)" }}>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                    <i className="fas fa-check-circle fa-2x text-white opacity-75"></i>
+                                    <span className="badge bg-white text-success rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>Décaissés</span>
                                 </div>
+                                <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>{stats?.credits_decaisse || 0}</h3>
+                                <p className="text-white-50 mb-0 small">{tauxConversion}% du total</p>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
+            </a>
+        </div>
 
-                {/* Crédits décaissés */}
-                <div className="col-md-3">
-                    <a href="/gestion_credit/pages/credit-decaisse" className="text-decoration-none">
-                        <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = "translateY(-5px)";
-                                e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = "translateY(0)";
-                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
-                            }}>
-                            <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #28a745 0%, #1e7e34 100%)" }}>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div className="d-flex align-items-center gap-2 mb-2">
-                                            <i className="fas fa-check-circle fa-2x text-white opacity-75"></i>
-                                            <span className="badge bg-white text-success rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                                                Décaissés
-                                            </span>
-                                        </div>
-                                        <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>
-                                            {stats?.credits_decaisse || 0}
-                                        </h3>
-                                        <p className="text-white-50 mb-0 small">{tauxConversion}% du total</p>
-                                    </div>
+        {/* Crédits rejetés */}
+        <div className="flex-grow-1" style={{ flex: "1 1 180px", minWidth: "180px" }}>
+            <a href="/gestion_credit/pages/validation-credit" className="text-decoration-none">
+                <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}>
+                    <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #dc3545 0%, #b02a37 100%)" }}>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                    <i className="fas fa-times-circle fa-2x text-white opacity-75"></i>
+                                    <span className="badge bg-white text-danger rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>Rejetés</span>
                                 </div>
+                                <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>{stats?.credits_rejetes || 0}</h3>
+                                <p className="text-white-50 mb-0 small">{tauxRejet}% du total</p>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
+            </a>
+        </div>
 
-                {/* Crédits rejetés */}
-                <div className="col-md-3">
-                    <a href="/gestion_credit/pages/validation-credit" className="text-decoration-none">
-                        <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = "translateY(-5px)";
-                                e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = "translateY(0)";
-                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
-                            }}>
-                            <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #dc3545 0%, #b02a37 100%)" }}>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div className="d-flex align-items-center gap-2 mb-2">
-                                            <i className="fas fa-times-circle fa-2x text-white opacity-75"></i>
-                                            <span className="badge bg-white text-danger rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                                                Rejetés
-                                            </span>
-                                        </div>
-                                        <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>
-                                            {stats?.credits_rejetes || 0}
-                                        </h3>
-                                        <p className="text-white-50 mb-0 small">{tauxRejet}% du total</p>
-                                    </div>
+        {/* NOUVELLE CARTE : Crédit encours de décaissement */}
+        <div className="flex-grow-1" style={{ flex: "1 1 180px", minWidth: "180px" }}>
+            <a href="/gestion_credit/pages/credit-encours-decaisss" className="text-decoration-none">
+                <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden" style={{ transition: "all 0.3s ease", cursor: "pointer" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}>
+                    <div className="card-body p-4" style={{ background: "linear-gradient(135deg, #fd7e14 0%, #e8590c 100%)" }}> {/* Dégradé orange */}
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                    <i className="fas fa-hand-holding-usd fa-2x text-white opacity-75"></i>
+                                    <span className="badge bg-white text-orange rounded-pill px-3 py-1" style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "#fd7e14" }}>En entente de décaissement</span>
                                 </div>
+                                <h3 className="text-white fw-bold mb-0" style={{ fontSize: "2rem" }}>{stats?.credits_encours_decaissement || 0}</h3>
+                                {/* <p className="text-white-50 mb-0 small">Dossiers en attente de décaissement</p> */}
+                                <p className="text-white-50 mb-0 small">{tauxEncoursD}% du total</p>
+                            </div>
+                            <div className="text-end">
+                                <i className="fas fa-arrow-right text-white opacity-50 fa-lg"></i>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
-            </div>
+            </a>
+        </div>
+    </div>
+
 
             {/* Ligne de métriques supplémentaires */}
             <div className="row g-4 mb-5">
-                <div className="col-md-4">
+                <div className="col-md-3">
                     <div className="card border-0 shadow-sm rounded-3">
                         <div className="card-body p-3 text-center">
                             <i className="fas fa-percent" style={{ color: "#20c997", fontSize: "24px" }}></i>
@@ -260,7 +266,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                     <div className="card border-0 shadow-sm rounded-3">
                         <div className="card-body p-3 text-center">
                             <i className="fas fa-chart-line" style={{ color: "#ffc107", fontSize: "24px" }}></i>
@@ -269,12 +275,22 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                     <div className="card border-0 shadow-sm rounded-3">
                         <div className="card-body p-3 text-center">
                             <i className="fas fa-chart-line" style={{ color: "#dc3545", fontSize: "24px" }}></i>
                             <h5 className="fw-bold mt-2 mb-0">{tauxRejet}%</h5>
                             <small className="text-muted">Taux de rejet (Rejetés/Total)</small>
+                        </div>
+                    </div>
+                </div>
+
+                     <div className="col-md-3">
+                    <div className="card border-0 shadow-sm rounded-3">
+                        <div className="card-body p-3 text-center">
+                            <i className="fas fa-chart-line" style={{ color: "#dc3545", fontSize: "24px" }}></i>
+                            <h5 className="fw-bold mt-2 mb-0">{tauxEncoursD}%</h5>
+                            <small className="text-muted">Taux en entente de décaissement </small>
                         </div>
                     </div>
                 </div>
@@ -381,7 +397,7 @@ export default function Dashboard() {
             </div>
 
             {/* Timeline - Évolution des délais */}
-            <div className="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+            {/* <div className="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
                 <div className="card-header bg-white border-0 pt-4 pb-0">
                     <div className="d-flex align-items-center gap-2">
                         <div style={{ width: "40px", height: "40px", backgroundColor: "rgba(32, 201, 151, 0.1)", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -404,10 +420,10 @@ export default function Dashboard() {
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
-            </div>
+            </div> */}
 
             {/* Intervalles entre signatures */}
-            {intervalData.length > 0 && (
+            {/* {intervalData.length > 0 && (
                 <div className="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
                     <div className="card-header bg-white border-0 pt-4 pb-0">
                         <div className="d-flex align-items-center gap-2">
@@ -434,7 +450,7 @@ export default function Dashboard() {
                         </ResponsiveContainer>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Footer */}
             <div className="row g-4 mt-2">

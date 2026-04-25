@@ -12,7 +12,7 @@ import TruncatedName from "./TruncatedName";
 import ModalCheckListSuperviseur from "../Modals/ModalsGC/ModalCheckListSuperviseur";
 import ModalTitreCredit from "../Modals/ModalsGC/ModalTitreCredit";
 
-const CreditDecaisse = () => {
+const EncoursDecaissement = () => {
     const inputRef = useRef(null);
     const [loading, setloading] = useState(false);
     const [fetchData, setFetchData] = useState([]);
@@ -51,7 +51,7 @@ const CreditDecaisse = () => {
 
     const getDataCredit = async () => {
         try {
-            const res = await axios.get("montage-credit/rapport/credit/decaisse");
+            const res = await axios.get("montage-credit/rapport/credit/encours-decaisse");
 
             if (Array.isArray(res.data.data) && res.data.data.length > 0) {
                 setFetchData(res.data.data);
@@ -80,7 +80,7 @@ const CreditDecaisse = () => {
         setloading(true);
         try {
             const res = await axios.post(
-                "/montage_credit/page/validation/credit/reference/decaisse",
+                "/montage_credit/page/validation/credit/reference/attente",
                 {
                     ref,
                     type_recherche,
@@ -298,11 +298,11 @@ const CreditDecaisse = () => {
                                 <div>
                                     <h5 className="fw-bold mb-1 text-white d-flex align-items-center gap-2">
                                         <i className="fas fa-gem fs-5"></i>
-                                        Crédits Décaissés
+                                        Crédits En ettente de Décaissement
                                     </h5>
                                     <small className="text-white-50">
                                         <i className="fas fa-hourglass-half me-1"></i>
-                                        Liste des crédits décaissés
+                                        Liste des crédits en entente de decaissement
                                     </small>
                                 </div>
                                 <div className="bg-white bg-opacity-15 rounded-4 px-3 py-2">
@@ -588,7 +588,7 @@ const CreditDecaisse = () => {
                                                                   </span>
                                                               ) : (
                                                                   <span className="badge-modern badge-attente">
-                                                                      ✅ Décaissé
+                                                                      ⏳ En attente de décaissement
                                                                   </span>
                                                               )}
                                                           </td>
@@ -723,7 +723,8 @@ const CreditDecaisse = () => {
                                                                   </span>
                                                               ) : (
                                                                   <span className="badge-modern badge-attente">
-                                                                      ✅ Décaissé
+                                                                      ⏳ En
+                                                                      attente
                                                                   </span>
                                                               )}
                                                           </td>
@@ -863,7 +864,7 @@ const CreditDecaisse = () => {
                                                           </span>
                                                       ) : (
                                                           <span className="badge-modern badge-attente">
-                                                              ✅ Décaissé
+                                                              ⏳  En attente de décaissement
                                                           </span>
                                                       )}
                                                   </div>
@@ -976,7 +977,7 @@ const CreditDecaisse = () => {
                                                           </span>
                                                       ) : (
                                                           <span className="badge-modern badge-attente">
-                                                              ✅ Décaissé
+                                                              ⏳  En attente de décaissement
                                                           </span>
                                                       )}
                                                   </div>
@@ -2269,4 +2270,4 @@ const CreditDecaisse = () => {
     );
 };
 
-export default CreditDecaisse;
+export default EncoursDecaissement;

@@ -55,6 +55,7 @@ import ValidationC from "./Page/GC/ValidationC";
 import CreditDecaisse from "./Page/GC/CreditDecaisse";
 import Dashboard from "./Page/GC/DashBoard";
 import RapportCredits from "./Page/GC/Reports/RapportCredits";
+import EncoursDecaissement from "./Page/GC/EncoursDecaissement";
 
 if (document.getElementById("app")) {
     ReactDOM.createRoot(document.getElementById("app")).render(
@@ -339,6 +340,15 @@ if (document.getElementById("rapportCredit")) {
     ReactDOM.createRoot(document.getElementById("rapportCredit")).render(
         <BrowserRouter>
             <RapportCredits />
+        </BrowserRouter>
+    );
+}
+
+
+if (document.getElementById("creditEncoursDecaiss")) {
+    ReactDOM.createRoot(document.getElementById("creditEncoursDecaiss")).render(
+        <BrowserRouter>
+            <EncoursDecaissement />
         </BrowserRouter>
     );
 }

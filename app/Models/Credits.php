@@ -20,6 +20,7 @@ class Credits extends Model
         'recouvreur',
         'montant_demande',
         'date_demande',
+        'date_octroie',
         'frequence_mensualite',
         'nombre_echeance',
         'NumDossier',

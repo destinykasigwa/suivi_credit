@@ -664,7 +664,7 @@ const PropositionMontant = ({
                     </div>
                     <small className="text-muted d-block mt-2" style={{ fontSize: "11px" }}>
                         <i className="fas fa-info-circle me-1"></i>
-                        Saisissez le montant en Francs Congolais
+                        Saisissez le montant 
                     </small>
                 </div>
 
