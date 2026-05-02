@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
 use App\Models\{Commentaire, CreditChecklist, Credits, CreditsImages, PropositionMontant, Signature};
 use App\Services\SendNotification;
 
@@ -1407,114 +1407,385 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
         }
     }
 
-    public function storeCreditChecklist(Request $request)
-    {
-        try {
-            // Validation minimale
-            $validated = $request->validate([
-                'nom_demandeur' => 'required|string|max:255',
-                'numero_dossier' => 'required|string|max:100',
-                'montant' => 'nullable|numeric',
-                'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            ]);
+    // public function storeCreditChecklist(Request $request)
+    // {
+    //     try {
+    //         // Validation minimale
+    //         $validated = $request->validate([
+    //             'nom_demandeur' => 'required|string|max:255',
+    //             'numero_dossier' => 'required|string|max:100',
+    //             'montant' => 'nullable|numeric',
+    //             'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+    //         ]);
 
-            // Récupérer toutes les données
-            $data = $request->except(['signature']);
-            // Ajouter l'ID de l'utilisateur authentifié
-            $data['idUser'] = auth()->id();
+    //         // Récupérer toutes les données
+    //         $data = $request->except(['signature']);
+    //         // Ajouter l'ID de l'utilisateur authentifié
+    //         $data['idUser'] = auth()->id();
 
-            // Fonction pour convertir en booléen
-            $toBoolean = function ($value) {
-                if (is_bool($value)) return $value;
-                if (is_null($value)) return false;
-                if (is_string($value)) {
-                    $value = strtolower(trim($value));
-                    // Convertir 'oui'/'non' en booléen
-                    if ($value === 'oui') return true;
-                    if ($value === 'non') return false;
-                    return in_array($value, ['true', 'on', '1', 'yes']);
+    //         // Fonction pour convertir en booléen
+    //         $toBoolean = function ($value) {
+    //             if (is_bool($value)) return $value;
+    //             if (is_null($value)) return false;
+    //             if (is_string($value)) {
+    //                 $value = strtolower(trim($value));
+    //                 // Convertir 'oui'/'non' en booléen
+    //                 if ($value === 'oui') return true;
+    //                 if ($value === 'non') return false;
+    //                 return in_array($value, ['true', 'on', '1', 'yes']);
+    //             }
+    //             return (bool) $value;
+    //         };
+
+    //         // Liste des champs checkbox
+    //         $checkboxFields = [
+    //             'piece_identite',
+    //             'lettre_demande',
+    //             'formulaire_pret',
+    //             'contrat_travail',
+    //             'fiche_paye',
+    //             'recommandation',
+    //             'caution_employeur',
+    //             'document_activite',
+    //             'bilan',
+    //             'decision_ctc',
+    //             'decision_cc',
+    //             'contrat_signe',
+    //             'garanties_constituees',
+    //             'rencontre_client',
+    //             'hypothèque',
+    //             'lettre_garantie',
+    //             'domiciliation_salaire',
+    //             'dat',
+    //             'aval',
+    //             'salaire',
+    //             'nantissement'
+    //         ];
+
+    //         // Convertir les checkboxes en booléen
+    //         foreach ($checkboxFields as $field) {
+    //             if (isset($data[$field])) {
+    //                 $data[$field] = $toBoolean($data[$field]);
+    //             } else {
+    //                 $data[$field] = false;
+    //             }
+    //         }
+
+    //         // Convertir les champs 'oui'/'non' en booléen pour la base de données
+    //         $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+    //         foreach ($ouiNonFields as $field) {
+    //             if (isset($data[$field])) {
+    //                 // Convertir 'oui' en true, 'non' en false
+    //                 $data[$field] = $toBoolean($data[$field]);
+    //             } else {
+    //                 $data[$field] = false;
+    //             }
+    //         }
+
+    //         // Traiter la signature
+    //         if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
+    //             $signature = $request->file('signature');
+    //             $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
+    //             $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
+    //             $data['signature'] = $signaturePath;
+    //         }
+
+    //         // Créer la checklist
+    //         $checklist = CreditChecklist::create($data);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Checklist enregistrée avec succès',
+    //             'data' => $checklist
+    //         ], 201);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erreur de validation',
+    //             'errors' => $e->errors()
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         Log::error('Erreur: ' . $e->getMessage());
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erreur lors de l\'enregistrement',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+//     public function storeCreditChecklist(Request $request)
+// {
+//     try {
+//         // Validation minimale, ajout de la signature_analyste
+//         $validated = $request->validate([
+//             'nom_demandeur' => 'required|string|max:255',
+//             'numero_dossier' => 'required|string|max:100',
+//             'montant' => 'nullable|numeric',
+//             'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+//             'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // nouvelle ligne
+//         ]);
+
+//         $data = $request->except(['signature', 'signature_analyste']);
+//         $data['idUser'] = auth()->id();
+
+//         // Fonction booléenne (inchangée)
+//         $toBoolean = function ($value) {
+//             if (is_bool($value)) return $value;
+//             if (is_null($value)) return false;
+//             if (is_string($value)) {
+//                 $value = strtolower(trim($value));
+//                 if ($value === 'oui') return true;
+//                 if ($value === 'non') return false;
+//                 return in_array($value, ['true', 'on', '1', 'yes']);
+//             }
+//             return (bool) $value;
+//         };
+
+//         // Liste des checkbox (ajoutez 'salaire' si manquant)
+//         $checkboxFields = [
+//             'piece_identite', 'lettre_demande', 'formulaire_pret',
+//             'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
+//             'document_activite', 'bilan',
+//             'decision_ctc', 'decision_cc',
+//             'contrat_signe', 'garanties_constituees', 'rencontre_client',
+//             'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
+//         ];
+
+//         foreach ($checkboxFields as $field) {
+//             $data[$field] = $toBoolean($data[$field] ?? false);
+//         }
+
+//         // Champs oui/non
+//         $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+//         foreach ($ouiNonFields as $field) {
+//             $data[$field] = $toBoolean($data[$field] ?? false);
+//         }
+
+//         // Traiter la signature du superviseur
+//         if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
+//             $signature = $request->file('signature');
+//             $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
+//             $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
+//             $data['signature'] = $signaturePath;
+//         }
+
+//         // Traiter la signature de l'analyste
+//         if ($request->hasFile('signature_analyste') && $request->file('signature_analyste')->isValid()) {
+//             $signatureAnalyste = $request->file('signature_analyste');
+//             $signatureAnalysteName = time() . '_analyste_' . uniqid() . '.' . $signatureAnalyste->getClientOriginalExtension();
+//             $signatureAnalystePath = $signatureAnalyste->storeAs('signatures', $signatureAnalysteName, 'public');
+//             $data['signature_analyste'] = $signatureAnalystePath;
+//         }
+
+//         $checklist = CreditChecklist::create($data);
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Checklist enregistrée avec succès',
+//             'data' => $checklist
+//         ], 201);
+
+//     } catch (\Illuminate\Validation\ValidationException $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Erreur de validation',
+//             'errors' => $e->errors()
+//         ], 422);
+//     } catch (\Exception $e) {
+//         Log::error('Erreur: ' . $e->getMessage());
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Erreur lors de l\'enregistrement',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+public function storeCreditChecklist(Request $request)
+{
+    try {
+        // Validation
+        $validated = $request->validate([
+            'nom_demandeur' => 'required|string|max:255',
+            'numero_dossier' => 'required|string|max:100',
+            'montant' => 'nullable|numeric',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+        ]);
+
+        $data = $request->except(['signature', 'signature_analyste']);
+        $data['idUser'] = auth()->id();
+
+        // 1. Vérifier si une checklist existe déjà pour cet idCredit
+        $idCredit = $request->input('idCredit');
+        if ($idCredit) {
+            $existing = CreditChecklist::where('idCredit', $idCredit)->first();
+            if ($existing) {
+                // Supprimer les fichiers signatures du disque
+                if ($existing->signature && Storage::disk('public')->exists($existing->signature)) {
+                    Storage::disk('public')->delete($existing->signature);
                 }
-                return (bool) $value;
-            };
-
-            // Liste des champs checkbox
-            $checkboxFields = [
-                'piece_identite',
-                'lettre_demande',
-                'formulaire_pret',
-                'contrat_travail',
-                'fiche_paye',
-                'recommandation',
-                'caution_employeur',
-                'document_activite',
-                'bilan',
-                'decision_ctc',
-                'decision_cc',
-                'contrat_signe',
-                'garanties_constituees',
-                'rencontre_client',
-                'hypothèque',
-                'lettre_garantie',
-                'domiciliation_salaire',
-                'dat',
-                'aval',
-                'salaire',
-                'nantissement'
-            ];
-
-            // Convertir les checkboxes en booléen
-            foreach ($checkboxFields as $field) {
-                if (isset($data[$field])) {
-                    $data[$field] = $toBoolean($data[$field]);
-                } else {
-                    $data[$field] = false;
+                if ($existing->signature_analyste && Storage::disk('public')->exists($existing->signature_analyste)) {
+                    Storage::disk('public')->delete($existing->signature_analyste);
                 }
+                // Supprimer l'enregistrement
+                $existing->delete();
             }
-
-            // Convertir les champs 'oui'/'non' en booléen pour la base de données
-            $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
-            foreach ($ouiNonFields as $field) {
-                if (isset($data[$field])) {
-                    // Convertir 'oui' en true, 'non' en false
-                    $data[$field] = $toBoolean($data[$field]);
-                } else {
-                    $data[$field] = false;
-                }
-            }
-
-            // Traiter la signature
-            if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
-                $signature = $request->file('signature');
-                $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
-                $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
-                $data['signature'] = $signaturePath;
-            }
-
-            // Créer la checklist
-            $checklist = CreditChecklist::create($data);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Checklist enregistrée avec succès',
-                'data' => $checklist
-            ], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur de validation',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error('Erreur: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de l\'enregistrement',
-                'error' => $e->getMessage()
-            ], 500);
         }
-    }
 
+        // 2. Conversion des booléens (champs checkbox et oui/non)
+        $toBoolean = function ($value) {
+            if (is_bool($value)) return $value;
+            if (is_null($value)) return false;
+            if (is_string($value)) {
+                $value = strtolower(trim($value));
+                if ($value === 'oui') return true;
+                if ($value === 'non') return false;
+                return in_array($value, ['true', 'on', '1', 'yes']);
+            }
+            return (bool) $value;
+        };
+
+        $checkboxFields = [
+            'piece_identite', 'lettre_demande', 'formulaire_pret',
+            'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
+            'document_activite', 'bilan',
+            'decision_ctc', 'decision_cc',
+            'contrat_signe', 'garanties_constituees', 'rencontre_client',
+            'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
+        ];
+
+        foreach ($checkboxFields as $field) {
+            $data[$field] = $toBoolean($data[$field] ?? false);
+        }
+
+        $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+        foreach ($ouiNonFields as $field) {
+            $data[$field] = $toBoolean($data[$field] ?? false);
+        }
+
+        // 3. Traitement des nouvelles signatures
+        if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
+            $signature = $request->file('signature');
+            $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
+            $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
+            $data['signature'] = $signaturePath;
+        }
+
+        if ($request->hasFile('signature_analyste') && $request->file('signature_analyste')->isValid()) {
+            $signatureAnalyste = $request->file('signature_analyste');
+            $signatureAnalysteName = time() . '_analyste_' . uniqid() . '.' . $signatureAnalyste->getClientOriginalExtension();
+            $signatureAnalystePath = $signatureAnalyste->storeAs('signatures', $signatureAnalysteName, 'public');
+            $data['signature_analyste'] = $signatureAnalystePath;
+        }
+
+        // 4. Création de la nouvelle checklist
+        $checklist = CreditChecklist::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Checklist enregistrée avec succès',
+            'data' => $checklist
+        ], 201);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur de validation',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        Log::error('Erreur: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur lors de l\'enregistrement',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function updateCreditChecklist(Request $request, $idCredit)
+{
+    try {
+        $checklist = CreditChecklist::where('idCredit', $idCredit)->firstOrFail();
+
+        // Validation inchangée
+        $validated = $request->validate([
+            'nom_demandeur' => 'required|string|max:255',
+            'numero_dossier' => 'required|string|max:100',
+            'montant' => 'nullable|numeric',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+        ]);
+
+        $data = $request->except(['signature', 'signature_analyste', '_method']);
+
+        // Conversion en entier (0/1) au lieu de booléen
+        $toInteger = function ($value) {
+            if (is_bool($value)) return $value ? 1 : 0;
+            if (is_null($value)) return 0;
+            if (is_string($value)) {
+                $value = strtolower(trim($value));
+                if ($value === 'oui') return 1;
+                if ($value === 'non') return 0;
+                return in_array($value, ['true', 'on', '1', 'yes']) ? 1 : 0;
+            }
+            return (int) $value;
+        };
+
+        $checkboxFields = [
+            'piece_identite', 'lettre_demande', 'formulaire_pret',
+            'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
+            'document_activite', 'bilan',
+            'decision_ctc', 'decision_cc',
+            'contrat_signe', 'garanties_constituees', 'rencontre_client',
+            'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
+        ];
+
+        foreach ($checkboxFields as $field) {
+            $data[$field] = $toInteger($data[$field] ?? 0);
+        }
+
+        $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+        foreach ($ouiNonFields as $field) {
+            $data[$field] = $toInteger($data[$field] ?? 0);
+        }
+
+        // Gestion des signatures (identique à votre code)
+        if ($request->hasFile('signature')) {
+            if ($checklist->signature && Storage::disk('public')->exists($checklist->signature)) {
+                Storage::disk('public')->delete($checklist->signature);
+            }
+            $path = $request->file('signature')->store('signatures', 'public');
+            $data['signature'] = $path;
+        }
+
+        if ($request->hasFile('signature_analyste')) {
+            if ($checklist->signature_analyste && Storage::disk('public')->exists($checklist->signature_analyste)) {
+                Storage::disk('public')->delete($checklist->signature_analyste);
+            }
+            $path = $request->file('signature_analyste')->store('signatures', 'public');
+            $data['signature_analyste'] = $path;
+        }
+
+        $checklist->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Checklist mise à jour',
+            'data' => $checklist
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Update error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur mise à jour',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     //PERMET DE RECUPERER UN CHECK LISTE SPECIFIQUE
 

@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import VisualisationChecklist from "./VisualisationChecklist";
+import ModalEditChecklist from "./ModalEditChecklist";
+import "../../../styles/style.css";
 
 export default function ModalCheckListSuperviseur({
     dossierId,
@@ -17,7 +19,11 @@ export default function ModalCheckListSuperviseur({
     const [checklistData, setChecklistData] = useState(null);
     const [isLoadingChecklist, setIsLoadingChecklist] = useState(false);
     const fileInputRef = useRef(null);
-
+    // Dans la section des states, ajoutez :
+const [signatureAnalyste, setSignatureAnalyste] = useState(null);
+const [signatureAnalystePreview, setSignatureAnalystePreview] = useState(null);
+const [showEditModal, setShowEditModal] = useState(false);
+const fileInputRefAnalyste = useRef(null);
     const [form, setForm] = useState({
         agence: "",
         date_etablissement: "",
@@ -71,6 +77,7 @@ export default function ModalCheckListSuperviseur({
         // Analyste
         date_analyste: "",
         nom_analyste: "",
+        commentaire_analyste:"",
     });
 
 
@@ -151,6 +158,47 @@ export default function ModalCheckListSuperviseur({
         }
     };
 
+
+    // Ajoutez les gestionnaires :
+const handleSignatureAnalysteChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        if (!file.type.match("image/jpeg") && !file.type.match("image/png")) {
+            Swal.fire({
+                icon: "error",
+                title: "Format non supporté",
+                text: "Veuillez choisir une image au format JPEG ou PNG",
+                confirmButtonColor: "#20c997",
+            });
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            Swal.fire({
+                icon: "error",
+                title: "Fichier trop volumineux",
+                text: "La signature ne doit pas dépasser 5 Mo",
+                confirmButtonColor: "#20c997",
+            });
+            return;
+        }
+        setSignatureAnalyste(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setSignatureAnalystePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const handleDeleteSignatureAnalyste = () => {
+    setSignatureAnalyste(null);
+    setSignatureAnalystePreview(null);
+    if (fileInputRefAnalyste.current) {
+        fileInputRefAnalyste.current.value = "";
+    }
+};
+
+
     const handleSubmit = async (e) => {
          e.preventDefault();
         try {
@@ -168,6 +216,11 @@ export default function ModalCheckListSuperviseur({
             if (signatureImage) {
                 dataToSend.append("signature", signatureImage);
             }
+
+            if (signatureAnalyste) {
+    dataToSend.append("signature_analyste", signatureAnalyste);
+}
+
 
             dataToSend.append("idCredit", dossierId);
 
@@ -332,7 +385,7 @@ export default function ModalCheckListSuperviseur({
                 id="modalCheckListSuperviseur"
                 style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
             >
-                <div className="modal-dialog modal-xl">
+                <div className="modal-dialog modal-xl" style={{ maxHeight: "100vh", display: "flex", flexDirection: "column" }}>
                     <div className="modal-content border-0 shadow-lg rounded-3">
                         {/* Header avec bouton visualiser */}
                         <div
@@ -355,6 +408,21 @@ export default function ModalCheckListSuperviseur({
                                         </h5>
                                     </div>
                                     <div className="d-flex gap-2">
+                                        <button className="btn btn-warning" onClick={() => setShowEditModal(true)}>
+    <i className="fas fa-edit"></i> Modifier
+</button>
+
+{showEditModal && (
+    <ModalEditChecklist
+        dossierId={dossierId}
+        NumDossier={NumDossier??NumDossier}
+        onClose={() => setShowEditModal(false)}
+        onUpdate={() => {
+            // Recharger les données si nécessaire
+            checkExistingChecklist();
+        }}
+    />
+)}
                                         <button
                                             type="button"
                                             className="btn btn-light btn-sm"
@@ -406,7 +474,7 @@ export default function ModalCheckListSuperviseur({
                         {/* Corps du formulaire */}
                         <div
                             className="modal-body p-4"
-                            style={{ maxHeight: "70vh", overflowY: "auto" }}
+                            style={{ maxHeight: "80vh", overflowY: "auto" }}
                         >
                             {/* Loader amélioré */}
                             {isLoadingBar && (
@@ -477,7 +545,7 @@ export default function ModalCheckListSuperviseur({
                                         </h6>
                                         <div className="row mb-3">
                                             <div className="col-md-6">
-                                                <label className="form-label fw-semibold">
+                                                <label className="form-label fw-semibold" >
                                                     Agence
                                                 </label>
                                                 <input
@@ -1132,10 +1200,78 @@ export default function ModalCheckListSuperviseur({
                                         </div>
 
                                         {/* SECTION ANALYSTE */}
-                                        <h6 className="text-primary mb-3">
+                                        {/* <h6 className="text-primary mb-3">
                                             <i className="fas fa-user-check me-2"></i>
                                             IX. Informations Analyste
                                         </h6>
+                                        <div className="row mb-3">
+                                          <div className="col-md-12">
+                                            
+                                            <label class="form-label fw-semibold">Commentaire Analyste</label> <br />
+                                             <textarea class="modern-textarea" rows="3"  placeholder="Écrivez ici..."
+                                                  name="commentaire_analyste"
+                                             value={form.commentaire_analyste}
+                                                    onChange={handleChange}
+                                             
+                                             ></textarea>
+                                          </div>
+                                        </div>
+                                        <div className="col-md-12 mb-3">
+    <label className="form-label fw-semibold">Signature de l'analyste</label>
+    <div className="border rounded-3 p-3" style={{ backgroundColor: "#f8f9fa" }}>
+        <div className="text-center mb-3">
+            {signatureAnalystePreview ? (
+                <div className="position-relative d-inline-block">
+                    <img
+                        src={signatureAnalystePreview}
+                        alt="Signature Analyste"
+                        style={{ maxHeight: "150px", maxWidth: "100%" }}
+                        className="border rounded"
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-danger position-absolute top-0 end-0 translate-middle-y"
+                        onClick={handleDeleteSignatureAnalyste}
+                        style={{ borderRadius: "50%", padding: "0 6px" }}
+                    >
+                        <i className="fas fa-times"></i>
+                    </button>
+                </div>
+            ) : (
+                <div className="text-muted py-4">
+                    <i className="fas fa-pen fa-3x mb-2"></i>
+                    <p>Aucune signature téléchargée</p>
+                </div>
+            )}
+        </div>
+        <div className="d-flex justify-content-center gap-3">
+            <label className="btn btn-outline-primary">
+                <i className="fas fa-upload me-2"></i>
+                Télécharger la signature
+                <input
+                    type="file"
+                    ref={fileInputRefAnalyste}
+                    accept="image/jpeg,image/png"
+                    onChange={handleSignatureAnalysteChange}
+                    style={{ display: "none" }}
+                />
+            </label>
+            {signatureAnalystePreview && (
+                <button
+                    type="button"
+                    className="btn btn-outline-danger"
+                    onClick={handleDeleteSignatureAnalyste}
+                >
+                    <i className="fas fa-trash-alt me-2"></i>
+                    Supprimer
+                </button>
+            )}
+        </div>
+        <small className="text-muted d-block text-center mt-2">
+            Formats acceptés : JPEG, PNG (max 5 Mo)
+        </small>
+    </div>
+                                         </div>
                                         <div className="row mb-3">
                                             <div className="col-md-6">
                                                 <label className="form-label fw-semibold">
@@ -1161,7 +1297,7 @@ export default function ModalCheckListSuperviseur({
                                                     onChange={handleChange}
                                                 />
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         <button
                                             onClick={handleSubmit}
@@ -1210,7 +1346,7 @@ export default function ModalCheckListSuperviseur({
                                     <div className="d-flex justify-content-between align-items-center">
                                         <h5 className="mb-0 fw-bold">
                                             <i className="fas fa-eye me-2"></i>
-                                            Visualisation de la Checklist
+                                            Visualisation de la Checklist N°: #<strong>{NumDossier??NumDossier}</strong>
                                         </h5>
                                         <div className="d-flex gap-2">
                                             <button
@@ -1239,11 +1375,12 @@ export default function ModalCheckListSuperviseur({
                                 </div>
                             </div>
                             <div
-                                className="modal-body p-0"
-                                style={{ maxHeight: "80vh", overflowY: "auto" }}
+                                className="modal-body p-0 "
+                                style={{ maxHeight: "95vh", overflowY: "auto" }}
                             >
                                 <VisualisationChecklist
                                     dossierId={dossierId}
+                                    NumDossier={NumDossier??NumDossier}
                                     onClose={() => setShowVisualisation(false)}
                                     checklistData={checklistData}
                                 />

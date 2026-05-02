@@ -688,7 +688,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
 
 
      Route::get('gestion_credit/dossier/credit-checklists/{dossierId}', [AGestionCreditController::class, 'getCreditChecklist']);
-    
+     Route::put('/gestion_credit/dossier/credit-checklists/{idCredit}', [AGestionCreditController::class, 'updateCreditChecklist']);
 
 
       Route::get('gestion_credit/credits/rapport', [AGestionCreditController::class, 'getRapportCredit']);

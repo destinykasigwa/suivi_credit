@@ -3,13 +3,13 @@ import Swal from "sweetalert2";
 
 export default function VisualisationChecklist({
     dossierId,
+    NumDossier,
     onClose,
     checklistData,
 }) {
     const [checklist, setChecklist] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Informations de l'organisation
     const organisation = {
         nom: "COOPEC AKIBA YETU",
         slogan: "Ensemble pour un avenir prospère",
@@ -21,34 +21,20 @@ export default function VisualisationChecklist({
     };
 
     useEffect(() => {
-        console.log("VisualisationChecklist - Données reçues:", checklistData);
-
         if (checklistData) {
-            console.log("Utilisation des données reçues en prop");
             setChecklist(checklistData);
             setIsLoading(false);
         } else {
-            console.log("Aucune donnée reçue, impossible d'afficher");
             setIsLoading(false);
             setChecklist(null);
         }
     }, [checklistData]);
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     if (isLoading) {
         return (
-            <div
-                className="d-flex justify-content-center align-items-center"
-                style={{ minHeight: "400px" }}
-            >
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "400px" }}>
                 <div className="text-center">
-                    <div
-                        className="spinner-border text-primary mb-3"
-                        style={{ width: "3rem", height: "3rem" }}
-                    >
+                    <div className="spinner-border text-primary mb-3" style={{ width: "3rem", height: "3rem" }}>
                         <span className="visually-hidden">Chargement...</span>
                     </div>
                     <p className="text-muted">Chargement de la check-list...</p>
@@ -64,14 +50,8 @@ export default function VisualisationChecklist({
                     <i className="fas fa-exclamation-triangle fa-2x mb-3"></i>
                     <h5>Aucune donnée disponible</h5>
                     <p>Veuillez d'abord remplir et enregistrer la checklist.</p>
-                    <button
-                        data-dismiss="modal"
-                        aria-label="Close"
-                        onClick={onClose}
-                        className="btn btn-primary mt-3"
-                    >
-                        <i className="fas fa-arrow-left me-2"></i>
-                        Retour
+                    <button onClick={onClose} className="btn btn-primary mt-3">
+                        <i className="fas fa-arrow-left me-2"></i>Retour
                     </button>
                 </div>
             </div>
@@ -79,755 +59,287 @@ export default function VisualisationChecklist({
     }
 
     return (
-        <div
-            className="container-fluid py-4"
-            style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-        >
-            {/* Boutons d'action - visible uniquement à l'écran */}
-            {/* <div className="mb-3 no-print">
-                <div className="d-flex justify-content-end gap-2">
-                    <button onClick={handlePrint} className="btn btn-primary">
-                        <i className="fas fa-print me-2"></i>
-                        Imprimer / PDF
-                    </button>
-                    <button onClick={onClose} className="btn btn-secondary">
-                        <i className="fas fa-times me-2"></i>
-                        Fermer
-                    </button>
-                </div>
-            </div> */}
-
+        <div className="container-fluid py-2" style={{ backgroundColor: "#f8f9fa" }}>
             {/* Contenu à imprimer */}
-            <div
-                className="card shadow-lg border-0"
-                id="print-area-visualisation"
-            >
-                <div className="card-body p-0">
-                    <div className="container-fluid p-4">
-                        {/* EN-TÊTE DE L'ORGANISATION - Visible à l'écran et à l'impression */}
-                        <div className="text-center mb-4">
+            <div className="card shadow-sm border-0" id="print-area-visualisation">
+                <div className="card-body p-2">
+                    {/* ================= BLOC 1 ================= */}
+                    <div className="print-block">
+                        {/* EN‑TÊTE compact */}
+                        <div className="text-center mb-2">
                             <img
                                 src={organisation.logo}
-                                alt="Logo COOPEC AKIBA YETU"
-                                style={{
-                                    height: "70px",
-                                    width: "auto",
-                                    objectFit: "contain",
-                                    marginBottom: "15px",
-                                }}
+                                alt="Logo"
+                                style={{ height: "50px", width: "auto", objectFit: "contain" }}
+                                className="print-logo"
                             />
-                            <h1
-                                className="fw-bold mb-1"
-                                style={{ color: "#1a5f4b" }}
-                            >
+                            <h1 className="fw-bold mb-0" style={{ color: "#1a5f4b", fontSize: "1.4rem" }}>
                                 {organisation.nom}
                             </h1>
-                            <p className="mb-1 text-muted">
-                                {organisation.slogan}
-                            </p>
-                            <p className="mb-0 small text-muted">
-                                {organisation.adresse}
-                            </p>
-                            <p className="small text-muted">
-                                Tél: {organisation.telephone} | Email:{" "}
-                                {organisation.email}
-                            </p>
-                            <hr
-                                className="my-3"
-                                style={{ borderTop: "2px solid #20c997" }}
-                            />
+                            <p className="mb-0 text-muted small">{organisation.slogan}</p>
+                            <p className="mb-0 small text-muted">{organisation.adresse}</p>
+                            <p className="small text-muted">Tél: {organisation.telephone} | Email: {organisation.email}</p>
+                            <hr className="my-1" style={{ borderTop: "2px solid #20c997" }} />
                         </div>
 
-                        {/* Titre du document */}
-                        <div className="text-center mb-4">
-                            <h2
-                                className="text-uppercase fw-bold mb-2"
-                                style={{ color: "#20c997" }}
-                            >
-                                CHECK-LIST DOSSIER DE CREDIT N°{" "}
-                                {checklist.numero_dossier}
-                            </h2>
-                            <hr
-                                className="my-3"
-                                style={{ borderTop: "2px solid #20c997" }}
-                            />
-                        </div>
+                        <h2 className="text-uppercase fw-bold text-center mb-2" style={{ color: "#20c997", fontSize: "1.2rem" }}>
+                            CHECK‑LIST DOSSIER DE CREDIT N° #{checklist.numero_dossier}
+                        </h2>
+                        <hr className="my-1" style={{ borderTop: "2px solid #20c997" }} />
 
                         {/* I. Généralités */}
-                        <div className="mb-4">
-                            <h5 className="fw-bold text-primary mb-3">
-                                <i className="fas fa-info-circle me-2"></i>I --
-                                Généralités
-                            </h5>
-                            <div className="row mb-3">
-                                <div className="col-md-6">
-                                    <div className="border p-3 rounded bg-light">
-                                        <strong>Agence :</strong>{" "}
-                                        {checklist.agence ||
-                                            "_________________"}
-                                    </div>
+                        <div className="mb-2">
+                            <h5 className="fw-bold text-primary mb-1">I — Généralités</h5>
+                            <div className="row g-1">
+                                <div className="col-6">
+                                    <div className="border px-1 py-0 bg-light rounded"><strong>Agence :</strong> {checklist.agence || "_______________"}</div>
                                 </div>
-                                <div className="col-md-6">
-                                    <div className="border p-3 rounded bg-light">
-                                        <strong>Date d'établissement :</strong>{" "}
-                                        {checklist.date_etablissement
-                                            ? new Date(
-                                                  checklist.date_etablissement,
-                                              ).toLocaleDateString("fr-FR")
-                                            : "_________________"}
-                                    </div>
+                                <div className="col-6">
+                                    <div className="border px-1 py-0 bg-light rounded"><strong>Date :</strong> {checklist.date_etablissement ? new Date(checklist.date_etablissement).toLocaleDateString("fr-FR") : "_______________"}</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* II. Références du demandeur */}
-                        <div className="mb-4">
-                            <h5 className="fw-bold text-primary mb-3">
-                                <i className="fas fa-user me-2"></i>
-                                II -- Références du demandeur
-                            </h5>
-                            <div className="border p-3 rounded bg-light mb-2">
-                                <strong>Nom du demandeur de crédit :</strong>{" "}
-                                {checklist.nom_demandeur || "_________________"}
-                            </div>
-                            <div className="border p-3 rounded bg-light mb-2">
-                                <strong>N° Dossier de crédit :</strong>{" "}
-                                {checklist.numero_dossier ||
-                                    "_________________"}
-                            </div>
-                            <div className="border p-3 rounded bg-light">
-                                <strong>Montant demandé :</strong>{" "}
-                                {checklist.montant || "_________________"}
-                            </div>
+                        {/* II. Références */}
+                        <div className="mb-2">
+                            <h5 className="fw-bold text-primary mb-1">II — Références du demandeur</h5>
+                            <div className="border px-1 py-0 bg-light rounded mb-1"><strong>Nom :</strong> {checklist.nom_demandeur || "_______________"}</div>
+                            <div className="border px-1 py-0 bg-light rounded mb-1"><strong>N° Dossier :</strong> {checklist.numero_dossier || "_______________"}</div>
+                            <div className="border px-1 py-0 bg-light rounded"><strong>Montant :</strong> {checklist.montant || "_______________"}</div>
                         </div>
 
                         {/* III. Liste de vérifications */}
-                        <h5 className="fw-bold text-primary mb-3">
-                            <i className="fas fa-check-circle me-2"></i>
-                            III -- Liste de vérifications
-                        </h5>
+                        <h5 className="fw-bold text-primary mb-1">III — Liste de vérifications</h5>
 
-                        {/* 1. INTRODUCTION DU DOSSIER */}
-                        <div className="mb-4">
-                            <h6 className="fw-bold text-dark">
-                                1. INTRODUCTION DU DOSSIER
-                            </h6>
+                        {/* 1. INTRODUCTION */}
+                        <div className="mb-2">
+                            <h6 className="fw-bold mb-0">1. INTRODUCTION DU DOSSIER</h6>
+                            <p className="fw-bold mb-0 mt-1">1. Inventaire des documents</p>
+                            <p className="text-decoration-underline mb-0 fw-semibold">Pour tous les dossiers :</p>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td className="w-75">- Documents d'identité</td><td className="text-center">{checklist.piece_identite ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Lettre de demande du membre</td><td className="text-center">{checklist.lettre_demande ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Formulaire de demande de prêt</td><td className="text-center">{checklist.formulaire_pret ? "✓" : "☐"}</td></tr>
+                                </tbody>
+                            </table>
 
-                            {/* Inventaire des documents */}
-                            <div className="mb-3">
-                                <p className="fw-bold mb-2">
-                                    1. Inventaire des documents
-                                </p>
+                            <p className="text-decoration-underline mb-0 fw-semibold">Salariés :</p>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td>- Contrat d'embauche</td><td className="text-center">{checklist.contrat_travail ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Dernière fiche de paye</td><td className="text-center">{checklist.fiche_paye ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Lettre recommandation employeur</td><td className="text-center">{checklist.recommandation ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Caution employeur</td><td className="text-center">{checklist.caution_employeur ? "✓" : "☐"}</td></tr>
+                                </tbody>
+                            </table>
 
-                                <p className="text-decoration-underline mb-2 fw-semibold">
-                                    Pour tous les dossiers :
-                                </p>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Documents d'identité
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.piece_identite ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Lettre de demande du membre
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.lettre_demande ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Formulaire de demande de prêt
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.formulaire_pret ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <p className="text-decoration-underline mb-0 fw-semibold">MPME :</p>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td>- Document de l'activité</td><td className="text-center">{checklist.document_activite ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Bilan et compte d'exploitation</td><td className="text-center">{checklist.bilan ? "✓" : "☐"}</td></tr>
+                                </tbody>
+                            </table>
 
-                                <p className="text-decoration-underline mb-2 fw-semibold">
-                                    Pour les dossiers de crédit des salariés :
-                                </p>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Contrat d'embauche
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.contrat_travail ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Dernière fiche de paye ou
-                                                listing de paye
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.fiche_paye ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Lettre de recommandation de
-                                                l'employeur
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.recommandation ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Caution de l'employeur
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.caution_employeur ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <p className="fw-bold mb-0 mt-1">2. Synthèse de l'ADC</p>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td>- j'ai rencontré le demandeur</td><td className="text-center fw-bold">{checklist.rencontre_adc ? "OUI" : "NON"}</td></tr>
+                                    <tr><td>- il a la capacité de rembourser</td><td className="text-center fw-bold">{checklist.capacite_remboursement ? "OUI" : "NON"}</td></tr>
+                                    <tr><td>- les infos fournies sont fiables</td><td className="text-center fw-bold">{checklist.fiabilite ? "OUI" : "NON"}</td></tr>
+                                    <tr><td>- avis positif sur l'octroi</td><td className="text-center fw-bold">{checklist.avis_positif ? "OUI" : "NON"}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                                <p className="text-decoration-underline mb-2 fw-semibold">
-                                    Pour les dossiers de crédit des MPME :
-                                </p>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Document de l'activité
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.document_activite ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Bilan et compte d'exploitation
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.bilan ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        {/* 2. AVANT CONTRAT */}
+                        <div className="mb-2 print-keep-together">
+                            <h6 className="fw-bold mb-0">2. AVANT D'ETABLIR LE CONTRAT DE PRET</h6>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td>- Décision de CTC avec Délégation</td><td className="text-center fw-bold">{checklist.decision_ctc ? "OUI" : "NON"}</td></tr>
+                                    <tr><td>- Décision CC</td><td className="text-center fw-bold">{checklist.decision_cc ? "OUI" : "NON"}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 3. AVANT DÉBOURSEMENT + GARANTIES */}
+                        <div className="mb-2 print-keep-together">
+                            <h6 className="fw-bold mb-0">3. AVANT DEBOURSEMENT</h6>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td>- Contrat de prêt signé</td><td className="text-center fw-bold">{checklist.contrat_signe ? "OUI" : "NON"}</td></tr>
+                                    <tr><td>- Garanties constituées</td><td className="text-center fw-bold">{checklist.garanties_constituees ? "OUI" : "NON"}</td></tr>
+                                    <tr><td>- Rencontre demandeur</td><td className="text-center fw-bold">{checklist.rencontre_client ? "OUI" : "NON"}</td></tr>
+                                </tbody>
+                            </table>
+                            <p className="fw-bold mb-0">Liste des Garanties</p>
+                            <table className="table table-bordered compact-table">
+                                <tbody>
+                                    <tr><td>- Mandat/Inscription hypothécaire</td><td className="text-center">{checklist.hypothèque ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Lettre de garantie ou caution</td><td className="text-center">{checklist.lettre_garantie ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Domiciliation de salaire</td><td className="text-center">{checklist.domiciliation_salaire ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- DAT</td><td className="text-center">{checklist.dat ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Aval/Garant</td><td className="text-center">{checklist.aval ? "✓" : "☐"}</td></tr>
+                                    <tr><td>- Nantissement de biens</td><td className="text-center">{checklist.nantissement ? "✓" : "☐"}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* ================= BLOC 2 (signatures, commentaires, dates) ================= */}
+                    <div className="print-block mt-2">
+                        {/* Commentaire analyste */}
+                        <div className="border p-1 bg-light rounded mb-2">
+                            <strong>Commentaire de l’analyste :</strong><br />
+                            {checklist.commentaire_analyste || "_________________"}
+                        </div>
+
+                        <div className="row g-1 mb-2">
+                            <div className="col-6">
+                                <div className="border p-1 bg-light rounded"><strong>Date d’analyse :</strong><br />{checklist.date_analyste ? new Date(checklist.date_analyste).toLocaleDateString("fr-FR") : "_______________"}</div>
                             </div>
-
-                            {/* Synthèse de l'ADC */}
-                            <div className="mb-3">
-                                <p className="fw-bold mb-2">
-                                    2. Synthèse de l'ADC
-                                </p>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - j'ai rencontré le demandeur
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.rencontre_adc ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - il a la capacité de rembourser
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.capacite_remboursement ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - les informations fournies sont
-                                                fiables
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.fiabilite ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - avis positif sur l'octroi
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.avis_positif ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <div className="row mt-3">
-                                    <div className="col-md-6 mb-3">
-                                        <div className="border p-3 rounded bg-light">
-                                            <strong>Date :</strong>{" "}
-                                            {checklist.date_adc
-                                                ? new Date(
-                                                      checklist.date_adc,
-                                                  ).toLocaleDateString("fr-FR")
-                                                : "_________________"}
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6 mb-3">
-                                        <div className="border p-3 rounded bg-light">
-                                            <strong>
-                                                Nom et Signature de l'ADC :
-                                            </strong>
-                                            <br />
-                                            {checklist.nom_adc ||
-                                                "_________________"}
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="col-6">
+                                <div className="border p-1 bg-light rounded"><strong>Nom de l’analyste :</strong><br />{checklist.nom_analyste || "_______________"}</div>
                             </div>
+                        </div>
 
-                            {/* Superviseur */}
-                            <div className="row mb-4">
-                                <div className="col-md-6 mb-3">
-                                    <div className="border p-3 rounded bg-light">
-                                        <strong>Date :</strong>{" "}
-                                        {checklist.date_superviseur
-                                            ? new Date(
-                                                  checklist.date_superviseur,
-                                              ).toLocaleDateString("fr-FR")
-                                            : "_________________"}
-                                    </div>
-                                </div>
-                                <div className="col-md-6 mb-3">
-                                        {checklist.signature && (
-                                            <div className="mt-2">
-                                                <div className="border p-3 rounded bg-light">
-                                                    <strong>
-                                                        Nom et Signature
-                                                        Superviseur pour
-                                                        contrôle :
-                                                    </strong>
-                                                    <br />
-                                                    {checklist.nom_superviseur ||
-                                                        "_________________"}
-                                                    <div className="mt-2">
-                                                        {checklist.signature ? (
-                                                            <>
-                                                                <img
-                                                                    src={`/storage/${checklist.signature}`}
-                                                                    style={{
-                                                                        maxHeight:
-                                                                            "70px",
-                                                                    }}
-                                                                />
-                                                                <p className="small text-muted mt-1">
-                                                                    Signature
-                                                                    électronique
-                                                                </p>
-                                                            </>
-                                                        ) : (
-                                                            <div
-                                                                style={{
-                                                                    height: "60px",
-                                                                    borderBottom:
-                                                                        "1px solid #000",
-                                                                    width: "100%",
-                                                                }}
-                                                            ></div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                </div>
+                       <div className="border p-1 bg-light rounded mb-2 d-flex align-items-center">
+    <strong className="me-1">Signature de l’analyste (risque & conformité) :</strong>
+    {checklist.signature_analyste ? (
+        <span className="d-inline-flex align-items-center">
+            <img
+                src={`/storage/${checklist.signature_analyste}`}
+                alt="signature analyste"
+                style={{ height: "25px", width: "auto", marginLeft: "5px" }}
+            />
+            <span className="small text-muted ms-1">(électronique)</span>
+        </span>
+    ) : (
+        <span className="signature-placeholder d-inline-block" style={{ width: "150px", height: "25px", borderBottom: "1px solid #000", marginLeft: "5px" }}></span>
+    )}
+</div>
+
+                        <div className="row g-1 mb-2">
+                            <div className="col-6">
+                                <div className="border p-1 bg-light rounded"><strong>Date validation superviseur :</strong><br />{checklist.date_superviseur ? new Date(checklist.date_superviseur).toLocaleDateString("fr-FR") : "_______________"}</div>
                             </div>
-
-                            {/* 2. AVANT D'ETABLIR LE CONTRAT DE PRET */}
-                            <div className="mb-4">
-                                <h6 className="fw-bold text-dark">
-                                    2. AVANT D'ETABLIR LE CONTRAT DE PRET
-                                </h6>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Décision de CTC avec
-                                                Délégation du pouvoir
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.decision_ctc ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Décision CC
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.decision_cc ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div className="col-6">
+                                <div className="border p-1 bg-light rounded"><strong>Nom superviseur :</strong><br />{checklist.nom_superviseur || "_______________"}</div>
                             </div>
+                        </div>
+<div className="border p-1 bg-light rounded mb-2 d-flex align-items-center">
+    <strong className="me-1">Signature superviseur :</strong>
+    {checklist.signature ? (
+        <span className="d-inline-flex align-items-center">
+            <img
+                src={`/storage/${checklist.signature}`}
+                alt="signature superviseur"
+                style={{ height: "25px", width: "auto", marginLeft: "5px" }}
+            />
+            <span className="small text-muted ms-1">(électronique)</span>
+        </span>
+    ) : (
+        <span className="signature-placeholder d-inline-block" style={{ width: "150px", height: "25px", borderBottom: "1px solid #000", marginLeft: "5px" }}></span>
+    )}
+</div>
 
-                            {/* 3. AVANT DEBOURSEMENT */}
-                            <div className="mb-4">
-                                <h6 className="fw-bold text-dark">
-                                    3. AVANT DEBOURSEMENT
-                                </h6>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Contrat de prêt dument rempli
-                                                et signé
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.contrat_signe ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Garantie correctement
-                                                constituées
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.garanties_constituees ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - J'ai rencontré le demandeur
-                                            </td>
-                                            <td className="text-center fw-bold">
-                                                {checklist.rencontre_client ? (
-                                                    <span className="text-success">
-                                                        OUI
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-danger">
-                                                        NON
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <p className="fw-bold mt-3">
-                                    Liste des Garanties
-                                </p>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Mandat/Inscription
-                                                hypothécaire
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.hypothèque ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Lettre de garantie ou de
-                                                caution
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.lettre_garantie ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Domiciliation de salaire
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.domiciliation_salaire ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">- DAT</td>
-                                            <td className="text-center">
-                                                {checklist.dat ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Aval/Garant
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.aval ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="w-75">
-                                                - Constitution de gage
-                                                (nantissement de biens)
-                                            </td>
-                                            <td className="text-center">
-                                                {checklist.nantissement ? (
-                                                    <span className="text-success fw-bold fs-5">
-                                                        ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted fs-5">
-                                                        ☐
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <div className="row g-1">
+                            <div className="col-6">
+                                <div className="border p-1 bg-light rounded"><strong>Date ADC :</strong><br />{checklist.date_adc ? new Date(checklist.date_adc).toLocaleDateString("fr-FR") : "_______________"}</div>
                             </div>
-
-                            {/* Analyste */}
-                            <div className="row mt-4">
-                                <div className="col-md-6">
-                                    <div className="border p-3 rounded bg-light">
-                                        <strong>Date :</strong>{" "}
-                                        {checklist.date_analyste
-                                            ? new Date(
-                                                  checklist.date_analyste,
-                                              ).toLocaleDateString("fr-FR")
-                                            : "_________________"}
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="border p-3 rounded bg-light">
-                                        <strong>
-                                            Nom et Signature de l'analyste de
-                                            risque et conformité :
-                                        </strong>
-                                        <br />
-                                        {checklist.nom_analyste ||
-                                            "_________________"}
-                                    </div>
-                                </div>
+                            <div className="col-6">
+                                <div className="border p-1 bg-light rounded"><strong>Nom / Signature ADC :</strong><br />{checklist.nom_adc || "_______________"}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Styles d'impression */}
+            {/* STYLES D'IMPRESSION – TENIR EXACTEMENT SUR 2 PAGES */}
             <style>{`
                 @media print {
                     body {
                         margin: 0;
                         padding: 0;
                         background: white;
+                        font-size: 8.5pt !important;
+                        line-height: 1.2 !important;
                     }
-                    .no-print {
-                        display: none !important;
-                    }
-                    #print-area-visualisation {
-                        box-shadow: none !important;
+                    .container-fluid, .card, .card-body {
+                        padding: 0 !important;
                         margin: 0 !important;
-                        padding: 0 !important;
                     }
-                    .card {
-                        border: none !important;
+                    /* Réduction des espaces */
+                    .mb-2, .mb-1, .mt-1, .mt-2, .my-1, .g-1 {
+                        margin-bottom: 2px !important;
+                        margin-top: 2px !important;
                     }
-                    .container-fluid {
-                        padding: 0 !important;
+                    .border {
+                        padding: 2px !important;
+                    }
+                    h1 { font-size: 14pt !important; margin: 0 !important; }
+                    h2 { font-size: 12pt !important; margin: 2px 0 !important; }
+                    h5 { font-size: 10pt !important; margin: 2px 0 !important; }
+                    h6 { font-size: 9pt !important; margin: 2px 0 !important; }
+                    p { margin: 1px 0 !important; }
+                    .compact-table td, .compact-table th {
+                        padding: 1px 2px !important;
+                        font-size: 8pt !important;
                     }
                     table {
+                        margin-bottom: 2px !important;
+                    }
+                    .print-logo {
+                        height: 35px !important;
+                    }
+                    .print-signature {
+                        max-height: 30px !important;
+                        width: auto;
+                    }
+                    .signature-placeholder {
+                        height: 30px;
+                        border-bottom: 1px solid #000;
+                        width: 150px;
+                        margin-top: 4px;
+                    }
+                    /* Éviter les coupures dans les blocs principaux */
+                    .print-block, .print-keep-together, .border, .row {
                         page-break-inside: avoid;
                     }
-                    .bg-light {
-                        background-color: #f8f9fa !important;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
+                    /* Forcer la répartition sur deux pages */
+                    .print-block:first-child {
+                        page-break-after: avoid;
+                    }
+                    /* Pas de saut intempestif */
+                    .card-body {
+                        display: block;
                     }
                     @page {
-                        size: auto;
-                        margin: 15mm;
+                        size: A4;
+                        margin: 8mm;
                     }
 
-
-                     /* Agrandir l'image de signature à l'impression */
-  .border img {
-    max-height: 80px !important;
-    min-width: 200px !important;
+                    .d-flex {
+    display: flex !important;
+}
+.align-items-center {
+    align-items: center !important;
+}
+.border .d-inline-flex {
+    line-height: 1 !important;
+}
+img[alt*="signature"] {
+    height: 25px !important;
     width: auto !important;
-  }
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.signature-placeholder {
+    height: 25px !important;
+}
                 }
-                    
             `}</style>
         </div>
     );

@@ -74,7 +74,9 @@ class CreditChecklist extends Model
         'signature',
         'date_analyste',
         'nom_analyste',
-        'signature'
+        'signature',
+        'commentaire_analyste',
+        'signature_analyste'
     ];
     
     protected $casts = [

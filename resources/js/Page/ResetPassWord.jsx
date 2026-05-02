@@ -110,9 +110,7 @@ const getPasswordStrengthPercent = (password) => {
 
         `}
       </style>
-      <div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{
-    background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)"
-}}>
+      <div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3">
     <div className="row w-100 justify-content-center">
         <div className="col-12 col-md-8 col-lg-5">
             <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
