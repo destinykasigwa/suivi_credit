@@ -209,21 +209,26 @@ export default function ModalEditChecklist({
         dataToSend.append("_method", "PUT"); // Pour Laravel
 
         try {
-            await axios.post(
-                `/gestion_credit/dossier/credit-checklists/${dossierId}`,
-                dataToSend,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-            );
-            Swal.fire("Succès", "Checklist mise à jour", "success");
-            if (onUpdate) onUpdate();
-            onClose();
-        } catch (error) {
-            Swal.fire("Erreur", "Échec de la mise à jour", "error");
-        } finally {
-            setLoading(false);
-        }
+    await axios.post(
+        `/gestion_credit/dossier/credit-checklists/${dossierId}`,
+        dataToSend,
+        { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    Swal.fire("Succès", "Checklist mise à jour", "success");
+    if (onUpdate) onUpdate();
+    onClose();
+} catch (error) {
+    // Récupération du message personnalisé depuis la réponse du backend
+    let errorMessage = "Échec de la mise à jour";
+    if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+    } else if (error.message) {
+        errorMessage = error.message;
+    }
+    Swal.fire("Erreur", errorMessage, "error");
+} finally {
+    setLoading(false);
+}
     };
 
     // Pour l'analyste

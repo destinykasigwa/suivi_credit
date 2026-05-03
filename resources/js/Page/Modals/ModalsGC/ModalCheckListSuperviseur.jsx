@@ -199,80 +199,128 @@ const handleDeleteSignatureAnalyste = () => {
 };
 
 
-    const handleSubmit = async (e) => {
-         e.preventDefault();
-        try {
-            setIsLoadingBar(true);
-            setProgress(0);
+//     const handleSubmit = async (e) => {
+//          e.preventDefault();
+//         try {
+//             setIsLoadingBar(true);
+//             setProgress(0);
 
-            const dataToSend = new FormData();
+//             const dataToSend = new FormData();
 
-            Object.keys(form).forEach((key) => {
-                if (key !== "signature") {
-                    dataToSend.append(key, form[key]);
-                }
-            });
+//             Object.keys(form).forEach((key) => {
+//                 if (key !== "signature") {
+//                     dataToSend.append(key, form[key]);
+//                 }
+//             });
 
-            if (signatureImage) {
-                dataToSend.append("signature", signatureImage);
-            }
+//             if (signatureImage) {
+//                 dataToSend.append("signature", signatureImage);
+//             }
 
-            if (signatureAnalyste) {
-    dataToSend.append("signature_analyste", signatureAnalyste);
-}
+//             if (signatureAnalyste) {
+//     dataToSend.append("signature_analyste", signatureAnalyste);
+// }
 
 
-            dataToSend.append("idCredit", dossierId);
+//             dataToSend.append("idCredit", dossierId);
 
-            const interval = setInterval(() => {
-                setProgress((prev) => {
-                    if (prev >= 90) {
-                        clearInterval(interval);
-                        return 90;
-                    }
-                    return prev + 10;
-                });
-            }, 200);
+//             const interval = setInterval(() => {
+//                 setProgress((prev) => {
+//                     if (prev >= 90) {
+//                         clearInterval(interval);
+//                         return 90;
+//                     }
+//                     return prev + 10;
+//                 });
+//             }, 200);
 
-            const response = await axios.post(
-                "/gestion_credit/dossier/credit-checklists",
-                dataToSend,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                },
-            );
+//             const response = await axios.post(
+//                 "/gestion_credit/dossier/credit-checklists",
+//                 dataToSend,
+//                 {
+//                     headers: {
+//                         "Content-Type": "multipart/form-data",
+//                     },
+//                 },
+//             );
 
-            clearInterval(interval);
-            setProgress(100);
+//             clearInterval(interval);
+//             setProgress(100);
 
-            setTimeout(() => {
-                setIsLoadingBar(false);
-                Swal.fire({
-                    icon: "success",
-                    title: "Succès !",
-                    text: "Checklist enregistrée avec succès",
-                    confirmButtonColor: "#20c997",
-                    timer: 2000,
-                });
+//             setTimeout(() => {
+//                 setIsLoadingBar(false);
+//                 Swal.fire({
+//                     icon: "success",
+//                     title: "Succès !",
+//                     text: "Checklist enregistrée avec succès",
+//                     confirmButtonColor: "#20c997",
+//                     timer: 2000,
+//                 });
 
-                // setTimeout(() => {
-                //     onClose();
-                // }, 2000);
-            }, 500);
-        } catch (error) {
+//                 // setTimeout(() => {
+//                 //     onClose();
+//                 // }, 2000);
+//             }, 500);
+//         } catch (error) {
+//             setIsLoadingBar(false);
+//             console.error(error);
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Erreur",
+//                 text: "Erreur lors de l'enregistrement de la checklist",
+//                 confirmButtonColor: "#20c997",
+//             });
+//         }
+//     };
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    let interval; // déclarer ici pour y accéder dans catch
+    try {
+        setIsLoadingBar(true);
+        setProgress(0);
+
+        const dataToSend = new FormData();
+        // ... remplissage du FormData ...
+
+        interval = setInterval(() => {
+            setProgress((prev) => (prev >= 90 ? 90 : prev + 10));
+        }, 200);
+
+        const response = await axios.post("/gestion_credit/dossier/credit-checklists", dataToSend, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        clearInterval(interval);
+        setProgress(100);
+        setTimeout(() => {
             setIsLoadingBar(false);
-            console.error(error);
             Swal.fire({
-                icon: "error",
-                title: "Erreur",
-                text: "Erreur lors de l'enregistrement de la checklist",
+                icon: "success",
+                title: "Succès !",
+                text: "Checklist enregistrée avec succès",
                 confirmButtonColor: "#20c997",
+                timer: 2000,
             });
-        }
-    };
+        }, 500);
+    } catch (error) {
+        if (interval) clearInterval(interval);
+        setIsLoadingBar(false);
+        console.error(error);
 
+        let errorMessage = "Erreur lors de l'enregistrement de la checklist";
+        if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+        }
+
+        Swal.fire({
+            icon: "error",
+            title: "Erreur",
+            text: errorMessage,
+            confirmButtonColor: "#20c997",
+        });
+    }
+};
     const handleDeleteSignature = () => {
         setSignatureImage(null);
         setSignaturePreview(null);

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
-use App\Models\{Commentaire, CreditChecklist, Credits, CreditsImages, PropositionMontant, Signature};
+use App\Models\{Commentaire, CreditChecklist, Credits, CreditsImages, PropositionMontant, Signature, User};
 use App\Services\SendNotification;
 
 class AGestionCreditController extends Controller
@@ -1605,6 +1605,15 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
 
 public function storeCreditChecklist(Request $request)
 {
+   $user = Auth::user();
+$allowedRoles = ['Superviseur', 'Analyste Risques'];
+
+if (!in_array($user->role, $allowedRoles)) {
+    return response()->json([
+        'success' => false,
+        'message' => "Vous n'êtes pas autorisé à completer cette checkliste. Seuls le superviseur et l'analyste des risques sont autorisés. Votre rôle actuel est : {$user->role}",
+    ], 422);
+}
     try {
         // Validation
         $validated = $request->validate([
@@ -1708,7 +1717,18 @@ public function storeCreditChecklist(Request $request)
 
 public function updateCreditChecklist(Request $request, $idCredit)
 {
+
     try {
+
+       $user = Auth::user();
+$allowedRoles = ['Superviseur', 'Analyste Risques'];
+
+if (!in_array($user->role, $allowedRoles)) {
+    return response()->json([
+        'success' => false,
+        'message' => "Vous n'êtes pas autorisé à modifier cette checkliste. Seuls le superviseur et l'analyste des risques sont autorisés. Votre rôle actuel est : {$user->role}",
+    ], 422);
+}
         $checklist = CreditChecklist::where('idCredit', $idCredit)->firstOrFail();
 
         // Validation inchangée
