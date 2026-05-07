@@ -9,22 +9,24 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TransactionsEmail extends Mailable
+class ReponseDossierEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $user = "";
     public $data = "";
+    public $userName="";
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($data,$userName)
     {
 
         $this->data = $data;
+         $this->userName = $userName;
     }
 
     /**
@@ -47,7 +49,7 @@ class TransactionsEmail extends Mailable
     public function content()
     {
         return new Content(
-            view: 'emails.transactions',
+            view: 'emails.reponse-dossier',
         );
     }
 
@@ -64,8 +66,8 @@ class TransactionsEmail extends Mailable
     public function build()
     {
         return $this
-            ->from('info@ihdemunis.org')
-            ->subject('Initiative Humanitaire pour le Demunis')
-            ->view('emails.transactions');
+            ->from('info@coopecakibayetu.org')
+            ->subject('AKIBA YETU')
+            ->view('emails.reponse-dossier');
     }
 }

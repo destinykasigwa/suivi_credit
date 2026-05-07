@@ -925,7 +925,9 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
                 'parent_id' => $request->parent_id,
             ]);
             if ($request->user_id) {
-                $this->sendNotification->SendNotificationWhenReplyAcomment($request->user_id, $request->getDossierId);
+                  $sendName=Auth::user()->name;
+                  $this->sendNotification->SendNotificationWhenReplyAcomment($request->user_id, $request->getDossierId);
+                  $this->sendNotification->sendEmailWhenResponseComment($request->contenu,$request->user_id, $request->getDossierId,$sendName);
             }
 
             return response()->json([

@@ -3333,7 +3333,8 @@ const CommentaireItem = ({
             <div
                 className="me-3 d-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
                 style={{
-                    width: "35px",
+                      minWidth: "35px", // évite l’écrasement
+                     flexShrink: 0,
                     height: "35px",
                     fontSize: "14px",
                     fontWeight: "bold",
