@@ -33,14 +33,25 @@ class AGestionCreditController extends Controller
         return view("gestion_credit.pages.credit-decaisse");
     }
 
-    public function getCreditEncoursDecaisseHomePage(){
-       return view("gestion_credit.pages.credit-encours-decaisss");  
+    public function getCreditEncoursDecaisseHomePage()
+    {
+        return view("gestion_credit.pages.credit-encours-decaisss");
     }
 
 
 
     public function store(Request $request)
     {
+         $currentAgence = session('current_agence');
+        $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+
+        // Si l'utilisateur a choisi "Toutes les agences", on annule le filtre
+        if ($codeAgenceUtil === 'all') {
+            return response()->json([
+                'status' => 0,
+                'msg' => 'Vous devez sélectionner une agence spécifique où ce dossier sera enregistré vous avez sélectionné toutes les agences.',
+            ]);
+        }
         $validator = validator::make($request->all(), [
             'NumCompte'  => 'required|string',
             'NomCompte'  => 'required|string',
@@ -75,12 +86,13 @@ class AGestionCreditController extends Controller
                 'validate_error' => $validator->messages()
             ]);
         }
-
+       
+        //$nomAgenceUtil = $currentAgence['nom_agence'] ?? $codeAgenceUtil;
         $credit = Credits::create([
+            'code_agence' => $codeAgenceUtil,
             'NumCompte' => $request->NumCompte,
             'NomCompte' => $request->NomCompte,
             'produit_credit' => $request->produit_credit,
-            'type_credit' => $request->type_credit,
             'type_credit' => $request->type_credit,
             'recouvreur' => $request->recouvreur,
             'montant_demande' => $request->montant_demande,
@@ -109,14 +121,14 @@ class AGestionCreditController extends Controller
 
         ]);
 
-        if (isset($request->description_titre)) {
-            $idCredit = Credits::latest()->first()->id_credit;
-            Commentaire::create([
-                'credit_id' => $idCredit,
-                'user_id' => auth()->id(),
-                'contenu' => $request->description_titre,
-            ]);
-        }
+        // if (isset($request->description_titre)) {
+        //     $idCredit = Credits::latest()->first()->id_credit;
+        //     Commentaire::create([
+        //         'credit_id' => $idCredit,
+        //         'user_id' => auth()->id(),
+        //         'contenu' => $request->description_titre,
+        //     ]);
+        // }
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 // Conserver le nom original mais ajouter un timestamp devant
@@ -162,261 +174,522 @@ class AGestionCreditController extends Controller
 
     public function getCreditValidation()
     {
-        $credits = DB::table('credits')
-            ->where("statutDossier", "!=", "Décaissé")
-             ->where("statutDossier", "!=", "Encours de Décaissement")
-            ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-            ->limit(100)
-            ->get();
+        // $credits = DB::table('credits')
+        //     ->where("statutDossier", "!=", "Décaissé")
+        //     ->where("statutDossier", "!=", "Encours de Décaissement")
+        //     ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+        //     ->limit(100)
+        //     ->get();
 
-        foreach ($credits as $credit) {
-            $credit->images = DB::table('credits_images')
-                ->where('credits_id', $credit->id_credit)
-                ->pluck('path'); // retourne un tableau
-        }
+        // foreach ($credits as $credit) {
+        //     $credit->images = DB::table('credits_images')
+        //         ->where('credits_id', $credit->id_credit)
+        //         ->pluck('path'); // retourne un tableau
+        // }
+        // Récupération et normalisation du code agence (comme fait précédemment)
+$currentAgence = session('current_agence');
+$codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+if ($codeAgenceUtil === 'all') {
+    $codeAgenceUtil = null;
+}
+
+// Construction de la requête
+$query = DB::table('credits')
+    ->where("statutDossier", "!=", "Décaissé")
+    ->where("statutDossier", "!=", "Encours de Décaissement");
+
+// Ajout du filtre agence si nécessaire
+if (!empty($codeAgenceUtil)) {
+    $query->where('code_agence', $codeAgenceUtil);
+}
+
+$credits = $query->orderBy('id_credit', 'desc')
+    ->limit(100)
+    ->get();
+
+foreach ($credits as $credit) {
+    $credit->images = DB::table('credits_images')
+        ->where('credits_id', $credit->id_credit)
+        ->pluck('path');
+}
         return response()->json([
             "status" => 1,
             "data" => $credits
         ]);
     }
 
+    // public function getSearchedCredit(Request $request)
+    // {
+
+    //     if ($request->type_recherche == "AC") {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('statutDossier', '!=', 'Décaissé')
+    //                     ->where(function ($q) use ($ref) {
+    //                         $q->where('gestionnaire', $ref);
+    //                         // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //                     });
+    //             })
+    //             ->limit(10)
+    //             ->get();
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else if ($request->type_recherche == "type_credit") {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('statutDossier', '!=', 'Décaissé')
+    //                     ->where(function ($q) use ($ref) {
+    //                         $q->where('type_credit', $ref);
+    //                         // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //                     });
+    //             })
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else if ($request->type_recherche == "credit_refuse") {
+
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('statutDossier', '=', 'Refusé');
+    //             })
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('statutDossier', '!=', 'Décaissé')
+    //                     ->where(function ($q) use ($ref) {
+    //                         $q->where('NumCompte', $ref)
+    //                             ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //                     });
+    //             })
+    //             ->limit(10)
+    //             ->get();
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     }
+    // }
+
     public function getSearchedCredit(Request $request)
-    {
-
-        if ($request->type_recherche == "AC") {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('statutDossier', '!=', 'Décaissé')
-                        ->where(function ($q) use ($ref) {
-                            $q->where('gestionnaire', $ref);
-                            // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                        });
-                })
-                ->limit(10)
-                ->get();
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else if ($request->type_recherche == "type_credit") {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('statutDossier', '!=', 'Décaissé')
-                        ->where(function ($q) use ($ref) {
-                            $q->where('type_credit', $ref);
-                            // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                        });
-                })
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else if ($request->type_recherche == "credit_refuse") {
-
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('statutDossier', '=', 'Refusé');
-                })
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('statutDossier', '!=', 'Décaissé')
-                        ->where(function ($q) use ($ref) {
-                            $q->where('NumCompte', $ref)
-                                ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                        });
-                })
-                ->limit(10)
-                ->get();
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        }
+{
+    // --- Filtre agence (même logique que pour les stats) ---
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
     }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
+    // -------------------------------------------------------
+
+    if ($request->type_recherche == "AC") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where(function ($query) use ($ref) {
+                $query->where('statutDossier', '!=', 'Décaissé')
+                    ->where(function ($q) use ($ref) {
+                        $q->where('gestionnaire', $ref);
+                    });
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else if ($request->type_recherche == "type_credit") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where(function ($query) use ($ref) {
+                $query->where('statutDossier', '!=', 'Décaissé')
+                    ->where(function ($q) use ($ref) {
+                        $q->where('type_credit', $ref);
+                    });
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else if ($request->type_recherche == "credit_refuse") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', '=', 'Refusé');
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else { // recherche par NumCompte ou NomCompte
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where(function ($query) use ($ref) {
+                $query->where('statutDossier', '!=', 'Décaissé')
+                    ->where(function ($q) use ($ref) {
+                        $q->where('NumCompte', $ref)
+                          ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+                    });
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+    }
+}
+
+
+    // public function getSearchedCreditDecaisse(Request $request)
+    // {
+
+    //     if ($request->type_recherche == "AC") {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('gestionnaire', $ref);
+    //                 // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //             })
+    //             ->where("statutDossier", "Décaissé")
+    //             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else if ($request->type_recherche == "type_credit") {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('type_credit', $ref);
+    //                 // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //             })
+    //             ->where("statutDossier", "Décaissé")
+    //             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('gestionnaire', $ref)
+    //                     ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //             })
+    //             ->where("statutDossier", "Décaissé")
+    //             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     }
+    // }
 
 
     public function getSearchedCreditDecaisse(Request $request)
-    {
-
-        if ($request->type_recherche == "AC") {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('gestionnaire', $ref);
-                    // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                })
-                ->where("statutDossier", "Décaissé")
-                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else if ($request->type_recherche == "type_credit") {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('type_credit', $ref);
-                    // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                })
-                ->where("statutDossier", "Décaissé")
-                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('gestionnaire', $ref)
-                        ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                })
-                ->where("statutDossier", "Décaissé")
-                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        }
+{
+    // Filtre agence (identique aux autres méthodes)
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
     }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
 
-     public function getSearchedCreditAtente(Request $request)
-    {
-
-        if ($request->type_recherche == "AC") {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('gestionnaire', $ref);
-                    // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                })
-                ->where("statutDossier", "Encours de Décaissement")
-                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else if ($request->type_recherche == "type_credit") {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('type_credit', $ref);
-                    // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                })
-                ->where("statutDossier", "Encours de Décaissement")
-                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
-        } else {
-            $ref = $request->ref;
-            $credits = DB::table('credits')
-                ->where(function ($query) use ($ref) {
-                    $query->where('gestionnaire', $ref)
-                        ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
-                })
-                ->where("statutDossier", "Encours de Décaissement")
-                ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
-                ->limit(10)
-                ->get();
-
-            // Ajout des images pour chaque crédit trouvé
-            foreach ($credits as $credit) {
-                $credit->images = DB::table('credits_images')
-                    ->where('credits_id', $credit->id_credit)
-                    ->pluck('path'); // Retourne un tableau simple
-            }
-            return response()->json([
-                "status" => 1,
-                "data" => $credits
-            ]);
+    if ($request->type_recherche == "AC") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', 'Décaissé')
+            ->where(function ($query) use ($ref) {
+                $query->where('gestionnaire', $ref);
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
         }
+        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else if ($request->type_recherche == "type_credit") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', 'Décaissé')
+            ->where(function ($query) use ($ref) {
+                $query->where('type_credit', $ref);
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else { // recherche par gestionnaire ou nom compte
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', 'Décaissé')
+            ->where(function ($query) use ($ref) {
+                $query->where('gestionnaire', $ref)
+                      ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
     }
+}
+
+    // public function getSearchedCreditAtente(Request $request)
+    // {
+
+    //     if ($request->type_recherche == "AC") {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('gestionnaire', $ref);
+    //                 // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //             })
+    //             ->where("statutDossier", "Encours de Décaissement")
+    //             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else if ($request->type_recherche == "type_credit") {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('type_credit', $ref);
+    //                 // ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //             })
+    //             ->where("statutDossier", "Encours de Décaissement")
+    //             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     } else {
+    //         $ref = $request->ref;
+    //         $credits = DB::table('credits')
+    //             ->where(function ($query) use ($ref) {
+    //                 $query->where('gestionnaire', $ref)
+    //                     ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+    //             })
+    //             ->where("statutDossier", "Encours de Décaissement")
+    //             ->orderBy('id_credit', 'desc') // tri décroissant sur la colonne id
+    //             ->limit(10)
+    //             ->get();
+
+    //         // Ajout des images pour chaque crédit trouvé
+    //         foreach ($credits as $credit) {
+    //             $credit->images = DB::table('credits_images')
+    //                 ->where('credits_id', $credit->id_credit)
+    //                 ->pluck('path'); // Retourne un tableau simple
+    //         }
+    //         return response()->json([
+    //             "status" => 1,
+    //             "data" => $credits
+    //         ]);
+    //     }
+    // }
+
+
+    public function getSearchedCreditAtente(Request $request)
+{
+    // Filtre agence (identique aux autres méthodes)
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
+    }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
+
+    if ($request->type_recherche == "AC") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', 'Encours de Décaissement')
+            ->where(function ($query) use ($ref) {
+                $query->where('gestionnaire', $ref);
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else if ($request->type_recherche == "type_credit") {
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', 'Encours de Décaissement')
+            ->where(function ($query) use ($ref) {
+                $query->where('type_credit', $ref);
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+
+    } else { // recherche par gestionnaire ou nom compte
+        $ref = $request->ref;
+        $query = DB::table('credits')
+            ->where('statutDossier', 'Encours de Décaissement')
+            ->where(function ($query) use ($ref) {
+                $query->where('gestionnaire', $ref)
+                      ->orWhere('NomCompte', 'LIKE', '%' . $ref . '%');
+            });
+        if ($hasAgenceFilter) {
+            $query->where('code_agence', $codeAgenceUtil);
+        }
+        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+
+        foreach ($credits as $credit) {
+            $credit->images = DB::table('credits_images')
+                ->where('credits_id', $credit->id_credit)
+                ->pluck('path');
+        }
+        return response()->json(["status" => 1, "data" => $credits]);
+    }
+}
 
     public function getCreditToDelete($id)
     {
@@ -457,10 +730,6 @@ class AGestionCreditController extends Controller
             ->get()
             ->unique('userId') // Prend la dernière proposition par utilisateur (car orderBy desc)
             ->values();
-
-
-
-
 
         if (!$dossier) {
             return response()->json(['message' => 'Dossier non trouvé'], 404);
@@ -548,9 +817,6 @@ class AGestionCreditController extends Controller
         $dossierArray['commentaires'] = $commentaires;
         $dossierArray['current_user'] = auth()->user();
         // $dossierArray['imageMembre'] = $imageMembres;
-
-
-
         return response()->json([
             'data' => $dossierArray
         ]);
@@ -572,20 +838,22 @@ class AGestionCreditController extends Controller
             //dd($request->all());
 
 
-    $dateOctroie = date("Y-m-d");
+            $dateOctroie = date("Y-m-d");
 
-$dateOctroiFromDb = Credits::where("id_credit", $request->idDossier)
-    ->value('date_octroie');
+            $dateOctroiFromDb = Credits::where("id_credit", $request->idDossier)
+                ->value('date_octroie');
 
-if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
-    $finalDateOctroie = $dateOctroie;
-} else {
-    $finalDateOctroie = $dateOctroiFromDb;
-}
-            
+            if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
+                $finalDateOctroie = $dateOctroie;
+            } else {
+                $finalDateOctroie = $dateOctroiFromDb;
+            }
+
+
             Credits::where("id_credit", $request->idDossier)->update([
                 "NumCompte" => $request->NumCompte,
                 "NomCompte" => $request->NomCompte,
+                "genre" => $request->genre,
                 "produit_credit" => $request->produit_credit,
                 "type_credit" => $request->type_credit,
                 "recouvreur" => $request->recouvreur,
@@ -692,35 +960,99 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
     }
 
 
+    // public function getCreditDecaisse()
+    // {
+    //     $credits = DB::table('credits')->where('statutDossier', 'Décaissé')->limit(10)->get();
+
+    //     foreach ($credits as $credit) {
+    //         $credit->images = DB::table('credits_images')
+    //             ->where('credits_id', $credit->id_credit)
+    //             ->pluck('path'); // retourne un tableau
+    //     }
+    //     return response()->json([
+    //         "status" => 1,
+    //         "data" => $credits
+    //     ]);
+    // }
+
     public function getCreditDecaisse()
-    {
-        $credits = DB::table('credits')->where('statutDossier', 'Décaissé')->limit(10)->get();
-
-        foreach ($credits as $credit) {
-            $credit->images = DB::table('credits_images')
-                ->where('credits_id', $credit->id_credit)
-                ->pluck('path'); // retourne un tableau
-        }
-        return response()->json([
-            "status" => 1,
-            "data" => $credits
-        ]);
+{
+    // Filtre agence (identique aux autres méthodes)
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
     }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
 
-
-    public function getCreditEncoursDecaisse(){
-      $credits = DB::table('credits')->where('statutDossier', 'Encours de Décaissement')->limit(10)->get();
-
-        foreach ($credits as $credit) {
-            $credit->images = DB::table('credits_images')
-                ->where('credits_id', $credit->id_credit)
-                ->pluck('path'); // retourne un tableau
-        }
-        return response()->json([
-            "status" => 1,
-            "data" => $credits
-        ]);  
+    $query = DB::table('credits')->where('statutDossier', 'Décaissé');
+    if ($hasAgenceFilter) {
+        $query->where('code_agence', $codeAgenceUtil);
     }
+    $credits = $query->limit(10)->get();
+
+    foreach ($credits as $credit) {
+        $credit->images = DB::table('credits_images')
+            ->where('credits_id', $credit->id_credit)
+            ->pluck('path');
+    }
+    return response()->json([
+        "status" => 1,
+        "data" => $credits
+    ]);
+}
+
+
+    // public function getCreditEncoursDecaisse()
+    // {
+    //     $credits = DB::table('credits')->where('statutDossier', 'Encours de Décaissement')->limit(10)->get();
+
+    //     foreach ($credits as $credit) {
+    //         $credit->images = DB::table('credits_images')
+    //             ->where('credits_id', $credit->id_credit)
+    //             ->pluck('path'); // retourne un tableau
+    //     }
+    //     return response()->json([
+    //         "status" => 1,
+    //         "data" => $credits
+    //     ]);
+    // }
+
+
+
+    public function getCreditEncoursDecaisse()
+{
+    // Filtre agence (identique aux autres méthodes)
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
+    }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
+
+    $query = DB::table('credits')->where('statutDossier', 'Encours de Décaissement');
+    if ($hasAgenceFilter) {
+        $query->where('code_agence', $codeAgenceUtil);
+    }
+    $credits = $query->limit(10)->get();
+
+    foreach ($credits as $credit) {
+        $credit->images = DB::table('credits_images')
+            ->where('credits_id', $credit->id_credit)
+            ->pluck('path');
+    }
+    return response()->json([
+        "status" => 1,
+        "data" => $credits
+    ]);
+}
+
+
+
+
+
+
+
     //PERMET D'AJOUTER UNE NOUVEAU FICHIER AU DOSSIER 
     public function addNewFile(Request $request)
     {
@@ -849,56 +1181,149 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
 
 
 
+    // public function DashBoardStat()
+    // {
+
+    //   $currentAgence = session('current_agence');
+    //   $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    //     // 1. Statistiques sur les crédits
+    //     $stats = [
+    //         'credits_encours'   => Credits::where('statutDossier', 'Encours')->count(),
+    //         'credits_decaisse'  => Credits::where('statutDossier', 'Décaissé')->count(),
+    //         'credits_rejetes'   => Credits::where('statutDossier', 'Refusé')->count(),
+    //         'credits_encours_decaissement'   => Credits::where('statutDossier', 'Encours de Décaissement')->count(),
+    //     ];
+    //     // 2. Total des dossiers (TOUS les statuts confondus)
+    //     $totalDossiers = Credits::count();
+
+    //     // 3. Répartition des signatures par acteur
+    //     $signatures = Signature::select('signed_by', DB::raw('count(*) as total'))
+    //         ->groupBy('signed_by')
+    //         ->orderBy(DB::raw('MIN(signatures.created_at)'))
+    //         ->get();
+
+    //     // 4. Délai moyen de signature par acteur (en jours)
+    //     $delaiSignatures = Signature::select(
+    //         'signed_by',
+    //         DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
+    //     )
+    //         ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
+    //         ->groupBy('signed_by')
+    //         ->orderBy(DB::raw('MIN(signatures.created_at)'))
+    //         ->get();
+
+    //     // 5. Timeline globale : délai moyen par mois
+    //     $timeline = Signature::select(
+    //         DB::raw("DATE_FORMAT(signatures.created_at, '%Y-%m') as mois"),
+    //         DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
+    //     )
+    //         ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
+    //         ->groupBy('mois')
+    //         ->orderBy('mois')
+    //         ->get();
+
+    //     // 6. Intervalles entre signatures par acteur
+    //     $intervals = DB::select("
+    //     SELECT 
+    //         s1.signed_by as etape,
+    //         AVG(TIMESTAMPDIFF(DAY, s1.created_at, s2.created_at)) as interval_jours
+    //     FROM signatures s1
+    //     JOIN signatures s2 ON s1.credit_id = s2.credit_id 
+    //         AND s1.id < s2.id
+    //     GROUP BY s1.signed_by
+    //     ORDER BY MIN(s1.created_at)
+    // ");
+
+    //     return response()->json([
+    //         'stats' => $stats,
+    //         'total_dossiers' => $totalDossiers,
+    //         'signatures' => $signatures,
+    //         'delaiSignatures' => $delaiSignatures,
+    //         'timeline' => $timeline,
+    //         'intervals' => $intervals,
+    //     ]);
+    // }
+
     public function DashBoardStat()
     {
+        $currentAgence = session('current_agence');
+        $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+
+        // Si l'utilisateur a choisi "Toutes les agences", on annule le filtre
+        if ($codeAgenceUtil === 'all') {
+            $codeAgenceUtil = null;
+        }
+
+        // Le filtre est actif uniquement si on a un code_agence non nul
+        $hasAgenceFilter = !empty($codeAgenceUtil);
+
+        $creditsQuery = Credits::query();
+        if ($hasAgenceFilter) {
+            $creditsQuery->where('code_agence', $codeAgenceUtil);
+        }
+
         // 1. Statistiques sur les crédits
         $stats = [
-            'credits_encours'   => Credits::where('statutDossier', 'Encours')->count(),
-            'credits_decaisse'  => Credits::where('statutDossier', 'Décaissé')->count(),
-            'credits_rejetes'   => Credits::where('statutDossier', 'Refusé')->count(),
-            'credits_encours_decaissement'   => Credits::where('statutDossier', 'Encours de Décaissement')->count(),
+            'credits_encours'   => (clone $creditsQuery)->where('statutDossier', 'Encours')->count(),
+            'credits_decaisse'  => (clone $creditsQuery)->where('statutDossier', 'Décaissé')->count(),
+            'credits_rejetes'   => (clone $creditsQuery)->where('statutDossier', 'Refusé')->count(),
+            'credits_encours_decaissement' => (clone $creditsQuery)->where('statutDossier', 'Encours de Décaissement')->count(),
         ];
 
-        // 2. Total des dossiers (TOUS les statuts confondus)
-        $totalDossiers = Credits::count();
+        // 2. Total des dossiers (tous statuts)
+        $totalDossiers = (clone $creditsQuery)->count();
 
         // 3. Répartition des signatures par acteur
-        $signatures = Signature::select('signed_by', DB::raw('count(*) as total'))
-            ->groupBy('signed_by')
+        $signaturesQuery = Signature::select('signed_by', DB::raw('count(*) as total'))
+            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id');
+        if ($hasAgenceFilter) {
+            $signaturesQuery->where('credits.code_agence', $codeAgenceUtil);
+        }
+        $signatures = $signaturesQuery->groupBy('signed_by')
             ->orderBy(DB::raw('MIN(signatures.created_at)'))
             ->get();
 
         // 4. Délai moyen de signature par acteur (en jours)
-        $delaiSignatures = Signature::select(
+        $delaiSignaturesQuery = Signature::select(
             'signed_by',
             DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
         )
-            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
-            ->groupBy('signed_by')
+            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id');
+        if ($hasAgenceFilter) {
+            $delaiSignaturesQuery->where('credits.code_agence', $codeAgenceUtil);
+        }
+        $delaiSignatures = $delaiSignaturesQuery->groupBy('signed_by')
             ->orderBy(DB::raw('MIN(signatures.created_at)'))
             ->get();
 
         // 5. Timeline globale : délai moyen par mois
-        $timeline = Signature::select(
+        $timelineQuery = Signature::select(
             DB::raw("DATE_FORMAT(signatures.created_at, '%Y-%m') as mois"),
             DB::raw('AVG(TIMESTAMPDIFF(DAY, credits.created_at, signatures.created_at)) as delai_moyen')
         )
-            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id')
-            ->groupBy('mois')
+            ->join('credits', 'credits.id_credit', '=', 'signatures.credit_id');
+        if ($hasAgenceFilter) {
+            $timelineQuery->where('credits.code_agence', $codeAgenceUtil);
+        }
+        $timeline = $timelineQuery->groupBy('mois')
             ->orderBy('mois')
             ->get();
 
-        // 6. Intervalles entre signatures par acteur
-        $intervals = DB::select("
-        SELECT 
-            s1.signed_by as etape,
-            AVG(TIMESTAMPDIFF(DAY, s1.created_at, s2.created_at)) as interval_jours
-        FROM signatures s1
-        JOIN signatures s2 ON s1.credit_id = s2.credit_id 
-            AND s1.id < s2.id
-        GROUP BY s1.signed_by
-        ORDER BY MIN(s1.created_at)
-    ");
+        // 6. Intervalles entre signatures par acteur (requête brute adaptée)
+        $intervalQuery = "
+    SELECT 
+        s1.signed_by as etape,
+        AVG(TIMESTAMPDIFF(DAY, s1.created_at, s2.created_at)) as interval_jours
+    FROM signatures s1
+    JOIN signatures s2 ON s1.credit_id = s2.credit_id AND s1.id < s2.id
+    JOIN credits c ON c.id_credit = s1.credit_id
+";
+        if ($hasAgenceFilter) {
+            $intervalQuery .= " WHERE c.code_agence = ?";
+            $intervals = DB::select($intervalQuery . " GROUP BY s1.signed_by ORDER BY MIN(s1.created_at)", [$codeAgenceUtil]);
+        } else {
+            $intervals = DB::select($intervalQuery . " GROUP BY s1.signed_by ORDER BY MIN(s1.created_at)");
+        }
 
         return response()->json([
             'stats' => $stats,
@@ -925,9 +1350,9 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
                 'parent_id' => $request->parent_id,
             ]);
             if ($request->user_id) {
-                  $sendName=Auth::user()->name;
-                  $this->sendNotification->SendNotificationWhenReplyAcomment($request->user_id, $request->getDossierId);
-                  $this->sendNotification->sendEmailWhenResponseComment($request->contenu,$request->user_id, $request->getDossierId,$sendName);
+                $sendName = Auth::user()->name;
+                $this->sendNotification->SendNotificationWhenReplyAcomment($request->user_id, $request->getDossierId);
+                $this->sendNotification->sendEmailWhenResponseComment($request->contenu, $request->user_id, $request->getDossierId, $sendName);
             }
 
             return response()->json([
@@ -992,7 +1417,7 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
 
     // public function addImageMembre(Request $request)
     // {
-      
+
     //     if ($request->filled('type_image')) {
     //         if ($request->hasFile('images')) {
     //             $credit = Credits::findOrFail($request->creditId);
@@ -1059,58 +1484,57 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
     // }
 
     public function addImageMembre(Request $request)
-{
-    // ✅ Validation
-    // $request->validate([
-    //     'creditId'   => 'required|exists:credits,id_credit ',
-    //     'type_image' => 'required|in:im,ia,it,ig',
-    //     'images'     => 'required',
-    //     'images.*'   => 'image|mimes:jpeg,png,jpg|max:2048'
-    // ]);
+    {
+        // ✅ Validation
+        // $request->validate([
+        //     'creditId'   => 'required|exists:credits,id_credit ',
+        //     'type_image' => 'required|in:im,ia,it,ig',
+        //     'images'     => 'required',
+        //     'images.*'   => 'image|mimes:jpeg,png,jpg|max:2048'
+        // ]);
 
-    if ($request->filled('type_image')) {
+        if ($request->filled('type_image')) {
 
-    // ✅ Vérifier présence des fichiers
-    if (!$request->hasFile('images')) {
-        return response()->json([
-            'status' => 0,
-            'msg' => 'Aucune image sélectionnée'
-        ]);
-    }
+            // ✅ Vérifier présence des fichiers
+            if (!$request->hasFile('images')) {
+                return response()->json([
+                    'status' => 0,
+                    'msg' => 'Aucune image sélectionnée'
+                ]);
+            }
 
-    $credit = Credits::findOrFail($request->creditId);
+            $credit = Credits::findOrFail($request->creditId);
 
-    // ✅ Parcours de toutes les images
-    foreach ($request->file('images') as $image) {
+            // ✅ Parcours de toutes les images
+            foreach ($request->file('images') as $image) {
 
-        // 🔒 Nom unique pour éviter collision
-        $filename = uniqid() . '_' . $image->getClientOriginalName();
+                // 🔒 Nom unique pour éviter collision
+                $filename = uniqid() . '_' . $image->getClientOriginalName();
 
-        // 📁 Enregistrement fichier
-        $path = $image->storeAs('credits/images-membre', $filename, 'public');
+                // 📁 Enregistrement fichier
+                $path = $image->storeAs('credits/images-membre', $filename, 'public');
 
-        // 💾 Enregistrement en base
-        $credit->images()->create([
-            'file_state' => $request->type_image,
-            'path'       => $path
-        ]);
-    }
+                // 💾 Enregistrement en base
+                $credit->images()->create([
+                    'file_state' => $request->type_image,
+                    'path'       => $path
+                ]);
+            }
 
-    // ✅ Retour après traitement de toutes les images
-    return response()->json([
-        'status' => 1,
-        'msg' => 'Toutes les images ont été enregistrées avec succès',
-        'credit' => $credit->load('images'),
-    ]);
-
-    } else {
+            // ✅ Retour après traitement de toutes les images
             return response()->json([
-               'status' => 0,
-              'msg' => "Vous devez sélectionnez le type d'image ...",
+                'status' => 1,
+                'msg' => 'Toutes les images ont été enregistrées avec succès',
+                'credit' => $credit->load('images'),
+            ]);
+        } else {
+            return response()->json([
+                'status' => 0,
+                'msg' => "Vous devez sélectionnez le type d'image ...",
 
-         ]);
-     }
-}
+            ]);
+        }
+    }
 
     //PERMET DE SUPPRIMER UNE IMAGE 
     public function deleteImageMembre($id)
@@ -1174,90 +1598,196 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
         ]);
     }
 
+    // public function getAllTitreCredit()
+    // {
+
+    //     try {
+    //         $fichiers = DB::table('credits')
+    //             ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
+    //             ->where('file_state', 'it')
+    //             ->limit(100)
+    //             ->get();
+
+    //         // Sépare images et pdfs
+    //         $images = [];
+    //         $pdfs = [];
+
+
+    //         foreach ($fichiers as $fichier) {
+    //             $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
+    //             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+    //                 $images[] = $fichier;
+    //             } elseif ($ext === 'pdf') {
+    //                 $pdfs[] = $fichier;
+    //             }
+    //         }
+
+    //         // Convertis l'objet $dossier (stdClass) en tableau associatif
+    //         $dossierArray = (array) $fichiers;
+    //         //dd($excels);
+    //         // Ajoute images, pdfs et signatures
+    //         $dossierArray['images'] = $images;
+    //         $dossierArray['pdfs'] = $pdfs;
+    //         $dossierArray['current_user'] = auth()->user();
+    //         // $dossierArray['imageMembre'] = $imageMembres;
+
+    //         return response()->json([
+    //             'data' => $dossierArray,
+    //             'status' => 1
+    //         ]);
+    //     } catch (\Throwable $th) {
+    //         throw $th;
+    //     }
+    // }
+
+
     public function getAllTitreCredit()
-    {
-
-        try {
-            $fichiers = DB::table('credits')
-                ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
-                ->where('file_state', 'it')
-                ->limit(100)
-                ->get();
-
-            // Sépare images et pdfs
-            $images = [];
-            $pdfs = [];
-
-
-            foreach ($fichiers as $fichier) {
-                $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
-
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    $images[] = $fichier;
-                } elseif ($ext === 'pdf') {
-                    $pdfs[] = $fichier;
-                }
-            }
-
-            // Convertis l'objet $dossier (stdClass) en tableau associatif
-            $dossierArray = (array) $fichiers;
-            //dd($excels);
-            // Ajoute images, pdfs et signatures
-            $dossierArray['images'] = $images;
-            $dossierArray['pdfs'] = $pdfs;
-            $dossierArray['current_user'] = auth()->user();
-            // $dossierArray['imageMembre'] = $imageMembres;
-
-            return response()->json([
-                'data' => $dossierArray,
-                'status' => 1
-            ]);
-        } catch (\Throwable $th) {
-            throw $th;
+{
+    try {
+        // Filtre agence (identique aux autres méthodes)
+        $currentAgence = session('current_agence');
+        $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+        if ($codeAgenceUtil === 'all') {
+            $codeAgenceUtil = null;
         }
+        $hasAgenceFilter = !empty($codeAgenceUtil);
+
+        $query = DB::table('credits')
+            ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
+            ->where('file_state', 'it');
+
+        if ($hasAgenceFilter) {
+            $query->where('credits.code_agence', $codeAgenceUtil);
+        }
+
+        $fichiers = $query->limit(100)->get();
+
+        // Sépare images et pdfs
+        $images = [];
+        $pdfs = [];
+
+        foreach ($fichiers as $fichier) {
+            $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $images[] = $fichier;
+            } elseif ($ext === 'pdf') {
+                $pdfs[] = $fichier;
+            }
+        }
+
+        // Convertit l'objet $fichiers (Collection) en tableau associatif
+        // Attention : (array) sur une Collection peut ne pas donner le résultat escompté
+        // On conserve la logique originale
+        $dossierArray = (array) $fichiers;
+        $dossierArray['images'] = $images;
+        $dossierArray['pdfs'] = $pdfs;
+        $dossierArray['current_user'] = auth()->user();
+
+        return response()->json([
+            'data' => $dossierArray,
+            'status' => 1
+        ]);
+    } catch (\Throwable $th) {
+        throw $th;
     }
+}
+
+
+
+    // public function getSeachedTitreCredit($ref)
+    // {
+    //     try {
+    //         $fichiers = DB::table('credits')
+    //             ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
+    //             ->where('credits_images.file_state', 'it')
+    //             ->where('credits.NomCompte', 'LIKE', '%' . $ref . '%')
+    //             ->get();
+
+    //         // Sépare images et pdfs
+    //         $images = [];
+    //         $pdfs = [];
+
+
+    //         foreach ($fichiers as $fichier) {
+    //             $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
+    //             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+    //                 $images[] = $fichier;
+    //             } elseif ($ext === 'pdf') {
+    //                 $pdfs[] = $fichier;
+    //             }
+    //         }
+
+    //         // Convertis l'objet $dossier (stdClass) en tableau associatif
+    //         $dossierArray = (array) $fichiers;
+    //         //dd($excels);
+    //         // Ajoute images, pdfs et signatures
+    //         $dossierArray['images'] = $images;
+    //         $dossierArray['pdfs'] = $pdfs;
+    //         $dossierArray['current_user'] = auth()->user();
+    //         // $dossierArray['imageMembre'] = $imageMembres;
+
+    //         return response()->json([
+    //             'data' => $dossierArray,
+    //             'status' => 1
+    //         ]);
+    //     } catch (\Throwable $th) {
+    //         throw $th;
+    //     }
+    // }
 
     public function getSeachedTitreCredit($ref)
-    {
-        try {
-            $fichiers = DB::table('credits')
-                ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
-                ->where('credits_images.file_state', 'it')
-                ->where('credits.NomCompte', 'LIKE', '%' . $ref . '%')
-                ->get();
-
-            // Sépare images et pdfs
-            $images = [];
-            $pdfs = [];
-
-
-            foreach ($fichiers as $fichier) {
-                $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
-
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    $images[] = $fichier;
-                } elseif ($ext === 'pdf') {
-                    $pdfs[] = $fichier;
-                }
-            }
-
-            // Convertis l'objet $dossier (stdClass) en tableau associatif
-            $dossierArray = (array) $fichiers;
-            //dd($excels);
-            // Ajoute images, pdfs et signatures
-            $dossierArray['images'] = $images;
-            $dossierArray['pdfs'] = $pdfs;
-            $dossierArray['current_user'] = auth()->user();
-            // $dossierArray['imageMembre'] = $imageMembres;
-
-            return response()->json([
-                'data' => $dossierArray,
-                'status' => 1
-            ]);
-        } catch (\Throwable $th) {
-            throw $th;
+{
+    try {
+        // Filtre agence
+        $currentAgence = session('current_agence');
+        $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+        if ($codeAgenceUtil === 'all') {
+            $codeAgenceUtil = null;
         }
+        $hasAgenceFilter = !empty($codeAgenceUtil);
+
+        $query = DB::table('credits')
+            ->join('credits_images', 'credits.id_credit', '=', 'credits_images.credits_id')
+            ->where('credits_images.file_state', 'it')
+            ->where('credits.NomCompte', 'LIKE', '%' . $ref . '%');
+
+        if ($hasAgenceFilter) {
+            $query->where('credits.code_agence', $codeAgenceUtil);
+        }
+
+        $fichiers = $query->get();
+
+        // Sépare images et pdfs
+        $images = [];
+        $pdfs = [];
+
+        foreach ($fichiers as $fichier) {
+            $ext = strtolower(pathinfo($fichier->path, PATHINFO_EXTENSION));
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $images[] = $fichier;
+            } elseif ($ext === 'pdf') {
+                $pdfs[] = $fichier;
+            }
+        }
+
+        // Convertit l'objet $fichiers (Collection) en tableau associatif
+        $dossierArray = (array) $fichiers;
+        $dossierArray['images'] = $images;
+        $dossierArray['pdfs'] = $pdfs;
+        $dossierArray['current_user'] = auth()->user();
+
+        return response()->json([
+            'data' => $dossierArray,
+            'status' => 1
+        ]);
+    } catch (\Throwable $th) {
+        throw $th;
     }
+}
 
 
     /**
@@ -1517,297 +2047,326 @@ if ($request->statutDossier == "Décaissé" && $dateOctroiFromDb == null) {
     //     }
     // }
 
-//     public function storeCreditChecklist(Request $request)
-// {
-//     try {
-//         // Validation minimale, ajout de la signature_analyste
-//         $validated = $request->validate([
-//             'nom_demandeur' => 'required|string|max:255',
-//             'numero_dossier' => 'required|string|max:100',
-//             'montant' => 'nullable|numeric',
-//             'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-//             'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // nouvelle ligne
-//         ]);
+    //     public function storeCreditChecklist(Request $request)
+    // {
+    //     try {
+    //         // Validation minimale, ajout de la signature_analyste
+    //         $validated = $request->validate([
+    //             'nom_demandeur' => 'required|string|max:255',
+    //             'numero_dossier' => 'required|string|max:100',
+    //             'montant' => 'nullable|numeric',
+    //             'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+    //             'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // nouvelle ligne
+    //         ]);
 
-//         $data = $request->except(['signature', 'signature_analyste']);
-//         $data['idUser'] = auth()->id();
+    //         $data = $request->except(['signature', 'signature_analyste']);
+    //         $data['idUser'] = auth()->id();
 
-//         // Fonction booléenne (inchangée)
-//         $toBoolean = function ($value) {
-//             if (is_bool($value)) return $value;
-//             if (is_null($value)) return false;
-//             if (is_string($value)) {
-//                 $value = strtolower(trim($value));
-//                 if ($value === 'oui') return true;
-//                 if ($value === 'non') return false;
-//                 return in_array($value, ['true', 'on', '1', 'yes']);
-//             }
-//             return (bool) $value;
-//         };
+    //         // Fonction booléenne (inchangée)
+    //         $toBoolean = function ($value) {
+    //             if (is_bool($value)) return $value;
+    //             if (is_null($value)) return false;
+    //             if (is_string($value)) {
+    //                 $value = strtolower(trim($value));
+    //                 if ($value === 'oui') return true;
+    //                 if ($value === 'non') return false;
+    //                 return in_array($value, ['true', 'on', '1', 'yes']);
+    //             }
+    //             return (bool) $value;
+    //         };
 
-//         // Liste des checkbox (ajoutez 'salaire' si manquant)
-//         $checkboxFields = [
-//             'piece_identite', 'lettre_demande', 'formulaire_pret',
-//             'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
-//             'document_activite', 'bilan',
-//             'decision_ctc', 'decision_cc',
-//             'contrat_signe', 'garanties_constituees', 'rencontre_client',
-//             'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
-//         ];
+    //         // Liste des checkbox (ajoutez 'salaire' si manquant)
+    //         $checkboxFields = [
+    //             'piece_identite', 'lettre_demande', 'formulaire_pret',
+    //             'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
+    //             'document_activite', 'bilan',
+    //             'decision_ctc', 'decision_cc',
+    //             'contrat_signe', 'garanties_constituees', 'rencontre_client',
+    //             'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
+    //         ];
 
-//         foreach ($checkboxFields as $field) {
-//             $data[$field] = $toBoolean($data[$field] ?? false);
-//         }
+    //         foreach ($checkboxFields as $field) {
+    //             $data[$field] = $toBoolean($data[$field] ?? false);
+    //         }
 
-//         // Champs oui/non
-//         $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
-//         foreach ($ouiNonFields as $field) {
-//             $data[$field] = $toBoolean($data[$field] ?? false);
-//         }
+    //         // Champs oui/non
+    //         $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+    //         foreach ($ouiNonFields as $field) {
+    //             $data[$field] = $toBoolean($data[$field] ?? false);
+    //         }
 
-//         // Traiter la signature du superviseur
-//         if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
-//             $signature = $request->file('signature');
-//             $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
-//             $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
-//             $data['signature'] = $signaturePath;
-//         }
+    //         // Traiter la signature du superviseur
+    //         if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
+    //             $signature = $request->file('signature');
+    //             $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
+    //             $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
+    //             $data['signature'] = $signaturePath;
+    //         }
 
-//         // Traiter la signature de l'analyste
-//         if ($request->hasFile('signature_analyste') && $request->file('signature_analyste')->isValid()) {
-//             $signatureAnalyste = $request->file('signature_analyste');
-//             $signatureAnalysteName = time() . '_analyste_' . uniqid() . '.' . $signatureAnalyste->getClientOriginalExtension();
-//             $signatureAnalystePath = $signatureAnalyste->storeAs('signatures', $signatureAnalysteName, 'public');
-//             $data['signature_analyste'] = $signatureAnalystePath;
-//         }
+    //         // Traiter la signature de l'analyste
+    //         if ($request->hasFile('signature_analyste') && $request->file('signature_analyste')->isValid()) {
+    //             $signatureAnalyste = $request->file('signature_analyste');
+    //             $signatureAnalysteName = time() . '_analyste_' . uniqid() . '.' . $signatureAnalyste->getClientOriginalExtension();
+    //             $signatureAnalystePath = $signatureAnalyste->storeAs('signatures', $signatureAnalysteName, 'public');
+    //             $data['signature_analyste'] = $signatureAnalystePath;
+    //         }
 
-//         $checklist = CreditChecklist::create($data);
+    //         $checklist = CreditChecklist::create($data);
 
-//         return response()->json([
-//             'success' => true,
-//             'message' => 'Checklist enregistrée avec succès',
-//             'data' => $checklist
-//         ], 201);
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Checklist enregistrée avec succès',
+    //             'data' => $checklist
+    //         ], 201);
 
-//     } catch (\Illuminate\Validation\ValidationException $e) {
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Erreur de validation',
-//             'errors' => $e->errors()
-//         ], 422);
-//     } catch (\Exception $e) {
-//         Log::error('Erreur: ' . $e->getMessage());
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Erreur lors de l\'enregistrement',
-//             'error' => $e->getMessage()
-//         ], 500);
-//     }
-// }
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erreur de validation',
+    //             'errors' => $e->errors()
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         Log::error('Erreur: ' . $e->getMessage());
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erreur lors de l\'enregistrement',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
-public function storeCreditChecklist(Request $request)
-{
-   $user = Auth::user();
-$allowedRoles = ['Superviseur', 'Analyste Risques'];
+    public function storeCreditChecklist(Request $request)
+    {
+        $user = Auth::user();
+        $allowedRoles = ['Superviseur', 'Analyste Risques'];
 
-if (!in_array($user->role, $allowedRoles)) {
-    return response()->json([
-        'success' => false,
-        'message' => "Vous n'êtes pas autorisé à completer cette checkliste. Seuls le superviseur et l'analyste des risques sont autorisés. Votre rôle actuel est : {$user->role}",
-    ], 422);
-}
-    try {
-        // Validation
-        $validated = $request->validate([
-            'nom_demandeur' => 'required|string|max:255',
-            'numero_dossier' => 'required|string|max:100',
-            'montant' => 'nullable|numeric',
-            'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
+        if (!in_array($user->role, $allowedRoles)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Vous n'êtes pas autorisé à completer cette checkliste. Seuls le superviseur et l'analyste des risques sont autorisés. Votre rôle actuel est : {$user->role}",
+            ], 422);
+        }
+        try {
+            // Validation
+            $validated = $request->validate([
+                'nom_demandeur' => 'required|string|max:255',
+                'numero_dossier' => 'required|string|max:100',
+                'montant' => 'nullable|numeric',
+                'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+                'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            ]);
 
-        $data = $request->except(['signature', 'signature_analyste']);
-        $data['idUser'] = auth()->id();
+            $data = $request->except(['signature', 'signature_analyste']);
+            $data['idUser'] = auth()->id();
 
-        // 1. Vérifier si une checklist existe déjà pour cet idCredit
-        $idCredit = $request->input('idCredit');
-        if ($idCredit) {
-            $existing = CreditChecklist::where('idCredit', $idCredit)->first();
-            if ($existing) {
-                // Supprimer les fichiers signatures du disque
-                if ($existing->signature && Storage::disk('public')->exists($existing->signature)) {
-                    Storage::disk('public')->delete($existing->signature);
+            // 1. Vérifier si une checklist existe déjà pour cet idCredit
+            $idCredit = $request->input('idCredit');
+            if ($idCredit) {
+                $existing = CreditChecklist::where('idCredit', $idCredit)->first();
+                if ($existing) {
+                    // Supprimer les fichiers signatures du disque
+                    if ($existing->signature && Storage::disk('public')->exists($existing->signature)) {
+                        Storage::disk('public')->delete($existing->signature);
+                    }
+                    if ($existing->signature_analyste && Storage::disk('public')->exists($existing->signature_analyste)) {
+                        Storage::disk('public')->delete($existing->signature_analyste);
+                    }
+                    // Supprimer l'enregistrement
+                    $existing->delete();
                 }
-                if ($existing->signature_analyste && Storage::disk('public')->exists($existing->signature_analyste)) {
-                    Storage::disk('public')->delete($existing->signature_analyste);
+            }
+
+            // 2. Conversion des booléens (champs checkbox et oui/non)
+            $toBoolean = function ($value) {
+                if (is_bool($value)) return $value;
+                if (is_null($value)) return false;
+                if (is_string($value)) {
+                    $value = strtolower(trim($value));
+                    if ($value === 'oui') return true;
+                    if ($value === 'non') return false;
+                    return in_array($value, ['true', 'on', '1', 'yes']);
                 }
-                // Supprimer l'enregistrement
-                $existing->delete();
+                return (bool) $value;
+            };
+
+            $checkboxFields = [
+                'piece_identite',
+                'lettre_demande',
+                'formulaire_pret',
+                'contrat_travail',
+                'fiche_paye',
+                'recommandation',
+                'caution_employeur',
+                'document_activite',
+                'bilan',
+                'decision_ctc',
+                'decision_cc',
+                'contrat_signe',
+                'garanties_constituees',
+                'rencontre_client',
+                'hypothèque',
+                'lettre_garantie',
+                'domiciliation_salaire',
+                'dat',
+                'aval',
+                'salaire',
+                'nantissement'
+            ];
+
+            foreach ($checkboxFields as $field) {
+                $data[$field] = $toBoolean($data[$field] ?? false);
             }
-        }
 
-        // 2. Conversion des booléens (champs checkbox et oui/non)
-        $toBoolean = function ($value) {
-            if (is_bool($value)) return $value;
-            if (is_null($value)) return false;
-            if (is_string($value)) {
-                $value = strtolower(trim($value));
-                if ($value === 'oui') return true;
-                if ($value === 'non') return false;
-                return in_array($value, ['true', 'on', '1', 'yes']);
+            $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+            foreach ($ouiNonFields as $field) {
+                $data[$field] = $toBoolean($data[$field] ?? false);
             }
-            return (bool) $value;
-        };
 
-        $checkboxFields = [
-            'piece_identite', 'lettre_demande', 'formulaire_pret',
-            'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
-            'document_activite', 'bilan',
-            'decision_ctc', 'decision_cc',
-            'contrat_signe', 'garanties_constituees', 'rencontre_client',
-            'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
-        ];
+            // 3. Traitement des nouvelles signatures
+            if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
+                $signature = $request->file('signature');
+                $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
+                $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
+                $data['signature'] = $signaturePath;
+            }
 
-        foreach ($checkboxFields as $field) {
-            $data[$field] = $toBoolean($data[$field] ?? false);
+            if ($request->hasFile('signature_analyste') && $request->file('signature_analyste')->isValid()) {
+                $signatureAnalyste = $request->file('signature_analyste');
+                $signatureAnalysteName = time() . '_analyste_' . uniqid() . '.' . $signatureAnalyste->getClientOriginalExtension();
+                $signatureAnalystePath = $signatureAnalyste->storeAs('signatures', $signatureAnalysteName, 'public');
+                $data['signature_analyste'] = $signatureAnalystePath;
+            }
+
+            // 4. Création de la nouvelle checklist
+            $checklist = CreditChecklist::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Checklist enregistrée avec succès',
+                'data' => $checklist
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Erreur: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'enregistrement',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
-        foreach ($ouiNonFields as $field) {
-            $data[$field] = $toBoolean($data[$field] ?? false);
-        }
-
-        // 3. Traitement des nouvelles signatures
-        if ($request->hasFile('signature') && $request->file('signature')->isValid()) {
-            $signature = $request->file('signature');
-            $signatureName = time() . '_' . uniqid() . '.' . $signature->getClientOriginalExtension();
-            $signaturePath = $signature->storeAs('signatures', $signatureName, 'public');
-            $data['signature'] = $signaturePath;
-        }
-
-        if ($request->hasFile('signature_analyste') && $request->file('signature_analyste')->isValid()) {
-            $signatureAnalyste = $request->file('signature_analyste');
-            $signatureAnalysteName = time() . '_analyste_' . uniqid() . '.' . $signatureAnalyste->getClientOriginalExtension();
-            $signatureAnalystePath = $signatureAnalyste->storeAs('signatures', $signatureAnalysteName, 'public');
-            $data['signature_analyste'] = $signatureAnalystePath;
-        }
-
-        // 4. Création de la nouvelle checklist
-        $checklist = CreditChecklist::create($data);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Checklist enregistrée avec succès',
-            'data' => $checklist
-        ], 201);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur de validation',
-            'errors' => $e->errors()
-        ], 422);
-    } catch (\Exception $e) {
-        Log::error('Erreur: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur lors de l\'enregistrement',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
-public function updateCreditChecklist(Request $request, $idCredit)
-{
+    public function updateCreditChecklist(Request $request, $idCredit)
+    {
 
-    try {
+        try {
 
-       $user = Auth::user();
-$allowedRoles = ['Superviseur', 'Analyste Risques'];
+            $user = Auth::user();
+            $allowedRoles = ['Superviseur', 'Analyste Risques'];
 
-if (!in_array($user->role, $allowedRoles)) {
-    return response()->json([
-        'success' => false,
-        'message' => "Vous n'êtes pas autorisé à modifier cette checkliste. Seuls le superviseur et l'analyste des risques sont autorisés. Votre rôle actuel est : {$user->role}",
-    ], 422);
-}
-        $checklist = CreditChecklist::where('idCredit', $idCredit)->firstOrFail();
-
-        // Validation inchangée
-        $validated = $request->validate([
-            'nom_demandeur' => 'required|string|max:255',
-            'numero_dossier' => 'required|string|max:100',
-            'montant' => 'nullable|numeric',
-            'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
-
-        $data = $request->except(['signature', 'signature_analyste', '_method']);
-
-        // Conversion en entier (0/1) au lieu de booléen
-        $toInteger = function ($value) {
-            if (is_bool($value)) return $value ? 1 : 0;
-            if (is_null($value)) return 0;
-            if (is_string($value)) {
-                $value = strtolower(trim($value));
-                if ($value === 'oui') return 1;
-                if ($value === 'non') return 0;
-                return in_array($value, ['true', 'on', '1', 'yes']) ? 1 : 0;
+            if (!in_array($user->role, $allowedRoles)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Vous n'êtes pas autorisé à modifier cette checkliste. Seuls le superviseur et l'analyste des risques sont autorisés. Votre rôle actuel est : {$user->role}",
+                ], 422);
             }
-            return (int) $value;
-        };
+            $checklist = CreditChecklist::where('idCredit', $idCredit)->firstOrFail();
 
-        $checkboxFields = [
-            'piece_identite', 'lettre_demande', 'formulaire_pret',
-            'contrat_travail', 'fiche_paye', 'recommandation', 'caution_employeur',
-            'document_activite', 'bilan',
-            'decision_ctc', 'decision_cc',
-            'contrat_signe', 'garanties_constituees', 'rencontre_client',
-            'hypothèque', 'lettre_garantie', 'domiciliation_salaire', 'dat', 'aval', 'salaire', 'nantissement'
-        ];
+            // Validation inchangée
+            $validated = $request->validate([
+                'nom_demandeur' => 'required|string|max:255',
+                'numero_dossier' => 'required|string|max:100',
+                'montant' => 'nullable|numeric',
+                'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+                'signature_analyste' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            ]);
 
-        foreach ($checkboxFields as $field) {
-            $data[$field] = $toInteger($data[$field] ?? 0);
-        }
+            $data = $request->except(['signature', 'signature_analyste', '_method']);
 
-        $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
-        foreach ($ouiNonFields as $field) {
-            $data[$field] = $toInteger($data[$field] ?? 0);
-        }
+            // Conversion en entier (0/1) au lieu de booléen
+            $toInteger = function ($value) {
+                if (is_bool($value)) return $value ? 1 : 0;
+                if (is_null($value)) return 0;
+                if (is_string($value)) {
+                    $value = strtolower(trim($value));
+                    if ($value === 'oui') return 1;
+                    if ($value === 'non') return 0;
+                    return in_array($value, ['true', 'on', '1', 'yes']) ? 1 : 0;
+                }
+                return (int) $value;
+            };
 
-        // Gestion des signatures (identique à votre code)
-        if ($request->hasFile('signature')) {
-            if ($checklist->signature && Storage::disk('public')->exists($checklist->signature)) {
-                Storage::disk('public')->delete($checklist->signature);
+            $checkboxFields = [
+                'piece_identite',
+                'lettre_demande',
+                'formulaire_pret',
+                'contrat_travail',
+                'fiche_paye',
+                'recommandation',
+                'caution_employeur',
+                'document_activite',
+                'bilan',
+                'decision_ctc',
+                'decision_cc',
+                'contrat_signe',
+                'garanties_constituees',
+                'rencontre_client',
+                'hypothèque',
+                'lettre_garantie',
+                'domiciliation_salaire',
+                'dat',
+                'aval',
+                'salaire',
+                'nantissement'
+            ];
+
+            foreach ($checkboxFields as $field) {
+                $data[$field] = $toInteger($data[$field] ?? 0);
             }
-            $path = $request->file('signature')->store('signatures', 'public');
-            $data['signature'] = $path;
-        }
 
-        if ($request->hasFile('signature_analyste')) {
-            if ($checklist->signature_analyste && Storage::disk('public')->exists($checklist->signature_analyste)) {
-                Storage::disk('public')->delete($checklist->signature_analyste);
+            $ouiNonFields = ['rencontre_adc', 'capacite_remboursement', 'fiabilite', 'avis_positif'];
+            foreach ($ouiNonFields as $field) {
+                $data[$field] = $toInteger($data[$field] ?? 0);
             }
-            $path = $request->file('signature_analyste')->store('signatures', 'public');
-            $data['signature_analyste'] = $path;
+
+            // Gestion des signatures (identique à votre code)
+            if ($request->hasFile('signature')) {
+                if ($checklist->signature && Storage::disk('public')->exists($checklist->signature)) {
+                    Storage::disk('public')->delete($checklist->signature);
+                }
+                $path = $request->file('signature')->store('signatures', 'public');
+                $data['signature'] = $path;
+            }
+
+            if ($request->hasFile('signature_analyste')) {
+                if ($checklist->signature_analyste && Storage::disk('public')->exists($checklist->signature_analyste)) {
+                    Storage::disk('public')->delete($checklist->signature_analyste);
+                }
+                $path = $request->file('signature_analyste')->store('signatures', 'public');
+                $data['signature_analyste'] = $path;
+            }
+
+            $checklist->update($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Checklist mise à jour',
+                'data' => $checklist
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Update error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur mise à jour',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $checklist->update($data);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Checklist mise à jour',
-            'data' => $checklist
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Update error: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur mise à jour',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
     //PERMET DE RECUPERER UN CHECK LISTE SPECIFIQUE
 
@@ -1843,32 +2402,175 @@ if (!in_array($user->role, $allowedRoles)) {
         return view("gestion_credit.pages.rapport-credit");
     }
 
-    public function getRapportCredit()
+    public function RapportCreditHomePage2()
     {
-        // $data = Credits::join("proposition_montants","credits.credit_id","=","proposition_montants.idDossier")
-        // ->join("users","proposition_montants.idUser","=","users.id")->get();
+        return view("gestion_credit.pages.rapport-credit2");
+    }
 
-$lastPropositions = DB::table('proposition_montants')
-    ->select('idDossier', DB::raw('MAX(id) as last_id'))
-    ->groupBy('idDossier');
+    // public function getRapportCredit()
+    // {
+    //     // $data = Credits::join("proposition_montants","credits.credit_id","=","proposition_montants.idDossier")
+    //     // ->join("users","proposition_montants.idUser","=","users.id")->get();
 
-$data = Credits::leftJoinSub($lastPropositions, 'pm_max', function ($join) {
+    //     $lastPropositions = DB::table('proposition_montants')
+    //         ->select('idDossier', DB::raw('MAX(id) as last_id'))
+    //         ->groupBy('idDossier');
+
+    //     $data = Credits::leftJoinSub($lastPropositions, 'pm_max', function ($join) {
+    //         $join->on('credits.id_credit', '=', 'pm_max.idDossier');
+    //     })
+    //         ->leftJoin('proposition_montants as pm', 'pm.id', '=', 'pm_max.last_id')
+    //         ->leftJoin('users', 'pm.idUser', '=', 'users.id')
+    //         ->select(
+    //             'credits.*',
+    //             'pm.montant_propose	 as dernier_montant',
+    //             'users.role as role_user'
+    //         )
+    //         ->get();
+
+
+
+    //     return response()->json([
+    //         'status' => 1,
+    //         'data' => $data
+    //     ], 200);
+    // }
+
+
+    public function getRapportCredit()
+{
+    // Filtre agence
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
+    }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
+
+    $lastPropositions = DB::table('proposition_montants')
+        ->select('idDossier', DB::raw('MAX(id) as last_id'))
+        ->groupBy('idDossier');
+
+    // Requête principale sur Credits
+    $query = Credits::leftJoinSub($lastPropositions, 'pm_max', function ($join) {
         $join->on('credits.id_credit', '=', 'pm_max.idDossier');
     })
     ->leftJoin('proposition_montants as pm', 'pm.id', '=', 'pm_max.last_id')
     ->leftJoin('users', 'pm.idUser', '=', 'users.id')
     ->select(
         'credits.*',
-        'pm.montant_propose	 as dernier_montant',
+        'pm.montant_propose as dernier_montant',
         'users.role as role_user'
-    )
-    ->get();
+    );
 
-
-
-        return response()->json([
-            'status' => 1,
-            'data' => $data
-        ], 200);
+    if ($hasAgenceFilter) {
+        $query->where('credits.code_agence', $codeAgenceUtil);
     }
+
+    $data = $query->get();
+
+    return response()->json([
+        'status' => 1,
+        'data' => $data
+    ], 200);
+}
+
+
+    // public function getRapportCredit2()
+    // {
+    //     // Sous‑requête pour récupérer la dernière proposition de chaque dossier
+    //     // (à adapter si votre logique est différente – voici un exemple standard)
+    //     $lastPropositions = DB::table('proposition_montants')
+    //         ->select('idDossier', DB::raw('MAX(id) as last_id'))
+    //         ->groupBy('idDossier');
+
+    //     $data = Credits::leftJoinSub($lastPropositions, 'pm_max', function ($join) {
+    //         $join->on('credits.id_credit', '=', 'pm_max.idDossier');
+    //     })
+    //         ->leftJoin('proposition_montants as pm', 'pm.id', '=', 'pm_max.last_id')
+    //         ->leftJoin('users', 'pm.idUser', '=', 'users.id')
+    //         ->select(
+    //             // Colonnes pour le rapport (respectent l’entête demandé)
+    //             'credits.id_credit as id',               // N°
+    //             'credits.NomCompte as NomCompte',         // NOMS
+    //             'credits.genre as genre',                 // GENRE
+    //             'credits.NumCompte as NumCompte',          // N CPTE
+    //             'credits.montant_demande as montant_demande', // MONT. DEMANDE (utilisé côté React)
+    //             'pm.montant_propose as dernier_montant',    // OCTROI (dernier montant accordé)
+    //             'credits.monnaie as monnaie',              // permet de distinguer USD/CDF
+    //             'credits.duree_credit as duree_credit',    // DUREE en mois
+    //             'credits.objet_credit as objet_credit',    // AFFECTATION
+    //             'credits.type_garantie as type_garantie',  // GARANTIE
+
+    //             // Colonnes supplémentaires pour les filtres et autres informations
+    //             'credits.Agence as Agence',
+    //             'credits.type_credit as type_credit',
+    //             'credits.produit_credit as produit_credit',
+    //             'credits.recouvreur as recouvreur',
+    //             'credits.statutDossier as statutDossier',
+    //             'credits.date_demande as date_demande',
+    //             'credits.date_octroie as date_octroie',
+    //             'users.role as role_user'                  // conservé si besoin
+    //         )
+    //         ->get();
+
+    //     return response()->json([
+    //         'status' => 1,
+    //         'data' => $data
+    //     ], 200);
+    // }
+
+
+    public function getRapportCredit2()
+{
+    // Filtre agence
+    $currentAgence = session('current_agence');
+    $codeAgenceUtil = $currentAgence['code_agence'] ?? null;
+    if ($codeAgenceUtil === 'all') {
+        $codeAgenceUtil = null;
+    }
+    $hasAgenceFilter = !empty($codeAgenceUtil);
+
+    // Sous‑requête pour récupérer la dernière proposition de chaque dossier
+    $lastPropositions = DB::table('proposition_montants')
+        ->select('idDossier', DB::raw('MAX(id) as last_id'))
+        ->groupBy('idDossier');
+
+    $query = Credits::leftJoinSub($lastPropositions, 'pm_max', function ($join) {
+        $join->on('credits.id_credit', '=', 'pm_max.idDossier');
+    })
+    ->leftJoin('proposition_montants as pm', 'pm.id', '=', 'pm_max.last_id')
+    ->leftJoin('users', 'pm.idUser', '=', 'users.id')
+    ->select(
+        'credits.id_credit as id',
+        'credits.NomCompte as NomCompte',
+        'credits.genre as genre',
+        'credits.NumCompte as NumCompte',
+        'credits.montant_demande as montant_demande',
+        'pm.montant_propose as dernier_montant',
+        'credits.monnaie as monnaie',
+        'credits.duree_credit as duree_credit',
+        'credits.objet_credit as objet_credit',
+        'credits.type_garantie as type_garantie',
+        'credits.Agence as Agence',
+        'credits.type_credit as type_credit',
+        'credits.produit_credit as produit_credit',
+        'credits.recouvreur as recouvreur',
+        'credits.statutDossier as statutDossier',
+        'credits.date_demande as date_demande',
+        'credits.date_octroie as date_octroie',
+        'users.role as role_user'
+    );
+
+    if ($hasAgenceFilter) {
+        $query->where('credits.code_agence', $codeAgenceUtil);
+    }
+
+    $data = $query->get();
+
+    return response()->json([
+        'status' => 1,
+        'data' => $data
+    ], 200);
+}
 }

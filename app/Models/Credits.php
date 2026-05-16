@@ -13,6 +13,7 @@ class Credits extends Model
 
     protected $fillable =
     [
+        'code_agence',
         'NumCompte',
         'NomCompte',
         'produit_credit',
@@ -44,6 +45,7 @@ class Credits extends Model
         'statutDossier',
         'latitude',
         'longitude',
+        'genre'
 
     ];
 

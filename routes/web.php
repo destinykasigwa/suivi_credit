@@ -589,12 +589,14 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::get('/gestion_credit/pages/validation-credit', [AGestionCreditController::class, 'ValidatioCreditHomePage'])->name('gestion_credit.pages.validation-credit');
     Route::get('montage-credit/validation/rapport', [AGestionCreditController::class, 'getCreditValidation']);
     Route::get('/gestion_credit/rapport-credit', [AGestionCreditController::class, 'RapportCreditHomePage'])->name('gestion_credit.pages.rapport-credit');
+    Route::get('/gestion_credit/rapport-credit2', [AGestionCreditController::class, 'RapportCreditHomePage2'])->name('gestion_credit.pages.rapport-credit2');
+
     Route::post(
         "montage_credit/page/validation/credit/reference",
         [AGestionCreditController::class, 'getSearchedCredit']
     );
 
-      Route::post(
+    Route::post(
         "montage_credit/page/validation/credit/reference/decaisse",
         [AGestionCreditController::class, 'getSearchedCreditDecaisse']
     );
@@ -624,7 +626,7 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::get('/montage-credit/rapport/credit/decaisse', [AGestionCreditController::class, 'getCreditDecaisse']);
 
 
-   Route::get('/gestion_credit/pages/credit-encours-decaisss', [AGestionCreditController::class, 'getCreditEncoursDecaisseHomePage'])->name('gestion_credit.pages.credit-encours-decaisss');
+    Route::get('/gestion_credit/pages/credit-encours-decaisss', [AGestionCreditController::class, 'getCreditEncoursDecaisseHomePage'])->name('gestion_credit.pages.credit-encours-decaisss');
 
     Route::get('/montage-credit/rapport/credit/encours-decaisse', [AGestionCreditController::class, 'getCreditEncoursDecaisse']);
 
@@ -674,12 +676,12 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::get('montage_credit/page/titre/credit/reference/{ref}', [AGestionCreditController::class, 'getSeachedTitreCredit']);
 
 
-    
+
     Route::get('gestion_credit/dossier/montant-propose/{dossierId}', [AGestionCreditController::class, 'getHistorique']);
     Route::post('gestion_credit/dossier/montant-propose', [AGestionCreditController::class, 'storeProposeMontant']);
     Route::get('gestion_credit/dossier/montant-propose/last/{dossierId}', [AGestionCreditController::class, 'getLastProposition']);
     Route::delete('gestion_credit/dossier/montant-propose/{id}', [AGestionCreditController::class, 'destroy']);
-    
+
     Route::get('gestion_credit/dossier/montant-propose/{dossierId}', [AGestionCreditController::class, 'getHistorique']);
     Route::get('gestion_credit/propositions/{id}/commentaires', [AGestionCreditController::class, 'getPropositions']);
 
@@ -687,10 +689,22 @@ eco/page/report/get-searched-repertoire', [ReportsController::class, 'getSearche
     Route::post('gestion_credit/dossier/credit-checklists', [AGestionCreditController::class, 'storeCreditChecklist']);
 
 
-     Route::get('gestion_credit/dossier/credit-checklists/{dossierId}', [AGestionCreditController::class, 'getCreditChecklist']);
-     Route::put('/gestion_credit/dossier/credit-checklists/{idCredit}', [AGestionCreditController::class, 'updateCreditChecklist']);
+    Route::get('gestion_credit/dossier/credit-checklists/{dossierId}', [AGestionCreditController::class, 'getCreditChecklist']);
+    Route::put('/gestion_credit/dossier/credit-checklists/{idCredit}', [AGestionCreditController::class, 'updateCreditChecklist']);
 
 
-      Route::get('gestion_credit/credits/rapport', [AGestionCreditController::class, 'getRapportCredit']);
-    
+    Route::get('gestion_credit/credits/rapport', [AGestionCreditController::class, 'getRapportCredit']);
+
+
+    Route::get('gestion_credit/credits/rapport2', [AGestionCreditController::class, 'getRapportCredit2']);
+
+
+    // Nouvelles routes pour la gestion des agences utilisateur
+    //GET AGENCES
+    Route::get('eco/pages/getagences', [UtilisateurController::class, 'getAgences']);
+    Route::post('eco/pages/getusers/agences', [UtilisateurController::class, 'getUserAgences']);
+    Route::post('eco/pages/add/agence', [UtilisateurController::class, 'addAgenceToUser']);
+    Route::post('eco/pages/remove/agence', [UtilisateurController::class, 'removeAgenceFromUser']);
+    Route::post('eco/pages/add/all-agences', [UtilisateurController::class, 'addAllAgencesToUser']);
+    Route::post('eco/agence/change', [UtilisateurController::class, 'changeActiveAgence'])->name('eco.agence.change');
 });

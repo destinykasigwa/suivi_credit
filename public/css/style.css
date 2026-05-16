@@ -231,9 +231,6 @@ html, body {
 }
 
 
-
-
-
 .modern-textarea {
     border-radius: 12px;
     border: 1px solid #e2e8f0;
@@ -297,6 +294,39 @@ html, body {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(32, 201, 151, 0.3);
 }
+
+
+/* Styles pour les onglets de gestion des utilisateurs */
+.user-tabs {
+    gap: 8px;
+    padding: 0 20px;
+    background: linear-gradient(135deg, #1a2632 0%, #0f1419 100%);
+    border-bottom: none;
+}
+
+.user-tabs .nav-link {
+    border-radius: 12px 12px 0 0;
+    padding: 12px 24px;
+    font-weight: 600;
+    color: white;
+    background-color: transparent;
+    border: none;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-tabs .nav-link:hover {
+    color: teal;
+    background-color: rgba(0, 128, 128, 0.05);
+}
+
+.user-tabs .nav-link.active {
+    color: teal;
+    background-color: white;
+}
+
 
 
 

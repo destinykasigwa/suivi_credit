@@ -225,7 +225,7 @@ class AdhesionController extends Controller
                         'RefTypeCompte' => "3",
                         'RefCadre' => "33",
                         'RefGroupe' => "330",
-                        'RefSousGroupe' => "3301",
+                        'RefSousGroupe' => "3300",
                         'CodeMonnaie' => 2,
                         'NumeTelephone' => $data->telephone,
                         'DateNaissance' => $data->date_naissance,

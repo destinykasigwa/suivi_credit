@@ -30,6 +30,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
     const [NumCompte, setNumCompte] = useState();
     const [NomCompte, setNomCompte] = useState();
+    const [genre, setGenre] = useState(""); 
     const [produit_credit, setproduit_credit] = useState();
     const [type_credit, settype_credit] = useState();
     const [recouvreur, setrecouvreur] = useState();
@@ -150,6 +151,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 setstatutDossier(data.statutDossier);
                 setGetDossierId(data.id_credit);
                 setAgence(data.Agence);
+                setGenre(data.genre || ""); // Si genre est null, reste ""
             })
             .catch(() => setDossier(null));
     };
@@ -195,6 +197,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                 {
                     NumCompte,
                     NomCompte,
+                    genre,
                     produit_credit,
                     type_credit,
                     recouvreur,
@@ -850,6 +853,44 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 )
                                                                             }
                                                                         />
+                                                                    </td>
+                                                                </tr>
+                                                                 <tr>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+                                                                        <label
+                                                                            className="fw-semibold small mb-0"
+                                                                            style={{
+                                                                                color: "#4682b4",
+                                                                            }}
+                                                                        >
+                                                                            <i className="fas fa-user me-1"></i>
+                                                                            Genre
+                                                                        </label>
+                                                                    </td>
+                                                                    <td
+                                                                        style={{
+                                                                            padding:
+                                                                                "6px 8px",
+                                                                        }}
+                                                                    >
+              <select
+    className="form-control form-control-sm"
+    style={{ backgroundColor: "#f8f9fa" }}
+    value={genre}
+    onChange={(e) => setGenre(e.target.value)}
+>
+    <option value="" disabled hidden>
+        -- Sélectionnez --
+    </option>
+    <option value="Homme">Homme</option>
+    <option value="Femme">Femme</option>
+    <option value="PM">PM</option>
+</select>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>

@@ -72,7 +72,13 @@
             <li class="nav-item">
               <a href="{{ route('gestion_credit.pages.rapport-credit') }}" class="nav-link d-flex align-items-center gap-2" style="border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
                 <i class="fas fa-circle" style="font-size: 6px; color: #20c997;"></i>
-                <span>Autres rapports</span>
+                <span>Rapports crédits</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('gestion_credit.pages.rapport-credit2') }}" class="nav-link d-flex align-items-center gap-2" style="border-radius: 8px; padding: 8px 12px; transition: all 0.2s ease;">
+                <i class="fas fa-circle" style="font-size: 6px; color: #20c997;"></i>
+                <span>Autres rapports de crédits</span>
               </a>
             </li>
           </ul>
@@ -115,7 +121,7 @@
         </div>
         <div>
           <small class="text-muted d-block">Version 1.0.0</small>
-          <small class="text-muted" style="font-size: 10px;">© 2024 Akiba Yetu</small>
+          <small class="text-muted" style="font-size: 10px;">© 2026 Akiba Yetu</small>
         </div>
       </div>
     </div>

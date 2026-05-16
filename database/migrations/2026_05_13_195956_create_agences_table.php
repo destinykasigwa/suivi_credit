@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+         Schema::create('agences', function (Blueprint $table) {
+        $table->id();
+
+        $table->string('code_agence')->unique();
+        $table->string('nom_agence');
+        $table->string('devise_principale')->default('CDF');
+         $table->string('compte_liaison_cdf')->nullable();
+        $table->string('compte_liaison_usd')->nullable();
+        $table->boolean('active')->default(true);
+        $table->timestamps();
+    });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('agences');
+    }
+};

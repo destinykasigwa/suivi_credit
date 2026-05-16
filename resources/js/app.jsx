@@ -56,6 +56,7 @@ import CreditDecaisse from "./Page/GC/CreditDecaisse";
 import Dashboard from "./Page/GC/DashBoard";
 import RapportCredits from "./Page/GC/Reports/RapportCredits";
 import EncoursDecaissement from "./Page/GC/EncoursDecaissement";
+import RapportAnnexePv from "./Page/GC/Reports/RapportAnnexePv";
 
 if (document.getElementById("app")) {
     ReactDOM.createRoot(document.getElementById("app")).render(
@@ -349,6 +350,15 @@ if (document.getElementById("creditEncoursDecaiss")) {
     ReactDOM.createRoot(document.getElementById("creditEncoursDecaiss")).render(
         <BrowserRouter>
             <EncoursDecaissement />
+        </BrowserRouter>
+    );
+}
+
+
+if (document.getElementById("rapportCredit2")) {
+    ReactDOM.createRoot(document.getElementById("rapportCredit2")).render(
+        <BrowserRouter>
+            <RapportAnnexePv />
         </BrowserRouter>
     );
 }
