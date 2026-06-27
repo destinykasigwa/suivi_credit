@@ -13,7 +13,8 @@ class PropositionMontant extends Model
         'idUser',
         'idDossier',
         'montant_propose',
-        'commentaire'
+        'commentaire',
+        'signature_path',
     ];
 
 

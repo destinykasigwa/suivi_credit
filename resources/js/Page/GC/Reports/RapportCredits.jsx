@@ -39,7 +39,7 @@ export default function RapportCredits() {
         telephone: "+243 970 237 272",
         email: "contact@coopecakibayetu.org",
         siteWeb: "www.coopecakibayetu.org",
-        logo: "/images/logo/logo.png",
+        logo: "https://www.coopecakibayetu.org/wp-content/uploads/2022/08/AKIBA-YETU-transparent-PNG-02-1536x432.png",
     };
 
     useEffect(() => {

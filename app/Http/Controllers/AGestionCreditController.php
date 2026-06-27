@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
 use App\Models\{Commentaire, CreditChecklist, Credits, CreditsImages, PropositionMontant, Signature, User};
 use App\Services\SendNotification;
+use Illuminate\Support\Str;
 
 class AGestionCreditController extends Controller
 {
@@ -204,7 +205,7 @@ if (!empty($codeAgenceUtil)) {
 }
 
 $credits = $query->orderBy('id_credit', 'desc')
-    ->limit(100)
+    ->limit(500)
     ->get();
 
 foreach ($credits as $credit) {
@@ -334,7 +335,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->limit(10)->get();
+        $credits = $query->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -355,7 +356,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->limit(10)->get();
+        $credits = $query->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -371,7 +372,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->limit(10)->get();
+        $credits = $query->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -393,7 +394,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->limit(10)->get();
+        $credits = $query->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -498,7 +499,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+        $credits = $query->orderBy('id_credit', 'desc')->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -517,7 +518,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+        $credits = $query->orderBy('id_credit', 'desc')->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -537,7 +538,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+        $credits = $query->orderBy('id_credit', 'desc')->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -641,7 +642,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+        $credits = $query->orderBy('id_credit', 'desc')->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -660,7 +661,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+        $credits = $query->orderBy('id_credit', 'desc')->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -680,7 +681,7 @@ foreach ($credits as $credit) {
         if ($hasAgenceFilter) {
             $query->where('code_agence', $codeAgenceUtil);
         }
-        $credits = $query->orderBy('id_credit', 'desc')->limit(10)->get();
+        $credits = $query->orderBy('id_credit', 'desc')->limit(500)->get();
 
         foreach ($credits as $credit) {
             $credit->images = DB::table('credits_images')
@@ -989,7 +990,7 @@ foreach ($credits as $credit) {
     if ($hasAgenceFilter) {
         $query->where('code_agence', $codeAgenceUtil);
     }
-    $credits = $query->limit(10)->get();
+    $credits = $query->limit(500)->get();
 
     foreach ($credits as $credit) {
         $credit->images = DB::table('credits_images')
@@ -1034,8 +1035,7 @@ foreach ($credits as $credit) {
     if ($hasAgenceFilter) {
         $query->where('code_agence', $codeAgenceUtil);
     }
-    $credits = $query->limit(10)->get();
-
+    $credits = $query->limit(500)->get();
     foreach ($credits as $credit) {
         $credit->images = DB::table('credits_images')
             ->where('credits_id', $credit->id_credit)
@@ -1661,7 +1661,7 @@ foreach ($credits as $credit) {
             $query->where('credits.code_agence', $codeAgenceUtil);
         }
 
-        $fichiers = $query->limit(100)->get();
+        $fichiers = $query->limit(500)->get();
 
         // Sépare images et pdfs
         $images = [];
@@ -1805,34 +1805,148 @@ foreach ($credits as $credit) {
 
     //CETTE FONCTION PERMET DE PROPOSER UN MONTANT
 
-    public function storeProposeMontant(Request $request)
-    {
-        $request->validate([
-            'idDossier' => 'required|exists:credits,id_credit',
-            'montantPropose' => 'required|numeric|min:0'
-        ]);
+    // public function storeProposeMontant(Request $request)
+    // {
+    //     $request->validate([
+    //         'idDossier' => 'required|exists:credits,id_credit',
+    //         'montantPropose' => 'required|numeric|min:0'
+           
+    //     ]);
 
-        $proposition = PropositionMontant::create([
-            'idUser' => Auth::id(),
-            'idDossier' => $request->idDossier,
-            'montant_propose' => $request->montantPropose,
-            'commentaire' => $request->commentaire
-        ]);
+    //     $proposition = PropositionMontant::create([
+    //         'idUser' => Auth::id(),
+    //         'idDossier' => $request->idDossier,
+    //         'montant_propose' => $request->montantPropose,
+    //         'commentaire' => $request->commentaire
+    //     ]);
 
-        //ENREGISTRE LE COMMENTAIRE DE SA PROPOSITION POUR QU'IL SOIT VISIBLE DANS LA CHAT
+    //     //ENREGISTRE LE COMMENTAIRE DE SA PROPOSITION POUR QU'IL SOIT VISIBLE DANS LA CHAT
 
+    //     Commentaire::create([
+    //         'credit_id' => $request->idDossier,
+    //         'user_id' => auth()->id(),
+    //         'contenu' => $request->commentaire,
+    //     ]);
+
+
+    //     // Charger la relation user pour la réponse
+    //     $proposition->load('user');
+
+    //     return response()->json(["status" => 1, "msg" => "Votre proposition a bien été publiée."]);
+    // }
+
+//     public function storeProposeMontant(Request $request)
+// {
+//     $request->validate([
+//         'idDossier' => 'required|exists:credits,id_credit',
+//         'montantPropose' => 'required|numeric|min:0',
+//         'commentaire' => 'nullable|string|max:500',
+//         'signature_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif|max:5120', // 5 Mo
+//     ]);
+
+//     // Création de la proposition
+//     $proposition = PropositionMontant::create([
+//         'idUser' => Auth::id(),
+//         'idDossier' => $request->idDossier,
+//         'montant_propose' => $request->montantPropose,
+//         'commentaire' => $request->commentaire,
+//     ]);
+
+//     // Traitement du fichier de signature
+//     if ($request->hasFile('signature_file')) {
+//         $file = $request->file('signature_file');
+        
+//         // Générer un nom unique
+//         $extension = $file->getClientOriginalExtension();
+//         $fileName = 'signature_' . $proposition->id . '_' . Str::random(10) . '.' . $extension;
+        
+//         // Stocker dans le dossier 'signatures' (public)
+//         $path = $file->storeAs('signatures', $fileName, 'public');
+        
+//         // Mettre à jour la proposition avec le chemin
+//         $proposition->signature_path = $path;
+//         $proposition->save();
+//     }
+
+//     // Enregistrer le commentaire dans la table des commentaires (si présent)
+//     if ($request->filled('commentaire')) {
+//         Commentaire::create([
+//             'credit_id' => $request->idDossier,
+//             'user_id' => auth()->id(),
+//             'contenu' => $request->commentaire,
+//         ]);
+//     }
+
+//     // Recharger la relation user
+//     $proposition->load('user');
+
+//     return response()->json([
+//         "status" => 1,
+//         "msg" => "Votre proposition a bien été publiée.",
+//         "data" => $proposition
+//     ]);
+// }
+
+public function storeProposeMontant(Request $request)
+{
+    $request->validate([
+        'idDossier' => 'required|exists:credits,id_credit',
+        'montantPropose' => 'required|numeric|min:0',
+        'commentaire' => 'nullable|string|max:500',
+        'signature_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif|max:5120',
+    ]);
+
+    $user = Auth::user();
+
+    // Vérifier si un autre utilisateur avec le même rôle a déjà proposé pour ce dossier
+    $existing = DB::table('proposition_montants')
+        ->join('users', 'proposition_montants.idUser', '=', 'users.id')
+        ->where('proposition_montants.idDossier', $request->idDossier)
+        ->where('users.role', $user->role)
+        ->exists();
+
+    if ($existing) {
+        return response()->json([
+            'status' => 0,
+            'msg' => 'Une proposition a déjà été faite pour votre rôle (' . $user->role . ').',
+        ], 422);
+    }
+
+    // Création de la proposition
+    $proposition = PropositionMontant::create([
+        'idUser' => $user->id,
+        'idDossier' => $request->idDossier,
+        'montant_propose' => $request->montantPropose,
+        'commentaire' => $request->commentaire,
+    ]);
+
+    // Traitement du fichier de signature
+    if ($request->hasFile('signature_file')) {
+        $file = $request->file('signature_file');
+        $extension = $file->getClientOriginalExtension();
+        $fileName = 'signature_' . $proposition->id . '_' . Str::random(10) . '.' . $extension;
+        $path = $file->storeAs('signatures', $fileName, 'public');
+        $proposition->signature_path = $path;
+        $proposition->save();
+    }
+
+    // Enregistrer le commentaire
+    if ($request->filled('commentaire')) {
         Commentaire::create([
             'credit_id' => $request->idDossier,
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'contenu' => $request->commentaire,
         ]);
-
-
-        // Charger la relation user pour la réponse
-        $proposition->load('user');
-
-        return response()->json(["status" => 1, "msg" => "Votre proposition a bien été publiée."]);
     }
+
+    $proposition->load('user');
+
+    return response()->json([
+        'status' => 1,
+        'msg' => 'Votre proposition a bien été publiée.',
+        'data' => $proposition,
+    ]);
+}
 
     /**
      * Récupérer la dernière proposition pour un dossier
@@ -1879,65 +1993,136 @@ foreach ($credits as $credit) {
 
     //PERMET DE RECUPERER LES PROPOSITION DES MONTANTS POUR LES AFFICHER A L'UTILISATEUR
 
-    public function getPropositions($id)
-    {
-        try {
-            // Récupérer les propositions avec le rôle directement depuis users
-            $propositions = DB::table('proposition_montants')
-                ->join("credits", "proposition_montants.idDossier", "credits.id_credit")
-                ->join("users", "proposition_montants.idUser", "users.id")
-                ->where('proposition_montants.idDossier', $id)
-                ->whereNotNull('proposition_montants.montant_propose')
-                ->select(
-                    'proposition_montants.*',
-                    'users.name as nom',
-                    'users.role',                    // ← Le rôle directement depuis users !
-                    'credits.monnaie as devise'
-                )
-                ->orderBy('proposition_montants.created_at', 'asc')
-                ->get();
+    // public function getPropositions($id)
+    // {
+    //     try {
+    //         // Récupérer les propositions avec le rôle directement depuis users
+    //         $propositions = DB::table('proposition_montants')
+    //             ->join("credits", "proposition_montants.idDossier", "credits.id_credit")
+    //             ->join("users", "proposition_montants.idUser", "users.id")
+    //             ->where('proposition_montants.idDossier', $id)
+    //             ->whereNotNull('proposition_montants.montant_propose')
+    //             ->select(
+    //                 'proposition_montants.*',
+    //                 'users.name as nom',
+    //                 'users.role',                    // ← Le rôle directement depuis users !
+    //                 'credits.monnaie as devise'
+    //             )
+    //             ->orderBy('proposition_montants.created_at', 'asc')
+    //             ->get();
 
-            // Statistiques des signatures (toujours depuis la table signatures)
-            $signatures = DB::table('signatures')
-                ->where('credit_id', $id)
-                ->select('signed_by', 'created_at')
-                ->orderBy('created_at', 'asc')
-                ->get();
+    //         // Statistiques des signatures (toujours depuis la table signatures)
+    //         $signatures = DB::table('signatures')
+    //             ->where('credit_id', $id)
+    //             ->select('signed_by', 'created_at')
+    //             ->orderBy('created_at', 'asc')
+    //             ->get();
 
-            $ordreIntervenants = ['Commercial', 'Chef de département', 'Directrice financière', 'Directeur Général'];
-            $totalSignatures = $signatures->count();
-            $totalIntervenants = count($ordreIntervenants);
-            $pourcentageAvancement = $totalIntervenants > 0 ? ($totalSignatures / $totalIntervenants) * 100 : 0;
+    //         $ordreIntervenants = ['Commercial', 'Chef de département', 'Directrice financière', 'Directeur Général'];
+    //         $totalSignatures = $signatures->count();
+    //         $totalIntervenants = count($ordreIntervenants);
+    //         $pourcentageAvancement = $totalIntervenants > 0 ? ($totalSignatures / $totalIntervenants) * 100 : 0;
 
-            $rolesExistants = $signatures->pluck('signed_by')->toArray();
-            $prochaineSignature = null;
-            foreach ($ordreIntervenants as $role) {
-                if (!in_array($role, $rolesExistants)) {
-                    $prochaineSignature = $role;
-                    break;
-                }
+    //         $rolesExistants = $signatures->pluck('signed_by')->toArray();
+    //         $prochaineSignature = null;
+    //         foreach ($ordreIntervenants as $role) {
+    //             if (!in_array($role, $rolesExistants)) {
+    //                 $prochaineSignature = $role;
+    //                 break;
+    //             }
+    //         }
+
+    //         return response()->json([
+    //             'status' => 1,
+    //             'data' => $propositions,
+    //             'signatures_stats' => [
+    //                 'total_signatures' => $totalSignatures,
+    //                 'total_intervenants' => $totalIntervenants,
+    //                 'pourcentage_avancement' => round($pourcentageAvancement, 1),
+    //                 'signataires' => $signatures,
+    //                 'reste_a_signer' => max(0, $totalIntervenants - $totalSignatures),
+    //                 'prochaine_signature' => $prochaineSignature
+    //             ]
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => 0,
+    //             'msg' => 'Erreur: ' . $e->getMessage(),
+    //             'data' => []
+    //         ]);
+    //     }
+    // }
+
+ public function getPropositions($id)
+{
+    try {
+        // 1. Récupérer toutes les propositions (avec leur signature_path)
+        $propositions = DB::table('proposition_montants')
+            ->join("credits", "proposition_montants.idDossier", "credits.id_credit")
+            ->join("users", "proposition_montants.idUser", "users.id")
+            ->where('proposition_montants.idDossier', $id)
+            ->whereNotNull('proposition_montants.montant_propose')
+            ->select(
+                'proposition_montants.*',
+                'users.name as nom',
+                'users.role',
+                'credits.monnaie as devise'
+            )
+            ->orderBy('proposition_montants.created_at', 'asc')
+            ->get();
+
+        // 2. Ordre des 5 intervenants (selon ta liste)
+        $ordreIntervenants = [
+            'AC',
+            'Superviseur',
+            'Analyste Risques',
+            'CTC',
+            'CC'
+        ];
+
+        // 3. Compter les signatures à partir des propositions
+        $rolesSignes = DB::table('proposition_montants')
+            ->join('users', 'proposition_montants.idUser', 'users.id')
+            ->where('proposition_montants.idDossier', $id)
+            ->whereNotNull('proposition_montants.signature_path')
+            ->select('users.role')
+            ->distinct()
+            ->pluck('role')
+            ->toArray();
+
+        $totalSignatures = count($rolesSignes);
+        $totalIntervenants = count($ordreIntervenants);
+        $pourcentageAvancement = $totalIntervenants > 0 ? ($totalSignatures / $totalIntervenants) * 100 : 0;
+
+        // 4. Déterminer le prochain signataire (premier rôle non encore signé)
+        $prochaineSignature = null;
+        foreach ($ordreIntervenants as $role) {
+            if (!in_array($role, $rolesSignes)) {
+                $prochaineSignature = $role;
+                break;
             }
-
-            return response()->json([
-                'status' => 1,
-                'data' => $propositions,
-                'signatures_stats' => [
-                    'total_signatures' => $totalSignatures,
-                    'total_intervenants' => $totalIntervenants,
-                    'pourcentage_avancement' => round($pourcentageAvancement, 1),
-                    'signataires' => $signatures,
-                    'reste_a_signer' => max(0, $totalIntervenants - $totalSignatures),
-                    'prochaine_signature' => $prochaineSignature
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 0,
-                'msg' => 'Erreur: ' . $e->getMessage(),
-                'data' => []
-            ]);
         }
+
+        return response()->json([
+            'status' => 1,
+            'data' => $propositions,
+            'signatures_stats' => [
+                'total_signatures' => $totalSignatures,
+                'total_intervenants' => $totalIntervenants,
+                'pourcentage_avancement' => round($pourcentageAvancement, 1),
+                'reste_a_signer' => max(0, $totalIntervenants - $totalSignatures),
+                'prochaine_signature' => $prochaineSignature,
+                'signataires' => $rolesSignes // optionnel (pour debug)
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 0,
+            'msg' => 'Erreur: ' . $e->getMessage(),
+            'data' => []
+        ]);
     }
+}
 
     // public function storeCreditChecklist(Request $request)
     // {
@@ -2137,6 +2322,7 @@ foreach ($credits as $credit) {
 
     public function storeCreditChecklist(Request $request)
     {
+        dd($request->all());
         $user = Auth::user();
         $allowedRoles = ['Superviseur', 'Analyste Risques'];
 

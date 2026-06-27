@@ -290,41 +290,7 @@ export default function ModalContratPret({ creditId, onClose }) {
         }
     };
 
-    // const deleteImageActivite = async (id) => {
-    //     let confirmation;
-    //     confirmation = await Swal.fire({
-    //         title: "Êtes-vous sûr?",
-    //         text: "Vous êtes sûr ? vous êtes sur le point de supprimer cette image voulez vous continuer ?",
-    //         icon: "question",
-    //         showCancelButton: true,
-    //         confirmButtonText: "Oui",
-    //         cancelButtonText: "Non",
-    //     });
-
-    //     if (confirmation.isConfirmed) {
-    //         const res = await axios.delete(
-    //             "/gestion_credit/pages/files/credit/image/activite/" + id
-    //         );
-    //         if (res.data.status == 1) {
-    //             getDossierCredit();
-    //             Swal.fire({
-    //                 title: "Suppression",
-    //                 text: res.data.msg,
-    //                 icon: "success",
-    //                 timer: 8000,
-    //                 confirmButtonText: "Okay",
-    //             });
-    //         } else {
-    //             Swal.fire({
-    //                 title: "Suppression",
-    //                 text: res.data.msg,
-    //                 icon: "error",
-    //                 timer: 8000,
-    //                 confirmButtonText: "Okay",
-    //             });
-    //         }
-    //     }
-    // };
+  
 
     const deleteImageMembre = async (id) => {
         console.log(id);
@@ -416,8 +382,31 @@ export default function ModalContratPret({ creditId, onClose }) {
     }, {});
 
     return (
-    <div
-  className="modal fade"
+        <>
+        <style>
+                {`
+             .modal-fullscreen-custom .modal-dialog {
+                margin: 0 !important;
+                width: 100vw !important;
+                max-width: 100% !important;
+                height: 100vh !important;
+                max-height: 100% !important;
+                }
+
+                .modal-fullscreen-custom .modal-content {
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+                }
+
+                .modal-fullscreen-custom .modal-body {
+                overflow-y: auto !important;
+                max-height: calc(100vh - 140px); /* Ajuste selon la hauteur de ton header/footer */
+                }
+            `}
+            </style>
+        <div
+  className="modal fade modal-fullscreen-custom"
   tabIndex="-1"
   aria-hidden="true"
   id="modalContratPret"
@@ -899,5 +888,8 @@ export default function ModalContratPret({ creditId, onClose }) {
     <ModalTitreCredit onClose={() => setDossierIdSelected(null)} />
   )}
 </div>
+        </>
+
+    
     );
 }

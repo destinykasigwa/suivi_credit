@@ -20,10 +20,11 @@ export default function ModalCheckListSuperviseur({
     const [isLoadingChecklist, setIsLoadingChecklist] = useState(false);
     const fileInputRef = useRef(null);
     // Dans la section des states, ajoutez :
-const [signatureAnalyste, setSignatureAnalyste] = useState(null);
-const [signatureAnalystePreview, setSignatureAnalystePreview] = useState(null);
-const [showEditModal, setShowEditModal] = useState(false);
-const fileInputRefAnalyste = useRef(null);
+    const [signatureAnalyste, setSignatureAnalyste] = useState(null);
+    const [signatureAnalystePreview, setSignatureAnalystePreview] =
+        useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const fileInputRefAnalyste = useRef(null);
     const [form, setForm] = useState({
         agence: "",
         date_etablissement: "",
@@ -77,14 +78,13 @@ const fileInputRefAnalyste = useRef(null);
         // Analyste
         date_analyste: "",
         nom_analyste: "",
-        commentaire_analyste:"",
+        commentaire_analyste: "",
     });
 
-
     useEffect(() => {
-     console.log("this is data"+ dossierId)
-    }, [])
-    
+        console.log("this is data" + dossierId);
+    }, []);
+
     // Vérifier si la checklist existe déjà pour ce dossier
     const checkExistingChecklist = async () => {
         try {
@@ -158,138 +158,158 @@ const fileInputRefAnalyste = useRef(null);
         }
     };
 
-
     // Ajoutez les gestionnaires :
-const handleSignatureAnalysteChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        if (!file.type.match("image/jpeg") && !file.type.match("image/png")) {
-            Swal.fire({
-                icon: "error",
-                title: "Format non supporté",
-                text: "Veuillez choisir une image au format JPEG ou PNG",
-                confirmButtonColor: "#20c997",
-            });
-            return;
+    const handleSignatureAnalysteChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (
+                !file.type.match("image/jpeg") &&
+                !file.type.match("image/png")
+            ) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Format non supporté",
+                    text: "Veuillez choisir une image au format JPEG ou PNG",
+                    confirmButtonColor: "#20c997",
+                });
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Fichier trop volumineux",
+                    text: "La signature ne doit pas dépasser 5 Mo",
+                    confirmButtonColor: "#20c997",
+                });
+                return;
+            }
+            setSignatureAnalyste(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSignatureAnalystePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
-        if (file.size > 5 * 1024 * 1024) {
-            Swal.fire({
-                icon: "error",
-                title: "Fichier trop volumineux",
-                text: "La signature ne doit pas dépasser 5 Mo",
-                confirmButtonColor: "#20c997",
-            });
-            return;
+    };
+
+    const handleDeleteSignatureAnalyste = () => {
+        setSignatureAnalyste(null);
+        setSignatureAnalystePreview(null);
+        if (fileInputRefAnalyste.current) {
+            fileInputRefAnalyste.current.value = "";
         }
-        setSignatureAnalyste(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setSignatureAnalystePreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-    }
-};
+    };
 
-const handleDeleteSignatureAnalyste = () => {
-    setSignatureAnalyste(null);
-    setSignatureAnalystePreview(null);
-    if (fileInputRefAnalyste.current) {
-        fileInputRefAnalyste.current.value = "";
-    }
-};
+    //     const handleSubmit = async (e) => {
+    //          e.preventDefault();
+    //         try {
+    //             setIsLoadingBar(true);
+    //             setProgress(0);
 
+    //             const dataToSend = new FormData();
 
-//     const handleSubmit = async (e) => {
-//          e.preventDefault();
-//         try {
-//             setIsLoadingBar(true);
-//             setProgress(0);
+    //             Object.keys(form).forEach((key) => {
+    //                 if (key !== "signature") {
+    //                     dataToSend.append(key, form[key]);
+    //                 }
+    //             });
 
-//             const dataToSend = new FormData();
+    //             if (signatureImage) {
+    //                 dataToSend.append("signature", signatureImage);
+    //             }
 
-//             Object.keys(form).forEach((key) => {
-//                 if (key !== "signature") {
-//                     dataToSend.append(key, form[key]);
-//                 }
-//             });
+    //             if (signatureAnalyste) {
+    //     dataToSend.append("signature_analyste", signatureAnalyste);
+    // }
 
-//             if (signatureImage) {
-//                 dataToSend.append("signature", signatureImage);
-//             }
+    //             dataToSend.append("idCredit", dossierId);
 
-//             if (signatureAnalyste) {
-//     dataToSend.append("signature_analyste", signatureAnalyste);
-// }
+    //             const interval = setInterval(() => {
+    //                 setProgress((prev) => {
+    //                     if (prev >= 90) {
+    //                         clearInterval(interval);
+    //                         return 90;
+    //                     }
+    //                     return prev + 10;
+    //                 });
+    //             }, 200);
 
+    //             const response = await axios.post(
+    //                 "/gestion_credit/dossier/credit-checklists",
+    //                 dataToSend,
+    //                 {
+    //                     headers: {
+    //                         "Content-Type": "multipart/form-data",
+    //                     },
+    //                 },
+    //             );
 
-//             dataToSend.append("idCredit", dossierId);
+    //             clearInterval(interval);
+    //             setProgress(100);
 
-//             const interval = setInterval(() => {
-//                 setProgress((prev) => {
-//                     if (prev >= 90) {
-//                         clearInterval(interval);
-//                         return 90;
-//                     }
-//                     return prev + 10;
-//                 });
-//             }, 200);
+    //             setTimeout(() => {
+    //                 setIsLoadingBar(false);
+    //                 Swal.fire({
+    //                     icon: "success",
+    //                     title: "Succès !",
+    //                     text: "Checklist enregistrée avec succès",
+    //                     confirmButtonColor: "#20c997",
+    //                     timer: 2000,
+    //                 });
 
-//             const response = await axios.post(
-//                 "/gestion_credit/dossier/credit-checklists",
-//                 dataToSend,
-//                 {
-//                     headers: {
-//                         "Content-Type": "multipart/form-data",
-//                     },
-//                 },
-//             );
+    //                 // setTimeout(() => {
+    //                 //     onClose();
+    //                 // }, 2000);
+    //             }, 500);
+    //         } catch (error) {
+    //             setIsLoadingBar(false);
+    //             console.error(error);
+    //             Swal.fire({
+    //                 icon: "error",
+    //                 title: "Erreur",
+    //                 text: "Erreur lors de l'enregistrement de la checklist",
+    //                 confirmButtonColor: "#20c997",
+    //             });
+    //         }
+    //     };
 
-//             clearInterval(interval);
-//             setProgress(100);
-
-//             setTimeout(() => {
-//                 setIsLoadingBar(false);
-//                 Swal.fire({
-//                     icon: "success",
-//                     title: "Succès !",
-//                     text: "Checklist enregistrée avec succès",
-//                     confirmButtonColor: "#20c997",
-//                     timer: 2000,
-//                 });
-
-//                 // setTimeout(() => {
-//                 //     onClose();
-//                 // }, 2000);
-//             }, 500);
-//         } catch (error) {
-//             setIsLoadingBar(false);
-//             console.error(error);
-//             Swal.fire({
-//                 icon: "error",
-//                 title: "Erreur",
-//                 text: "Erreur lors de l'enregistrement de la checklist",
-//                 confirmButtonColor: "#20c997",
-//             });
-//         }
-//     };
-
-const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    let interval; // déclarer ici pour y accéder dans catch
+    let interval;
     try {
         setIsLoadingBar(true);
         setProgress(0);
-
         const dataToSend = new FormData();
-        // ... remplissage du FormData ...
+
+        // 1. Ajouter tous les champs du formulaire (sauf les fichiers)
+        Object.keys(form).forEach((key) => {
+            if (key !== "signature" && key !== "signature_analyste") {
+                dataToSend.append(key, form[key]);
+            }
+        });
+
+        // 2. Ajouter les signatures si présentes
+        if (signatureImage) {
+            dataToSend.append("signature", signatureImage);
+        }
+        if (signatureAnalyste) {
+            dataToSend.append("signature_analyste", signatureAnalyste);
+        }
+
+        // 3. Ajouter l'id du dossier
+        dataToSend.append("idCredit", dossierId);
 
         interval = setInterval(() => {
             setProgress((prev) => (prev >= 90 ? 90 : prev + 10));
         }, 200);
 
-        const response = await axios.post("/gestion_credit/dossier/credit-checklists", dataToSend, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
+        const response = await axios.post(
+            "/gestion_credit/dossier/credit-checklists",
+            dataToSend,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
 
         clearInterval(interval);
         setProgress(100);
@@ -307,12 +327,10 @@ const handleSubmit = async (e) => {
         if (interval) clearInterval(interval);
         setIsLoadingBar(false);
         console.error(error);
-
         let errorMessage = "Erreur lors de l'enregistrement de la checklist";
         if (error.response?.data?.message) {
             errorMessage = error.response.data.message;
         }
-
         Swal.fire({
             icon: "error",
             title: "Erreur",
@@ -433,7 +451,14 @@ const handleSubmit = async (e) => {
                 id="modalCheckListSuperviseur"
                 style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
             >
-                <div className="modal-dialog modal-xl" style={{ maxHeight: "100vh", display: "flex", flexDirection: "column" }}>
+                <div
+                    className="modal-dialog modal-xl"
+                    style={{
+                        maxHeight: "100vh",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
                     <div className="modal-content border-0 shadow-lg rounded-3">
                         {/* Header avec bouton visualiser */}
                         <div
@@ -449,28 +474,41 @@ const handleSubmit = async (e) => {
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div className="d-flex align-items-center gap-3 flex-wrap">
                                         <i className="fas fa-folder-open fa-2x"></i>
-                                        <h5 className="mb-0 fw-bold" >
-                                            Checklist Dossier de Crédit N° 
-                                           <span style={{color:"green" }}> #{NumDossier??NumDossier}</span>
+                                        <h5 className="mb-0 fw-bold">
+                                            Checklist Dossier de Crédit N°
+                                            <span style={{ color: "green" }}>
+                                                {" "}
+                                                #{NumDossier ?? NumDossier}
+                                            </span>
                                             {}
                                         </h5>
                                     </div>
                                     <div className="d-flex gap-2">
-                                        <button className="btn btn-warning" onClick={() => setShowEditModal(true)}>
-    <i className="fas fa-edit"></i> Modifier
-</button>
+                                        <button
+                                            className="btn btn-warning"
+                                            onClick={() =>
+                                                setShowEditModal(true)
+                                            }
+                                        >
+                                            <i className="fas fa-edit"></i>{" "}
+                                            Modifier
+                                        </button>
 
-{showEditModal && (
-    <ModalEditChecklist
-        dossierId={dossierId}
-        NumDossier={NumDossier??NumDossier}
-        onClose={() => setShowEditModal(false)}
-        onUpdate={() => {
-            // Recharger les données si nécessaire
-            checkExistingChecklist();
-        }}
-    />
-)}
+                                        {showEditModal && (
+                                            <ModalEditChecklist
+                                                dossierId={dossierId}
+                                                NumDossier={
+                                                    NumDossier ?? NumDossier
+                                                }
+                                                onClose={() =>
+                                                    setShowEditModal(false)
+                                                }
+                                                onUpdate={() => {
+                                                    // Recharger les données si nécessaire
+                                                    checkExistingChecklist();
+                                                }}
+                                            />
+                                        )}
                                         <button
                                             type="button"
                                             className="btn btn-light btn-sm"
@@ -593,7 +631,7 @@ const handleSubmit = async (e) => {
                                         </h6>
                                         <div className="row mb-3">
                                             <div className="col-md-6">
-                                                <label className="form-label fw-semibold" >
+                                                <label className="form-label fw-semibold">
                                                     Agence
                                                 </label>
                                                 <input
@@ -1109,7 +1147,7 @@ const handleSubmit = async (e) => {
                                                     Nantissement
                                                 </label>
                                             </div>
-                                             <div className="form-check">
+                                            <div className="form-check">
                                                 <input
                                                     type="checkbox"
                                                     className="form-check-input"
@@ -1394,7 +1432,10 @@ const handleSubmit = async (e) => {
                                     <div className="d-flex justify-content-between align-items-center">
                                         <h5 className="mb-0 fw-bold">
                                             <i className="fas fa-eye me-2"></i>
-                                            Visualisation de la Checklist N°: #<strong>{NumDossier??NumDossier}</strong>
+                                            Visualisation de la Checklist N°: #
+                                            <strong>
+                                                {NumDossier ?? NumDossier}
+                                            </strong>
                                         </h5>
                                         <div className="d-flex gap-2">
                                             <button
@@ -1428,7 +1469,7 @@ const handleSubmit = async (e) => {
                             >
                                 <VisualisationChecklist
                                     dossierId={dossierId}
-                                    NumDossier={NumDossier??NumDossier}
+                                    NumDossier={NumDossier ?? NumDossier}
                                     onClose={() => setShowVisualisation(false)}
                                     checklistData={checklistData}
                                 />

@@ -123,6 +123,17 @@ class UtilisateurController extends Controller
                 "user_id" => $request->userId,
                 "profil_id" => $request->profilId
             ]);
+
+            //MET A JOUR LA TABLE USERS
+            $getLastProfilName = Profile::where("user_id", $request->userId)
+                ->join("profils_users", "profiles.id", "=", "profils_users.profil_id")
+                ->latest()->first()->nom_profile;
+             User::where("id",$request->userId)->update(
+                [
+                    "role"=> $getLastProfilName
+                ]
+             );
+
             return response()->json(["status" => 1, "msg" => "Profil bien accordé."]);
         } else {
             return response()->json(["status" => 0, "msg" => "C'est utilisateur a déjà ce profil."]);
@@ -182,24 +193,24 @@ class UtilisateurController extends Controller
     public function createNewCaissierAccount(Request $request)
     {
         if (isset($request->userId)) {
-             $currentAgence = session('current_agence');
-             $codeAgence = $currentAgence['code_agence'] ?? null;
+            $currentAgence = session('current_agence');
+            $codeAgence = $currentAgence['code_agence'] ?? null;
 
-    if (!$codeAgence) {
-        return response()->json(['status' => 0, 'msg' => 'Aucune agence courante définie']);
-    }
+            if (!$codeAgence) {
+                return response()->json(['status' => 0, 'msg' => 'Aucune agence courante définie']);
+            }
             $userData = User::where("id", $request->userId)->first();
             //CREATE USD ACCOUNT
             Comptes::create([
                 'CodeAgence' => $codeAgence,
-                'NumCompte' => "570" . $request->userId . $codeAgence. "1",
-                'NomCompte' =>"CAISSE ". $userData->name." USD" ,
+                'NumCompte' => "570" . $request->userId . $codeAgence . "1",
+                'NomCompte' => "CAISSE " . $userData->name . " USD",
                 'RefTypeCompte' => "5",
                 'RefCadre' => "57",
                 'RefGroupe' => "570",
                 'RefSousGroupe' => "5700",
                 'CodeMonnaie' => 1,
-                'NumAdherant' => "5700" . $request->userId . $codeAgence."1",
+                'NumAdherant' => "5700" . $request->userId . $codeAgence . "1",
                 'isCaissier' => 1,
                 'caissierId' => $request->userId,
                 'nature_compte' => "ACTIF",
@@ -210,14 +221,14 @@ class UtilisateurController extends Controller
             //CREATE CDF ACCOUNT
             Comptes::create([
                 'CodeAgence' => $codeAgence,
-                'NumCompte' => "570" . $request->userId . $codeAgence."2",
-                 'NomCompte' =>"CAISSE ". $userData->name." CDF" ,
+                'NumCompte' => "570" . $request->userId . $codeAgence . "2",
+                'NomCompte' => "CAISSE " . $userData->name . " CDF",
                 'RefTypeCompte' => "5",
                 'RefCadre' => "57",
                 'RefGroupe' => "570",
                 'RefSousGroupe' => "5700",
                 'CodeMonnaie' => 2,
-                'NumAdherant' => "5700" . $request->userId .$codeAgence. "2",
+                'NumAdherant' => "5700" . $request->userId . $codeAgence . "2",
                 'isCaissier' => 1,
                 'caissierId' => $request->userId,
                 'nature_compte' => "ACTIF",
@@ -235,103 +246,107 @@ class UtilisateurController extends Controller
     //PERMET DE RECUPERER TOUTES LES AGENCES 
 
     // Exemples de méthodes (à adapter)
-public function getAgences() {
-    $agences = Agences::where('active', true)->get();
-    return response()->json(['status' => 1, 'data' => $agences]);
-}
+    public function getAgences()
+    {
+        $agences = Agences::where('active', true)->get();
+        return response()->json(['status' => 1, 'data' => $agences]);
+    }
 
-public function getUserAgences(Request $request)
-{
-    $user = User::find($request->userId);
-    // Inclure l'id du pivot
-    $agences = $user->agences()->get()->map(function($agence) {
-        return [
-            'id' => $agence->pivot->id,          // id de user_agences
-            'agence_id' => $agence->id,
-            'code_agence' => $agence->code_agence,
-            'nom_agence' => $agence->nom_agence,
-        ];
-    });
-    return response()->json(['status' => 1, 'get_agences_user' => $agences]);
-}
+    public function getUserAgences(Request $request)
+    {
+        $user = User::find($request->userId);
+        // Inclure l'id du pivot
+        $agences = $user->agences()->get()->map(function ($agence) {
+            return [
+                'id' => $agence->pivot->id,          // id de user_agences
+                'agence_id' => $agence->id,
+                'code_agence' => $agence->code_agence,
+                'nom_agence' => $agence->nom_agence,
+            ];
+        });
+        return response()->json(['status' => 1, 'get_agences_user' => $agences]);
+    }
 
-public function addAgenceToUser(Request $request) {
-    $user = User::find($request->userId);
-    $user->agences()->attach($request->agenceId);
-    return response()->json(['status' => 1, 'msg' => 'Agence ajoutée']);
-}
+    public function addAgenceToUser(Request $request)
+    {
+        $user = User::find($request->userId);
+        $user->agences()->attach($request->agenceId);
+        return response()->json(['status' => 1, 'msg' => 'Agence ajoutée']);
+    }
 
-public function removeAgenceFromUser(Request $request) {
-    UserAgences::find($request->idUserAgence)->delete();
-    return response()->json(['status' => 1, 'msg' => 'Agence retirée']);
-}
+    public function removeAgenceFromUser(Request $request)
+    {
+        UserAgences::find($request->idUserAgence)->delete();
+        return response()->json(['status' => 1, 'msg' => 'Agence retirée']);
+    }
 
-public function addAllAgencesToUser(Request $request) {
-    $user = User::find($request->userId);
-    $allAgencesIds = Agences::pluck('id')->toArray();
-    $user->agences()->sync($allAgencesIds);
-    return response()->json(['status' => 1, 'msg' => 'Toutes les agences ont été attribuées']);
-}
-
-
-
-// public function changeActiveAgence(Request $request)
-// {
-//     $agenceId = $request->agence_id;
-//     $agenceCode = $request->agence_code;
-//     $agenceNom = $request->agence_nom;
-    
-//     // Vérifier que cette agence appartient bien à l'utilisateur
-//     $user = auth()->user();
-//     $userAgences = $user->agences; // relation many-to-many
-    
-//     $validAgence = $userAgences->firstWhere('id', $agenceId);
-//     if (!$validAgence) {
-//         return response()->json(['status' => 0, 'msg' => 'Agence non autorisée']);
-//     }
-    
-//     // Stocker en session (et non en base)
-//     Session::put('current_agence', [
-//         'id' => $agenceId,
-//         'code_agence' => $agenceCode,
-//         'nom_agence' => $agenceNom,
-//     ]);
-    
-//     return response()->json(['status' => 1, 'msg' => 'Agence changée avec succès']);
-// }
+    public function addAllAgencesToUser(Request $request)
+    {
+        $user = User::find($request->userId);
+        $allAgencesIds = Agences::pluck('id')->toArray();
+        $user->agences()->sync($allAgencesIds);
+        return response()->json(['status' => 1, 'msg' => 'Toutes les agences ont été attribuées']);
+    }
 
 
-public function changeActiveAgence(Request $request)
-{
-    $agenceId = $request->agence_id;
-    $agenceCode = $request->agence_code;
-    $agenceNom = $request->agence_nom;
-    
-    $user = auth()->user();
-    
-    // Cas spécial : "Toutes les agences"
-    if ($agenceId === 'all') {
+
+    // public function changeActiveAgence(Request $request)
+    // {
+    //     $agenceId = $request->agence_id;
+    //     $agenceCode = $request->agence_code;
+    //     $agenceNom = $request->agence_nom;
+
+    //     // Vérifier que cette agence appartient bien à l'utilisateur
+    //     $user = auth()->user();
+    //     $userAgences = $user->agences; // relation many-to-many
+
+    //     $validAgence = $userAgences->firstWhere('id', $agenceId);
+    //     if (!$validAgence) {
+    //         return response()->json(['status' => 0, 'msg' => 'Agence non autorisée']);
+    //     }
+
+    //     // Stocker en session (et non en base)
+    //     Session::put('current_agence', [
+    //         'id' => $agenceId,
+    //         'code_agence' => $agenceCode,
+    //         'nom_agence' => $agenceNom,
+    //     ]);
+
+    //     return response()->json(['status' => 1, 'msg' => 'Agence changée avec succès']);
+    // }
+
+
+    public function changeActiveAgence(Request $request)
+    {
+        $agenceId = $request->agence_id;
+        $agenceCode = $request->agence_code;
+        $agenceNom = $request->agence_nom;
+
+        $user = auth()->user();
+
+        // Cas spécial : "Toutes les agences"
+        if ($agenceId === 'all') {
+            Session::put('current_agence', [
+                'id' => 'all',
+                'code_agence' => 'all',
+                'nom_agence' => 'Toutes les agences',
+            ]);
+            return response()->json(['status' => 1, 'msg' => 'Affichage toutes agences']);
+        }
+
+        // Sinon, vérifier que l'agence appartient bien à l'utilisateur
+        $userAgences = $user->agences;
+        $validAgence = $userAgences->firstWhere('id', $agenceId);
+        if (!$validAgence) {
+            return response()->json(['status' => 0, 'msg' => 'Agence non autorisée']);
+        }
+
         Session::put('current_agence', [
-            'id' => 'all',
-            'code_agence' => 'all',
-            'nom_agence' => 'Toutes les agences',
+            'id' => $agenceId,
+            'code_agence' => $agenceCode,
+            'nom_agence' => $agenceNom,
         ]);
-        return response()->json(['status' => 1, 'msg' => 'Affichage toutes agences']);
+
+        return response()->json(['status' => 1, 'msg' => 'Agence changée avec succès']);
     }
-    
-    // Sinon, vérifier que l'agence appartient bien à l'utilisateur
-    $userAgences = $user->agences;
-    $validAgence = $userAgences->firstWhere('id', $agenceId);
-    if (!$validAgence) {
-        return response()->json(['status' => 0, 'msg' => 'Agence non autorisée']);
-    }
-    
-    Session::put('current_agence', [
-        'id' => $agenceId,
-        'code_agence' => $agenceCode,
-        'nom_agence' => $agenceNom,
-    ]);
-    
-    return response()->json(['status' => 1, 'msg' => 'Agence changée avec succès']);
-}
 }

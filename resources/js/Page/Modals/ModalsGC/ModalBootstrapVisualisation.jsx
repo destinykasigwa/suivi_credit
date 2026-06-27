@@ -30,7 +30,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
     const [NumCompte, setNumCompte] = useState();
     const [NomCompte, setNomCompte] = useState();
-    const [genre, setGenre] = useState(""); 
+    const [genre, setGenre] = useState("");
     const [produit_credit, setproduit_credit] = useState();
     const [type_credit, settype_credit] = useState();
     const [recouvreur, setrecouvreur] = useState();
@@ -431,25 +431,36 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
     return (
         <>
-        {/* <style>
-            {`
-            .modal.full-height .modal-dialog {
-    margin-bottom: 5 !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    display: flex !important;
-    align-items: stretch !important;
-}
+            <style>
+                {`
+             .modal-fullscreen-custom .modal-dialog {
+                margin: 0 !important;
+                width: 100vw !important;
+                max-width: 100% !important;
+                height: 100vh !important;
+                max-height: 100% !important;
+                }
+
+                .modal-fullscreen-custom .modal-content {
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+                }
+
+                .modal-fullscreen-custom .modal-body {
+                overflow-y: auto !important;
+                max-height: calc(100vh - 140px); /* Ajuste selon la hauteur de ton header/footer */
+                }
             `}
-        </style> */}
+            </style>
             <div
-                 className="modal fade full-height"
+                className="modal fade modal-fullscreen-custom"
                 tabIndex="-1"
                 aria-hidden="true"
                 id="modalVisualisationDossier"
-                style={{ height: "100vh !important"}}
+                style={{ height: "100vh !important" }}
             >
-                <div className="modal-dialog modal-xl modal-full-height">
+                <div className="modal-dialog modal-xl modal-full">
                     <div className="modal-content border-0 shadow-lg rounded-3">
                         {/* Header modernisé */}
                         <div
@@ -510,7 +521,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                         <option value="Décaissé">
                                                             Décaissé
                                                         </option>
-                                                        <option value="Encours de Décaissement">Encours de Décaissement</option>
+                                                        <option value="Encours de Décaissement">
+                                                            Encours de
+                                                            Décaissement
+                                                        </option>
                                                     </select>
                                                 ) : (
                                                     <select
@@ -545,8 +559,10 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                         <option value="Décaissé">
                                                             Décaissé
                                                         </option>
-                                                        <option value="Encours de Décaissement">Encours de Décaissement</option>
-
+                                                        <option value="Encours de Décaissement">
+                                                            Encours de
+                                                            Décaissement
+                                                        </option>
                                                     </select>
                                                 )}
                                             </div>
@@ -638,7 +654,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
 
                         <div
                             className="modal-body p-4"
-                            style={{ maxHeight: "70vh", overflowY: "auto" }}
+                            style={{ maxHeight: "100vh", overflowY: "auto" }}
                         >
                             {/* Loader amélioré */}
                             {isLoadingBar && (
@@ -855,7 +871,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                         />
                                                                     </td>
                                                                 </tr>
-                                                                 <tr>
+                                                                <tr>
                                                                     <td
                                                                         style={{
                                                                             padding:
@@ -878,19 +894,44 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                                 "6px 8px",
                                                                         }}
                                                                     >
-              <select
-    className="form-control form-control-sm"
-    style={{ backgroundColor: "#f8f9fa" }}
-    value={genre}
-    onChange={(e) => setGenre(e.target.value)}
->
-    <option value="" disabled hidden>
-        -- Sélectionnez --
-    </option>
-    <option value="Homme">Homme</option>
-    <option value="Femme">Femme</option>
-    <option value="PM">PM</option>
-</select>
+                                                                        <select
+                                                                            className="form-control form-control-sm"
+                                                                            style={{
+                                                                                backgroundColor:
+                                                                                    "#f8f9fa",
+                                                                            }}
+                                                                            value={
+                                                                                genre
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
+                                                                                setGenre(
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option
+                                                                                value=""
+                                                                                disabled
+                                                                                hidden
+                                                                            >
+                                                                                --
+                                                                                Sélectionnez
+                                                                                --
+                                                                            </option>
+                                                                            <option value="Homme">
+                                                                                Homme
+                                                                            </option>
+                                                                            <option value="Femme">
+                                                                                Femme
+                                                                            </option>
+                                                                            <option value="PM">
+                                                                                PM
+                                                                            </option>
+                                                                        </select>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
@@ -2589,7 +2630,9 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                 propositionId={
                                                                     getDossierId
                                                                 }
-                                                                NumDossier={dossier.NumDossier}
+                                                                NumDossier={
+                                                                    dossier.NumDossier
+                                                                }
                                                                 onClose={() =>
                                                                     setShowPropositions(
                                                                         false,
@@ -3295,8 +3338,6 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
             )} */}
         </>
     );
-
-
 }
 
 const CommentaireItem = ({
@@ -3374,8 +3415,8 @@ const CommentaireItem = ({
             <div
                 className="me-3 d-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
                 style={{
-                      minWidth: "35px", // évite l’écrasement
-                     flexShrink: 0,
+                    minWidth: "35px", // évite l’écrasement
+                    flexShrink: 0,
                     height: "35px",
                     fontSize: "14px",
                     fontWeight: "bold",
