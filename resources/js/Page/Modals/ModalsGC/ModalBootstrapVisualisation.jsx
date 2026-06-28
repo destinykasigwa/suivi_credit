@@ -2472,35 +2472,75 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                                             onClick={
                                                                                 handleSubmitUpadate
                                                                             }
-                                                                            className="btn w-100 mt-3  bg-gradient-primary text-white"
+                                                                            className="btn w-100 mt-3"
                                                                             style={{
+                                                                                background:
+                                                                                    "linear-gradient(135deg, #20c997 0%, #0d9488 100%)",
                                                                                 color: "white",
-                                                                                transition:
-                                                                                    "all 0.2s ease",
+                                                                                border: "none",
                                                                                 borderRadius:
-                                                                                    "10px",
+                                                                                    "50px",
+                                                                                padding:
+                                                                                    "14px 24px",
+                                                                                fontWeight:
+                                                                                    "600",
+                                                                                fontSize:
+                                                                                    "0.95rem",
+                                                                                letterSpacing:
+                                                                                    "0.3px",
+                                                                                boxShadow:
+                                                                                    "0 6px 20px rgba(13, 148, 136, 0.35)",
+                                                                                transition:
+                                                                                    "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                                                                cursor: "pointer",
+                                                                                display:
+                                                                                    "inline-flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                justifyContent:
+                                                                                    "center",
+                                                                                gap: "10px",
+                                                                                position:
+                                                                                    "relative",
+                                                                                overflow:
+                                                                                    "hidden",
                                                                             }}
                                                                             onMouseEnter={(
                                                                                 e,
                                                                             ) => {
-                                                                                e.currentTarget.style.backgroundColor =
-                                                                                    "#198764";
                                                                                 e.currentTarget.style.transform =
-                                                                                    "translateY(-1px)";
+                                                                                    "translateY(-3px)";
+                                                                                e.currentTarget.style.boxShadow =
+                                                                                    "0 10px 30px rgba(13, 148, 136, 0.5)";
+                                                                                e.currentTarget.style.background =
+                                                                                    "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)";
                                                                             }}
                                                                             onMouseLeave={(
                                                                                 e,
                                                                             ) => {
-                                                                                e.currentTarget.style.backgroundColor =
-                                                                                    "#20c997";
                                                                                 e.currentTarget.style.transform =
                                                                                     "translateY(0)";
+                                                                                e.currentTarget.style.boxShadow =
+                                                                                    "0 6px 20px rgba(13, 148, 136, 0.35)";
+                                                                                e.currentTarget.style.background =
+                                                                                    "linear-gradient(135deg, #20c997 0%, #0d9488 100%)";
                                                                             }}
                                                                         >
-                                                                            <i className="fas fa-save me-2"></i>
-                                                                            Modifier
-                                                                            le
-                                                                            dossier
+                                                                            {/* Icône animée (optionnel) */}
+                                                                            <i
+                                                                                className="fas fa-save"
+                                                                                style={{
+                                                                                    fontSize:
+                                                                                        "1.1rem",
+                                                                                    transition:
+                                                                                        "transform 0.3s ease",
+                                                                                }}
+                                                                            ></i>
+                                                                            <span>
+                                                                                Modifier
+                                                                                le
+                                                                                dossier
+                                                                            </span>
                                                                         </button>
                                                                     </td>
                                                                 </tr>
@@ -2537,6 +2577,7 @@ export default function ModalBootstrapVisualisation({ dossierId, onClose }) {
                                                 onClick={() =>
                                                     handleViewPropositions()
                                                 }
+                                                className="mt-2"
                                                 style={{
                                                     background:
                                                         "linear-gradient(98deg, #006892 0%, #0085af 100%)",

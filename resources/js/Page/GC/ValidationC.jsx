@@ -536,9 +536,7 @@ const ValidationC = () => {
                             <div className="d-none d-lg-block">
                                 <table className="table modern-table align-middle mb-0">
                                     <thead>
-                                        <tr
-                                         
-                                        >
+                                        <tr>
                                             <th>Num Compte</th>
                                             <th>Nom Compte</th>
                                             <th>Date demande</th>
@@ -552,19 +550,27 @@ const ValidationC = () => {
                                         {!fetchSearchedCredit && currentItems
                                             ? currentItems.map(
                                                   (credit, index) => (
-                                                      <tr key={index}
-         style={{
-        border: selectedRowId == credit.id_credit
-            ? "2px solid #0d9488"
-            : "1px solid #e5e7eb",
-        backgroundColor: selectedRowId == credit.id_credit
-            ? "rgba(13, 148, 136, 0.1)"
-            : "white",
-        transition: "all 0.25s ease",
-        boxShadow: selectedRowId == credit.id_credit
-            ? "0 4px 12px rgba(13, 148, 136, 0.15)"
-            : "none",
-    }}
+                                                      <tr
+                                                          key={index}
+                                                          style={{
+                                                              border:
+                                                                  selectedRowId ==
+                                                                  credit.id_credit
+                                                                      ? "2px solid #0d9488"
+                                                                      : "1px solid #e5e7eb",
+                                                              backgroundColor:
+                                                                  selectedRowId ==
+                                                                  credit.id_credit
+                                                                      ? "rgba(13, 148, 136, 0.1)"
+                                                                      : "white",
+                                                              transition:
+                                                                  "all 0.25s ease",
+                                                              boxShadow:
+                                                                  selectedRowId ==
+                                                                  credit.id_credit
+                                                                      ? "0 4px 12px rgba(13, 148, 136, 0.15)"
+                                                                      : "none",
+                                                          }}
                                                       >
                                                           <td
                                                               className="fw-semibold"
@@ -602,7 +608,7 @@ const ValidationC = () => {
                                                                 "Encours" ? (
                                                                   <span className="badge-modern badge-encours">
                                                                       ✅ En
-                                                                      étude 
+                                                                      étude
                                                                   </span>
                                                               ) : (
                                                                   <span className="badge-modern badge-attente">
@@ -611,78 +617,136 @@ const ValidationC = () => {
                                                                   </span>
                                                               )}
                                                           </td>
-                                                         <td className="py-3">
-                        <div className="d-flex gap-2 justify-content-center align-items-center flex-wrap">
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => {
-                                    setSelectedRowId(credit.id_credit); // ← AJOUT
-                                    setSelectedDossierId(credit.id_credit);
-                                    setShowActionsOffcanvas(false);
-                                    setTimeout(() => {
-                                        const modal = new window.bootstrap.Modal(
-                                            document.getElementById("modalVisualisationDossier")
-                                        );
-                                        modal.show();
-                                    }, 300);
-                                }}
-                            >
-                                <i className="fas fa-eye"></i>
-                                <span className="ms-1"> Visualiser</span>
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-info"
-                                onClick={() => {
-                                    setSelectedRowId(credit.id_credit); // ← AJOUT
-                                    setSelectedDossierIdContrat(credit.id_credit);
-                                    setShowActionsOffcanvas(false);
-                                    setTimeout(() => {
-                                        const modal = new window.bootstrap.Modal(
-                                            document.getElementById("modalContratPret")
-                                        );
-                                        modal.show();
-                                    }, 300);
-                                }}
-                            >
-                                <i className="fa fa-file"></i>
-                                <span className="ms-1"> Fichiers</span>
-                            </button>
-                            <button
-                                className="btn btn-sm btn-outline-secondary"
-                                type="button"
-                                onClick={() => {
-                                    setSelectedRowId(credit.id_credit); // ← AJOUT
-                                    setCurrentCredit(credit);
-                                    setShowActionsOffcanvas(true);
-                                }}
-                                style={{ borderRadius: "6px", padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: "6px", transition: "all 0.2s ease" }}
-                            >
-                                <i className="fas fa-bars"></i>
-                                <span className="d-none d-sm-inline">Actions</span>
-                            </button>
-                        </div>
-                    </td>
+                                                          <td className="py-3">
+                                                              <div className="d-flex gap-2 justify-content-center align-items-center flex-wrap">
+                                                                  <button
+                                                                      type="button"
+                                                                      className="btn btn-sm btn-outline-primary"
+                                                                      onClick={() => {
+                                                                          setSelectedRowId(
+                                                                              credit.id_credit,
+                                                                          ); // ← AJOUT
+                                                                          setSelectedDossierId(
+                                                                              credit.id_credit,
+                                                                          );
+                                                                          setShowActionsOffcanvas(
+                                                                              false,
+                                                                          );
+                                                                          setTimeout(
+                                                                              () => {
+                                                                                  const modal =
+                                                                                      new window.bootstrap.Modal(
+                                                                                          document.getElementById(
+                                                                                              "modalVisualisationDossier",
+                                                                                          ),
+                                                                                      );
+                                                                                  modal.show();
+                                                                              },
+                                                                              300,
+                                                                          );
+                                                                      }}
+                                                                  >
+                                                                      <i className="fas fa-eye"></i>
+                                                                      <span className="ms-1">
+                                                                          {" "}
+                                                                          Visualiser
+                                                                      </span>
+                                                                  </button>
+                                                                  <button
+                                                                      type="button"
+                                                                      className="btn btn-sm btn-outline-info"
+                                                                      onClick={() => {
+                                                                          setSelectedRowId(
+                                                                              credit.id_credit,
+                                                                          ); // ← AJOUT
+                                                                          setSelectedDossierIdContrat(
+                                                                              credit.id_credit,
+                                                                          );
+                                                                          setShowActionsOffcanvas(
+                                                                              false,
+                                                                          );
+                                                                          setTimeout(
+                                                                              () => {
+                                                                                  const modal =
+                                                                                      new window.bootstrap.Modal(
+                                                                                          document.getElementById(
+                                                                                              "modalContratPret",
+                                                                                          ),
+                                                                                      );
+                                                                                  modal.show();
+                                                                              },
+                                                                              300,
+                                                                          );
+                                                                      }}
+                                                                  >
+                                                                      <i className="fa fa-file"></i>
+                                                                      <span className="ms-1">
+                                                                          {" "}
+                                                                          Fichiers
+                                                                      </span>
+                                                                  </button>
+                                                                  <button
+                                                                      className="btn btn-sm btn-outline-secondary"
+                                                                      type="button"
+                                                                      onClick={() => {
+                                                                          setSelectedRowId(
+                                                                              credit.id_credit,
+                                                                          ); // ← AJOUT
+                                                                          setCurrentCredit(
+                                                                              credit,
+                                                                          );
+                                                                          setShowActionsOffcanvas(
+                                                                              true,
+                                                                          );
+                                                                      }}
+                                                                      style={{
+                                                                          borderRadius:
+                                                                              "6px",
+                                                                          padding:
+                                                                              "6px 12px",
+                                                                          display:
+                                                                              "inline-flex",
+                                                                          alignItems:
+                                                                              "center",
+                                                                          gap: "6px",
+                                                                          transition:
+                                                                              "all 0.2s ease",
+                                                                      }}
+                                                                  >
+                                                                      <i className="fas fa-bars"></i>
+                                                                      <span className="d-none d-sm-inline">
+                                                                          Actions
+                                                                      </span>
+                                                                  </button>
+                                                              </div>
+                                                          </td>
                                                       </tr>
                                                   ),
                                               )
                                             : fetchSearchedCredit &&
                                               fetchSearchedCredit.map(
                                                   (res, index) => (
-                                                      <tr key={index}
-                                                style={{
-        border: selectedRowId == credit.id_credit
-            ? "2px solid #0d9488"
-            : "1px solid #e5e7eb",
-        backgroundColor: selectedRowId == credit.id_credit
-            ? "rgba(13, 148, 136, 0.1)"
-            : "white",
-        transition: "all 0.25s ease",
-        boxShadow: selectedRowId == credit.id_credit
-            ? "0 4px 12px rgba(13, 148, 136, 0.15)"
-            : "none",
-    }}
+                                                      <tr
+                                                          key={index}
+                                                          style={{
+                                                              border:
+                                                                  selectedRowId ==
+                                                                  credit.id_credit
+                                                                      ? "2px solid #0d9488"
+                                                                      : "1px solid #e5e7eb",
+                                                              backgroundColor:
+                                                                  selectedRowId ==
+                                                                  credit.id_credit
+                                                                      ? "rgba(13, 148, 136, 0.1)"
+                                                                      : "white",
+                                                              transition:
+                                                                  "all 0.25s ease",
+                                                              boxShadow:
+                                                                  selectedRowId ==
+                                                                  credit.id_credit
+                                                                      ? "0 4px 12px rgba(13, 148, 136, 0.15)"
+                                                                      : "none",
+                                                          }}
                                                       >
                                                           <td className="fw-semibold">
                                                               {res.NumCompte}
@@ -739,7 +803,9 @@ const ValidationC = () => {
                                                                               },
                                                                               300,
                                                                           );
-                                                                          setSelectedRowId(res.id_credit); // ← AJOUT
+                                                                          setSelectedRowId(
+                                                                              res.id_credit,
+                                                                          ); // ← AJOUT
                                                                       }}
                                                                   >
                                                                       <i className="fas fa-eye"></i>
@@ -773,7 +839,9 @@ const ValidationC = () => {
                                                                               },
                                                                               300,
                                                                           );
-                                                                          setSelectedRowId(res.id_credit); // ← AJOUT   
+                                                                          setSelectedRowId(
+                                                                              res.id_credit,
+                                                                          ); // ← AJOUT
                                                                       }}
                                                                   >
                                                                       <i className="fa fa-file"></i>
@@ -793,7 +861,9 @@ const ValidationC = () => {
                                                                           setShowActionsOffcanvas(
                                                                               true,
                                                                           );
-                                                                             setSelectedRowId(res.id_credit); // ← AJOUT
+                                                                          setSelectedRowId(
+                                                                              res.id_credit,
+                                                                          ); // ← AJOUT
                                                                       }}
                                                                       style={{
                                                                           borderRadius:
@@ -853,7 +923,8 @@ const ValidationC = () => {
                                                           </span>
                                                       ) : (
                                                           <span className="badge-modern badge-attente">
-                                                              ⏳ En attente de decaissement
+                                                              ⏳ En attente de
+                                                              decaissement
                                                           </span>
                                                       )}
                                                   </div>
@@ -904,7 +975,9 @@ const ValidationC = () => {
                                                               modal.show();
                                                           }, 300);
 
-                                                             setSelectedRowId(credit.id_credit); // ← AJOUT
+                                                          setSelectedRowId(
+                                                              credit.id_credit,
+                                                          ); // ← AJOUT
                                                       }}
                                                   >
                                                       <i className="fas fa-eye"></i>
@@ -934,7 +1007,9 @@ const ValidationC = () => {
                                                                   );
                                                               modal.show();
                                                           }, 300);
-                                                               setSelectedRowId(credit.id_credit); // ← AJOUT
+                                                          setSelectedRowId(
+                                                              credit.id_credit,
+                                                          ); // ← AJOUT
                                                       }}
                                                   >
                                                       <i className="fa fa-file"></i>
@@ -969,7 +1044,8 @@ const ValidationC = () => {
                                                           </span>
                                                       ) : (
                                                           <span className="badge-modern badge-attente">
-                                                              ⏳ En attente de decaissement
+                                                              ⏳ En attente de
+                                                              decaissement
                                                           </span>
                                                       )}
                                                   </div>
@@ -1016,7 +1092,9 @@ const ValidationC = () => {
                                                               modal.show();
                                                           }, 300);
 
-                                                               setSelectedRowId(res.id_credit); // ← AJOUT
+                                                          setSelectedRowId(
+                                                              res.id_credit,
+                                                          ); // ← AJOUT
                                                       }}
                                                   >
                                                       <i className="fas fa-eye"></i>
@@ -1047,7 +1125,9 @@ const ValidationC = () => {
                                                                   );
                                                               modal.show();
                                                           }, 300);
-                                                               setSelectedRowId(res.id_credit); // ← AJOUT
+                                                          setSelectedRowId(
+                                                              res.id_credit,
+                                                          ); // ← AJOUT
                                                       }}
                                                   >
                                                       <i className="fa fa-file"></i>
@@ -1078,7 +1158,9 @@ const ValidationC = () => {
                                                               modal.show();
                                                           }, 300);
 
-                                                               setSelectedRowId(res.id_credit); // ← AJOUT
+                                                          setSelectedRowId(
+                                                              res.id_credit,
+                                                          ); // ← AJOUT
                                                       }}
                                                       style={{
                                                           borderRadius: "6px",

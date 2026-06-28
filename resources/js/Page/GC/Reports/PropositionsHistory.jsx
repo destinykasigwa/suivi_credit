@@ -151,237 +151,446 @@ const PropositionsHistory = ({ propositionId, NumDossier, onClose = null }) => {
     };
 
     // ✅ Export PDF
+    // const handleExportPDF = async () => {
+    //     const doc = new jsPDF("p", "mm", "a4");
+    //     const pageWidth = doc.internal.pageSize.getWidth();
+
+    //     // -------- EN-TÊTE (inchangé) --------
+    //     doc.setFillColor(16, 185, 129);
+    //     doc.rect(0, 0, pageWidth, 45, "F");
+    //     doc.setTextColor(255, 255, 255);
+    //     doc.setFontSize(18);
+    //     doc.setFont("helvetica", "bold");
+    //     doc.text(organisation.nom, pageWidth / 2, 15, { align: "center" });
+    //     doc.setFontSize(10);
+    //     doc.setFont("helvetica", "normal");
+    //     doc.text(organisation.slogan, pageWidth / 2, 23, { align: "center" });
+    //     doc.setFontSize(8);
+    //     doc.setTextColor(240, 240, 240);
+    //     doc.text(organisation.adresse, pageWidth / 2, 30, {
+    //         align: "center",
+    //         maxWidth: 170,
+    //     });
+    //     doc.text(
+    //         `${organisation.telephone} | ${organisation.email}`,
+    //         pageWidth / 2,
+    //         36,
+    //         { align: "center" },
+    //     );
+    //     doc.text(organisation.siteWeb, pageWidth / 2, 41, { align: "center" });
+    //     doc.setDrawColor(16, 185, 129);
+    //     doc.setLineWidth(0.5);
+    //     doc.line(10, 48, pageWidth - 10, 48);
+    //     doc.setTextColor(0, 0, 0);
+    //     doc.setFontSize(14);
+    //     doc.setFont("helvetica", "bold");
+    //     doc.text("Historique des propositions de montant", pageWidth / 2, 58, {
+    //         align: "center",
+    //     });
+    //     doc.setFontSize(10);
+    //     doc.setFont("helvetica", "normal");
+    //     doc.setTextColor(100, 100, 100);
+    //     doc.text(
+    //         `Dossier N°: ${NumDossier || propositionId}`,
+    //         pageWidth / 2,
+    //         66,
+    //         { align: "center" },
+    //     );
+    //     doc.setFontSize(8);
+    //     doc.setTextColor(150, 150, 150);
+    //     doc.text(
+    //         `Exporté le: ${new Date().toLocaleString("fr-FR")}`,
+    //         pageWidth - 20,
+    //         75,
+    //         { align: "right" },
+    //     );
+
+    //     // -------- CHARGEMENT DES IMAGES --------
+    //     const rows = [];
+    //     const imagesData = [];
+
+    //     for (const prop of propositions) {
+    //         let signatureText = "Non signé";
+    //         let imageBase64 = null;
+    //         if (prop.signature_path) {
+    //             try {
+    //                 const response = await fetch(
+    //                     `/storage/${prop.signature_path}`,
+    //                 );
+    //                 if (!response.ok) throw new Error("Erreur chargement");
+    //                 const blob = await response.blob();
+    //                 const base64 = await new Promise((resolve) => {
+    //                     const reader = new FileReader();
+    //                     reader.onloadend = () => resolve(reader.result);
+    //                     reader.readAsDataURL(blob);
+    //                 });
+    //                 imageBase64 = base64;
+    //                 signatureText = "Oui";
+    //             } catch (e) {
+    //                 console.error("Erreur signature", e);
+    //                 signatureText = "Erreur";
+    //             }
+    //         }
+    //         rows.push({
+    //             index: rows.length + 1,
+    //             nom: prop.nom || prop.signed_by || "",
+    //             role: prop.role || "",
+    //             montant: `${formatCurrency(prop.montant_propose || prop.montant || 0)} ${getCurrencySymbol(prop.devise || "CDF")}`,
+    //             commentaire: prop.commentaire || "Aucun commentaire",
+    //             date: formatDate(prop.created_at || prop.date),
+    //             signature: signatureText,
+    //             image: imageBase64,
+    //         });
+    //         imagesData.push({
+    //             nom: prop.nom || prop.signed_by || "",
+    //             image: imageBase64,
+    //         });
+    //     }
+
+    //     // -------- TABLEAU PRINCIPAL --------
+    //     const tableData = rows.map((r) => [
+    //         r.index,
+    //         r.nom,
+    //         r.role,
+    //         r.montant,
+    //         r.commentaire,
+    //         r.date,
+    //         r.signature,
+    //     ]);
+
+    //     doc.autoTable({
+    //         startY: 80,
+    //         head: [
+    //             [
+    //                 "#",
+    //                 "Signataire",
+    //                 "Rôle",
+    //                 "Montant",
+    //                 "Commentaire",
+    //                 "Date",
+    //                 "Signature",
+    //             ],
+    //         ],
+    //         body: tableData,
+    //         theme: "striped",
+    //         headStyles: {
+    //             fillColor: [16, 185, 129],
+    //             textColor: [255, 255, 255],
+    //             fontStyle: "bold",
+    //             halign: "center",
+    //         },
+    //         styles: {
+    //             fontSize: 8,
+    //             cellPadding: 2,
+    //             lineColor: [200, 200, 200],
+    //             lineWidth: 0.1,
+    //         },
+    //         columnStyles: {
+    //             0: { cellWidth: 8, halign: "center" },
+    //             1: { cellWidth: 30 },
+    //             2: { cellWidth: 25 },
+    //             3: { cellWidth: 25, halign: "right" },
+    //             4: { cellWidth: 50 },
+    //             5: { cellWidth: 28, halign: "center" },
+    //             6: { cellWidth: 25, halign: "center" },
+    //         },
+    //         alternateRowStyles: { fillColor: [245, 245, 245] },
+    //         margin: { left: 10, right: 10 },
+    //     });
+
+    //     const finalY = doc.lastAutoTable.finalY + 10;
+
+    //     // -------- SECTION SIGNATURES EN IMAGES --------
+    //     if (imagesData.some((item) => item.image)) {
+    //         doc.addPage();
+    //         doc.setFontSize(14);
+    //         doc.setFont("helvetica", "bold");
+    //         doc.text("Signatures des intervenants", pageWidth / 2, 20, {
+    //             align: "center",
+    //         });
+
+    //         let y = 30;
+    //         const imgWidth = 60;
+    //         const imgHeight = 30;
+    //         const xStart = (pageWidth - imgWidth) / 2;
+
+    //         for (const item of imagesData) {
+    //             if (item.image) {
+    //                 doc.setFontSize(10);
+    //                 doc.setFont("helvetica", "normal");
+    //                 doc.text(item.nom, pageWidth / 2, y, { align: "center" });
+    //                 y += 5;
+    //                 doc.addImage(
+    //                     item.image,
+    //                     "JPEG",
+    //                     xStart,
+    //                     y,
+    //                     imgWidth,
+    //                     imgHeight,
+    //                     undefined,
+    //                     "FAST",
+    //                 );
+    //                 y += imgHeight + 10;
+    //                 if (y > 270) {
+    //                     doc.addPage();
+    //                     y = 20;
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // -------- STATISTIQUES --------
+    //     if (signaturesStats) {
+    //         doc.setFontSize(10);
+    //         doc.setFont("helvetica", "bold");
+    //         doc.setTextColor(0, 0, 0);
+    //         doc.text("Récapitulatif des signatures:", 14, finalY);
+    //         doc.setFontSize(9);
+    //         doc.setFont("helvetica", "normal");
+    //         doc.text(
+    //             `• Signatures effectuées: ${signaturesStats.total_signatures}/${signaturesStats.total_intervenants}`,
+    //             20,
+    //             finalY + 7,
+    //         );
+    //         doc.text(
+    //             `• Pourcentage d'avancement: ${signaturesStats.pourcentage_avancement}%`,
+    //             20,
+    //             finalY + 14,
+    //         );
+    //         doc.text(
+    //             `• Reste à signer: ${signaturesStats.reste_a_signer} signature(s)`,
+    //             20,
+    //             finalY + 21,
+    //         );
+    //     }
+
+    //     // -------- PIED DE PAGE --------
+    //     const pageCount = doc.internal.getNumberOfPages();
+    //     for (let i = 1; i <= pageCount; i++) {
+    //         doc.setPage(i);
+    //         doc.setFontSize(8);
+    //         doc.setTextColor(150, 150, 150);
+    //         doc.text(
+    //             `COOPEC AKIBA YETU - Document officiel - Page ${i} sur ${pageCount}`,
+    //             pageWidth / 2,
+    //             doc.internal.pageSize.getHeight() - 10,
+    //             { align: "center" },
+    //         );
+    //     }
+
+    //     doc.save(
+    //         `Historique_Propositions_Dossier_${NumDossier || propositionId}.pdf`,
+    //     );
+    // };
+
     const handleExportPDF = async () => {
-        const doc = new jsPDF("p", "mm", "a4");
-        const pageWidth = doc.internal.pageSize.getWidth();
+    const doc = new jsPDF("p", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-        // -------- EN-TÊTE (inchangé) --------
-        doc.setFillColor(16, 185, 129);
-        doc.rect(0, 0, pageWidth, 45, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
-        doc.setFont("helvetica", "bold");
-        doc.text(organisation.nom, pageWidth / 2, 15, { align: "center" });
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(organisation.slogan, pageWidth / 2, 23, { align: "center" });
-        doc.setFontSize(8);
-        doc.setTextColor(240, 240, 240);
-        doc.text(organisation.adresse, pageWidth / 2, 30, {
-            align: "center",
-            maxWidth: 170,
-        });
-        doc.text(
-            `${organisation.telephone} | ${organisation.email}`,
-            pageWidth / 2,
-            36,
-            { align: "center" },
-        );
-        doc.text(organisation.siteWeb, pageWidth / 2, 41, { align: "center" });
-        doc.setDrawColor(16, 185, 129);
-        doc.setLineWidth(0.5);
-        doc.line(10, 48, pageWidth - 10, 48);
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
-        doc.text("Historique des propositions de montant", pageWidth / 2, 58, {
-            align: "center",
-        });
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(100, 100, 100);
-        doc.text(
-            `Dossier N°: ${NumDossier || propositionId}`,
-            pageWidth / 2,
-            66,
-            { align: "center" },
-        );
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text(
-            `Exporté le: ${new Date().toLocaleString("fr-FR")}`,
-            pageWidth - 20,
-            75,
-            { align: "right" },
-        );
+    // -------- EN-TÊTE (inchangé) --------
+    doc.setFillColor(16, 185, 129);
+    doc.rect(0, 0, pageWidth, 45, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text(organisation.nom, pageWidth / 2, 15, { align: "center" });
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(organisation.slogan, pageWidth / 2, 23, { align: "center" });
+    doc.setFontSize(8);
+    doc.setTextColor(240, 240, 240);
+    doc.text(organisation.adresse, pageWidth / 2, 30, {
+        align: "center",
+        maxWidth: 170,
+    });
+    doc.text(
+        `${organisation.telephone} | ${organisation.email}`,
+        pageWidth / 2,
+        36,
+        { align: "center" },
+    );
+    doc.text(organisation.siteWeb, pageWidth / 2, 41, { align: "center" });
+    doc.setDrawColor(16, 185, 129);
+    doc.setLineWidth(0.5);
+    doc.line(10, 48, pageWidth - 10, 48);
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Historique des propositions de montant", pageWidth / 2, 58, {
+        align: "center",
+    });
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text(
+        `Dossier N°: ${NumDossier || propositionId}`,
+        pageWidth / 2,
+        66,
+        { align: "center" },
+    );
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(
+        `Exporté le: ${new Date().toLocaleString("fr-FR")}`,
+        pageWidth - 20,
+        75,
+        { align: "right" },
+    );
 
-        // -------- CHARGEMENT DES IMAGES --------
-        const rows = [];
-        const imagesData = [];
+    // -------- PRÉPARATION DES DONNÉES AVEC IMAGES --------
+    const rows = [];
+    const imageMap = []; // index 0 correspond à la ligne 0 du tableau
 
-        for (const prop of propositions) {
-            let signatureText = "Non signé";
-            let imageBase64 = null;
-            if (prop.signature_path) {
-                try {
-                    const response = await fetch(
-                        `/storage/${prop.signature_path}`,
-                    );
-                    if (!response.ok) throw new Error("Erreur chargement");
-                    const blob = await response.blob();
-                    const base64 = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.readAsDataURL(blob);
-                    });
-                    imageBase64 = base64;
-                    signatureText = "Oui";
-                } catch (e) {
-                    console.error("Erreur signature", e);
-                    signatureText = "Erreur";
-                }
+    for (const prop of propositions) {
+        let imageBase64 = null;
+        if (prop.signature_path) {
+            try {
+                const response = await fetch(`/storage/${prop.signature_path}`);
+                if (!response.ok) throw new Error("Erreur chargement");
+                const blob = await response.blob();
+                const base64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+                imageBase64 = base64;
+            } catch (e) {
+                console.error("Erreur signature", e);
             }
-            rows.push({
-                index: rows.length + 1,
-                nom: prop.nom || prop.signed_by || "",
-                role: prop.role || "",
-                montant: `${formatCurrency(prop.montant_propose || prop.montant || 0)} ${getCurrencySymbol(prop.devise || "CDF")}`,
-                commentaire: prop.commentaire || "Aucun commentaire",
-                date: formatDate(prop.created_at || prop.date),
-                signature: signatureText,
-                image: imageBase64,
-            });
-            imagesData.push({
-                nom: prop.nom || prop.signed_by || "",
-                image: imageBase64,
-            });
         }
+        // On garde l'image pour l'ajouter dans la cellule
+        imageMap.push(imageBase64);
 
-        // -------- TABLEAU PRINCIPAL --------
-        const tableData = rows.map((r) => [
-            r.index,
-            r.nom,
-            r.role,
-            r.montant,
-            r.commentaire,
-            r.date,
-            r.signature,
+        // Données du tableau (sans l'image dans le texte)
+        rows.push([
+            (rows.length + 1).toString(),
+            prop.nom || prop.signed_by || "",
+            prop.role || "",
+            `${formatCurrency(prop.montant_propose || prop.montant || 0)} ${getCurrencySymbol(prop.devise || "CDF")}`,
+            prop.commentaire || "Aucun commentaire",
+            formatDate(prop.created_at || prop.date),
+            prop.signature_path ? "" : "Aucune", // texte de remplacement (sera masqué si image)
         ]);
+    }
 
-        doc.autoTable({
-            startY: 80,
-            head: [
-                [
-                    "#",
-                    "Signataire",
-                    "Rôle",
-                    "Montant",
-                    "Commentaire",
-                    "Date",
-                    "Signature",
-                ],
+    // -------- GÉNÉRATION DU TABLEAU --------
+    doc.autoTable({
+        startY: 80,
+        head: [
+            [
+                "#",
+                "Signataire",
+                "Rôle",
+                "Montant",
+                "Commentaire",
+                "Date",
+                "Signature",
             ],
-            body: tableData,
-            theme: "striped",
-            headStyles: {
-                fillColor: [16, 185, 129],
-                textColor: [255, 255, 255],
-                fontStyle: "bold",
-                halign: "center",
-            },
-            styles: {
-                fontSize: 8,
-                cellPadding: 2,
-                lineColor: [200, 200, 200],
-                lineWidth: 0.1,
-            },
-            columnStyles: {
-                0: { cellWidth: 8, halign: "center" },
-                1: { cellWidth: 30 },
-                2: { cellWidth: 25 },
-                3: { cellWidth: 25, halign: "right" },
-                4: { cellWidth: 50 },
-                5: { cellWidth: 28, halign: "center" },
-                6: { cellWidth: 25, halign: "center" },
-            },
-            alternateRowStyles: { fillColor: [245, 245, 245] },
-            margin: { left: 10, right: 10 },
-        });
+        ],
+        body: rows,
+        theme: "striped",
+        headStyles: {
+            fillColor: [16, 185, 129],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            halign: "center",
+        },
+        styles: {
+            fontSize: 8,
+            cellPadding: 2,
+            lineColor: [200, 200, 200],
+            lineWidth: 0.1,
+        },
+        columnStyles: {
+            0: { cellWidth: 8, halign: "center" },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 25 },
+            3: { cellWidth: 25, halign: "right" },
+            4: { cellWidth: 50 },
+            5: { cellWidth: 28, halign: "center" },
+            6: { cellWidth: 30, halign: "center" }, // colonne signature plus large
+        },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { left: 10, right: 10 },
 
-        const finalY = doc.lastAutoTable.finalY + 10;
-
-        // -------- SECTION SIGNATURES EN IMAGES --------
-        if (imagesData.some((item) => item.image)) {
-            doc.addPage();
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Signatures des intervenants", pageWidth / 2, 20, {
-                align: "center",
-            });
-
-            let y = 30;
-            const imgWidth = 60;
-            const imgHeight = 30;
-            const xStart = (pageWidth - imgWidth) / 2;
-
-            for (const item of imagesData) {
-                if (item.image) {
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "normal");
-                    doc.text(item.nom, pageWidth / 2, y, { align: "center" });
-                    y += 5;
+        // -------- AJOUT DES IMAGES DANS LA COLONNE SIGNATURE --------
+        didDrawCell: function (data) {
+            // Vérifier si c'est la colonne Signature (index 6)
+            if (data.column.index === 6) {
+                const rowIndex = data.row.index;
+                const image = imageMap[rowIndex];
+                if (image) {
+                    // Récupérer les coordonnées de la cellule
+                    const x = data.cell.x + 1; // petit padding
+                    const y = data.cell.y + 1;
+                    const cellWidth = data.cell.width - 2;
+                    const cellHeight = data.cell.height - 2;
+                    // Calculer la taille pour que l'image s'adapte à la cellule
+                    const imgWidth = Math.min(cellWidth, 20); // max 20mm
+                    const imgHeight = (imgWidth * 0.75); // ratio 4:3
+                    // Centrer l'image
+                    const offsetX = (cellWidth - imgWidth) / 2;
+                    const offsetY = (cellHeight - imgHeight) / 2;
                     doc.addImage(
-                        item.image,
+                        image,
                         "JPEG",
-                        xStart,
-                        y,
+                        x + offsetX,
+                        y + offsetY,
                         imgWidth,
                         imgHeight,
                         undefined,
-                        "FAST",
+                        "FAST"
                     );
-                    y += imgHeight + 10;
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 20;
-                    }
                 }
             }
-        }
+        },
+    });
 
-        // -------- STATISTIQUES --------
-        if (signaturesStats) {
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(0, 0, 0);
-            doc.text("Récapitulatif des signatures:", 14, finalY);
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text(
-                `• Signatures effectuées: ${signaturesStats.total_signatures}/${signaturesStats.total_intervenants}`,
-                20,
-                finalY + 7,
-            );
-            doc.text(
-                `• Pourcentage d'avancement: ${signaturesStats.pourcentage_avancement}%`,
-                20,
-                finalY + 14,
-            );
-            doc.text(
-                `• Reste à signer: ${signaturesStats.reste_a_signer} signature(s)`,
-                20,
-                finalY + 21,
-            );
-        }
+    const finalY = doc.lastAutoTable.finalY + 10;
 
-        // -------- PIED DE PAGE --------
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-            doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setTextColor(150, 150, 150);
-            doc.text(
-                `COOPEC AKIBA YETU - Document officiel - Page ${i} sur ${pageCount}`,
-                pageWidth / 2,
-                doc.internal.pageSize.getHeight() - 10,
-                { align: "center" },
-            );
-        }
-
-        doc.save(
-            `Historique_Propositions_Dossier_${NumDossier || propositionId}.pdf`,
+    // -------- STATISTIQUES --------
+    if (signaturesStats) {
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("Récapitulatif des signatures:", 14, finalY);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text(
+            `• Signatures effectuées: ${signaturesStats.total_signatures}/${signaturesStats.total_intervenants}`,
+            20,
+            finalY + 7,
         );
-    };
+        doc.text(
+            `• Pourcentage d'avancement: ${signaturesStats.pourcentage_avancement}%`,
+            20,
+            finalY + 14,
+        );
+        doc.text(
+            `• Reste à signer: ${signaturesStats.reste_a_signer} signature(s)`,
+            20,
+            finalY + 21,
+        );
+    }
+
+    // -------- PIED DE PAGE --------
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text(
+            `COOPEC AKIBA YETU - Document officiel - Page ${i} sur ${pageCount}`,
+            pageWidth / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: "center" },
+        );
+    }
+
+    doc.save(
+        `Historique_Propositions_Dossier_${NumDossier || propositionId}.pdf`,
+    );
+};
     const dataToShow = propositions;
 
     if (loading) {
@@ -827,8 +1036,8 @@ const PropositionsHistory = ({ propositionId, NumDossier, onClose = null }) => {
                                                             >
                                                                 <MdStar
                                                                     size={10}
-                                                                />{" "}
-                                                                Dernière
+                                                                />
+                                                                {/* Dernière */}
                                                             </span>
                                                         )}
                                                     </span>
